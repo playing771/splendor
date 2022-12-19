@@ -1,5 +1,7 @@
 import { ICardShape } from "../../interfaces/card";
 
+const GREEN_DECK = ['1','2','3'];
+const YELLOW_DECK = ['5','6','8'];
 export class Deck {
   public name: string = '';
   public cards: ICardShape[];
@@ -17,3 +19,6 @@ export class Deck {
     return this.cards.splice(0, count);
   }
 }
+
+
+const deck = new Deck({})
