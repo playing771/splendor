@@ -3,8 +3,8 @@ export interface IBaseDeckConfig<C> {
   cards: Array<C>;
 }
 
-export interface IBaseDeck<C> {
+export interface IBaseDeckShape<C> {
   name: string;
   cards: Array<C>;
-  getTopCard(): C;
+  getTop(): C;
 }
