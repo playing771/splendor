@@ -1,7 +1,11 @@
 import { ICardShape } from "../../interfaces/card";
 import { BaseDeck } from "./BaseDeck"
 
-const CARDS_MOCKED = [{ id: "one" }, { id: "two" }, { id: "three" }]
+const CARDS_MOCKED = [
+  { id: "one" },
+  { id: "two" },
+  { id: "three" }
+]
 
 describe('Deck functionality', () => {
 
@@ -21,6 +25,13 @@ describe('Deck functionality', () => {
     expect(deck.getTop().id).toBe(CARDS_MOCKED[2].id)
     expect(deck.getTop().id).toBe(CARDS_MOCKED[1].id)
     expect(deck.getTop().id).toBe(CARDS_MOCKED[0].id)
+  })
+
+  it('can give top n cards', () => {
+    const deck = new BaseDeck({ cards: CARDS_MOCKED, name: 'TestDeck' });
+    const cards = deck.getTopCards(2);
+
+    expect(cards[0].id).toBe(CARDS_MOCKED[CARDS_MOCKED.length-1].id);
   })
 
   // it('can give N cards from top', () => {

@@ -33,4 +33,5 @@ export type TGameTableConfig<C> = {
   [ETokenColor.Green]: number,
   [ETokenColor.Red]: number,
   [ETokenColor.White]: number,
+  initialCountCard: number
 };

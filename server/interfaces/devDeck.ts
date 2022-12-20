@@ -1,11 +1,10 @@
 import { IBaseDeckConfig, IBaseDeckShape } from "./baseDeck";
 
 export enum EDevDeckLevel {
-  First, // green 
-  Second, // yellow
-  Third // blue
+  First = "First", // green 
+  Second = "Second", // yellow
+  Third = "Third" // blue
 }
-
 
 export interface IDevDeckConfig<C> extends IBaseDeckConfig<C> {
   level: EDevDeckLevel
