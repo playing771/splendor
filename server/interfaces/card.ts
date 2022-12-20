@@ -1,18 +1,12 @@
-export enum ECardColor {
-  Red = 'red',
-  Blue = 'blue',
-  White = 'white',
-  Brown = 'brown',
-  Green = 'green',
-}
+import { ETokenColor } from "./token";
 
 export type TCardCost = {
-  [key in ECardColor]: number
+  [key in ETokenColor]: number
 }
 
 export interface ICardShape {
   id: string;
-  color: ECardColor;
+  color: ETokenColor;
   score: number;
   cost: TCardCost
 }

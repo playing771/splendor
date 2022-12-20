@@ -1,7 +1,10 @@
-import { ECardColor } from "./card";
-
 export enum ETokenColor {
-  Gold = 'gold'
+  Gold = 'gold',
+  Red = 'red',
+  Blue = 'blue',
+  White = 'white',
+  Brown = 'brown',
+  Green = 'green',
 }
 
 export interface ITokenShape {

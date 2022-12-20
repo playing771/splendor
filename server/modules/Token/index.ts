@@ -7,6 +7,6 @@ export class Token implements ITokenShape{
     this.color = color
   }
 }
-export const createdToken = (config: ITokenShape) => {
+export const createToken = (config: ITokenShape) => {
   return new Token(config)
 }

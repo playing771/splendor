@@ -1,8 +1,9 @@
-import { ECardColor, ICardShape, TCardCost } from '../../interfaces/card'
+import { ICardShape, TCardCost } from '../../interfaces/card'
+import { ETokenColor } from '../../interfaces/token';
 
 export class Card implements ICardShape {
   id: string;
-  color: ECardColor;
+  color: ETokenColor;
   score: number;
   cost: TCardCost;
 
