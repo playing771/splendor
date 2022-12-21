@@ -1,8 +1,8 @@
-import { GameTable } from '.';
+import { GameTable } from '../GameTable';
 import { EDevDeckLevel } from '../../interfaces/devDeck';
 import { TGameTableConfig } from '../../interfaces/gameTable';
 import { ETokenColor } from '../../interfaces/token';
-import { TableManager } from './TableManager';
+import { TableManager } from '.';
 
 const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {
   initialCountCard: 4,

@@ -1,47 +1,43 @@
-import { EDevDeckLevel, IDevDeckShape } from '../../interfaces/devDeck';
-import {
-  TGameTableConfig,
-  TGameTableRowShape,
-  TGameTableShape,
-} from '../../interfaces/gameTable';
+import { EDevDeckLevel } from '../../interfaces/devDeck';
+import { TGameTableShape } from '../../interfaces/gameTable';
+import { ITableManagerShape } from '../../interfaces/tableManager';
 import { ETokenColor } from '../../interfaces/token';
-import { DevDeck } from '../DevDeck';
 
-export class GameTable<C> implements TGameTableShape<C> {
-  [EDevDeckLevel.First]: TGameTableRowShape<C>;
-  [EDevDeckLevel.Second]: TGameTableRowShape<C>;
-  [EDevDeckLevel.Third]: TGameTableRowShape<C>;
+export class TableManager<C> implements ITableManagerShape<C> {
+  table: TGameTableShape<C>;
 
-  [ETokenColor.Blue]: number;
-  [ETokenColor.Brown]: number;
-  [ETokenColor.Gold]: number;
-  [ETokenColor.Green]: number;
-  [ETokenColor.Red]: number;
-  [ETokenColor.White]: number;
+  takeToken(color: ETokenColor, count: number) {
+    this.table[color] += count;
+  }
 
-  constructor(config: TGameTableConfig<C>) {
-    
-    // Rows initialize    
-    Object.values(EDevDeckLevel).forEach((level) => {
-      const initialCards = config[level];
-      
-      const deck = new DevDeck({
-        level,
-        cards: initialCards,
-        name: `${level} level deck`,
-      })
+  giveToken(color: ETokenColor, count: number) {
+    const targetTokenCount = this.table[color];
+    if (count > targetTokenCount) {
+      throw Error('No more token');
+    }
 
-      const topcards = deck.getTopCards(config.initialCountCard);
-      this[level] = {
-        cards: topcards,
-        deck,
-      };
-    });
+    this.table[color] = targetTokenCount - count;
+    return count;
+  }
 
-    Object.values(ETokenColor).forEach((color: ETokenColor) => {
-      this[color] = config[color];
-    });
+  giveCardFromDeck(level: EDevDeckLevel): C {
+    return this.table[level].deck.getTop();
+  }
 
-    
+  giveCardFromTable(level: EDevDeckLevel, index: number): C {
+    const currentCard = this.table[level].cards[index];
+    this.table[level].cards[index] = this.table[level].deck.getTop();
+    return currentCard;
+  }
+
+  buyCard(): C {
+    throw new Error('Method not implemented.');
+  }
+  holdCard(): C {
+    throw new Error('Method not implemented.');
+  }
+  
+  constructor(table: TGameTableShape<C>) {
+    this.table = table;
   }
 }
