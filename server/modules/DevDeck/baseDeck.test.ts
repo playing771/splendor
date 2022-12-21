@@ -30,7 +30,6 @@ describe('Deck functionality', () => {
   it('can give top n cards', () => {
     const deck = new BaseDeck({ cards: CARDS_MOCKED, name: 'TestDeck' });
     const cards = deck.getTopCards(2);
-
     expect(cards[0].id).toBe(CARDS_MOCKED[CARDS_MOCKED.length-1].id);
   })
 

@@ -40,6 +40,7 @@ describe('Table functional', () => {
   it('Test give card from deck 1', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
+    
     expect(tableManager.giveCardFromDeck(EDevDeckLevel.First).id).toBe(
       'one_first'
     );
@@ -48,6 +49,7 @@ describe('Table functional', () => {
   it('Test give card from deck 2', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
+
     expect(tableManager.giveCardFromDeck(EDevDeckLevel.Second).id).toBe(
       'one_second'
     )
@@ -56,6 +58,7 @@ describe('Table functional', () => {
   it('Test give card from table', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
+
     expect(tableManager.giveCardFromTable(EDevDeckLevel.Second, 3).id).toBe(
       'two_second'
     )
@@ -63,4 +66,20 @@ describe('Table functional', () => {
     expect(tableManager.table[EDevDeckLevel.Second].deck.cards).toHaveLength(0);
   });
   
+  it('Test give token from table', ()=> {
+    const table = new GameTable(TABLE_CONFIG);
+    const tableManager = new TableManager(table);
+
+    expect(tableManager.giveToken(ETokenColor.Blue, 2)).toBe(2)
+    expect(tableManager.table.blue).toBe(3)
+  })
+
+  it('Test take token from table', ()=> {
+    const table = new GameTable(TABLE_CONFIG);
+    const tableManager = new TableManager(table);
+    tableManager.takeToken(ETokenColor.Blue, 1)
+
+    expect(tableManager.table.blue).toBe(6)
+  })
+
 });
