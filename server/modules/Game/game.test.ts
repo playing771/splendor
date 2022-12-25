@@ -4,7 +4,8 @@ describe('Game functionality', () => {
 
   it('', () => {
     const game = new Game();
-    console.log(game);
+    game.turns.transition('next')
+    console.log(game.turns);
     
   })
 })
