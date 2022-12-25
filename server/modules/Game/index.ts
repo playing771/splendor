@@ -9,19 +9,19 @@ import { CARDS_MAP_BY_LEVEL } from '../../static/cards';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
+import { addStateLogger } from '../StateMachine/addStateLogger';
 import { IStateMachine, TStateMachineDefinition } from '../StateMachine/models';
 import { TableManager } from '../TableManager';
-
-const PLAYERS: Array<{ id: string; name: string }> = [
-  {
-    id: 'sdfsf',
-    name: 'Maxim',
-  },
-  {
-    id: '134rwfd',
-    name: 'Evgenii',
-  },
-];
+import {
+  createGameSMDefinition,
+  EGameBasicState,
+  TTurnEvent,
+} from './createGameSMDefinition';
+import {
+  createPlayerSMDefinition,
+  EPlayerActions,
+  EPLayerState,
+} from './createPlayerSMDefinition';
 
 const tableConfig: TGameTableConfig<ICardShape> = {
   initialCountCard: 3,
@@ -36,85 +36,74 @@ const tableConfig: TGameTableConfig<ICardShape> = {
   [ETokenColor.White]: 5,
 };
 
-type TGameState = 'INITIALIZATION' | 'GAME_ENDED';
-type TTurnEvent = 'next' | 'start' | 'end';
-
-const createTurnsSMDefinition = <P extends string>(players: P[]) => {
-  const definition = players.reduce((acc, current, index) => {
-    const nextPlayerIndex = (index + 1) % players.length;
-    acc[current] = {
-      transitions: {
-        next: {
-          action: () => null,
-          target: players[nextPlayerIndex],
-        },
-      },
-    };
-    return acc;
-  }, {} as TStateMachineDefinition<P, TTurnEvent>);
-
-  const finalDefinition: TStateMachineDefinition<P | TGameState, TTurnEvent> = {
-    ...definition,
-    INITIALIZATION: {
-      transitions: {
-        start: {
-          action: () => null,
-          target: players[0],
-        },
-      },
-    },
-    GAME_ENDED: {
-      transitions: {
-        end: {
-          action: () => null,
-          target: 'INITIALIZATION',
-        },
-      },
-    },
-  };
-
-  return finalDefinition;
-};
-
-// {
-// INITIALIZATION: {
-//   transitions: {
-//     nextPlayer: {
-//       action: ()=>null,
-//       target: 'A'
-//     }
-//   }
-// },
-//   end: {
-//   transitions: {
-//     nextPlayer: {
-//       action: ()=>null,
-//       target: 'INITIALIZATION'
-//     }
-//   }
-// }
-// }
-// as TStateMachineDefinition<TGameState, TTurnEvent>
-
 export class Game implements IGameShape<ICardShape> {
+  id: string;
   table: TGameTableShape<ICardShape>;
   tableManager: ITableManagerShape<ICardShape>;
-  players: IPlayerShape[];
-  id: string;
-  turns: IStateMachine<typeof PLAYERS[number]['id'], TTurnEvent>;
 
-  constructor() {
+  sm: IStateMachine<string | EGameBasicState, TTurnEvent>;
+
+  players: IPlayerShape[];
+  smPlayers: { [playerId: string]: IStateMachine<EPLayerState, EPlayerActions> };
+
+  constructor(players: Array<{ id: string; name: string }>) {
+    this.id = `${Math.random()}`;
+
     this.table = new GameTable(tableConfig);
     this.tableManager = new TableManager(this.table);
-    this.id = `${Math.random()}`;
-    this.players = PLAYERS.map(({ id, name }) => new Player(name, id));
-    const smDefinition = createTurnsSMDefinition(
-      PLAYERS.map((player) => player.id)
-    );
-    console.log('smDefinition', smDefinition);
 
-    this.turns = createStateMachine(PLAYERS[0].id, smDefinition);
+    this.players = players.map(({ id, name }) => new Player(name, id));
+    this.smPlayers = this.initializePlayersSM();
+
+    const smDefinition = createGameSMDefinition(this.players, {
+      startTurn: this.startTurnPlayerActionCreator,
+      endTurn: this.endTurnPlayerActionCreator
+    });
+
+    this.sm = createStateMachine(EGameBasicState.Initialization, smDefinition);
+
+    this.startGame();
   }
 
-  getTokensByPlayer(playerId: string, color: ETokenColor, count: number) {}
+  private initializePlayersSM = () => {
+    return this.players.reduce((acc, current) => {
+      const playerStateMachine = createStateMachine<
+        EPLayerState,
+        EPlayerActions
+      >(EPLayerState.Idle, createPlayerSMDefinition());
+
+      acc[current.id] = playerStateMachine;
+
+      return acc;
+    }, {} as { [key: string]: IStateMachine<EPLayerState, EPlayerActions> });
+  }
+
+
+  startGame = () => {
+    this.sm.dispatchTransition('start');
+  };
+
+  startTurnPlayerActionCreator = (playerId: string) => () => {
+    this.smPlayers[playerId].dispatchTransition(EPlayerActions.StartTurn);
+  };
+
+  endTurnPlayerActionCreator = (playerId: string) => () => {
+    this.smPlayers[playerId].dispatchTransition(EPlayerActions.EndTurn);
+  };
+
+  dispatchPlayerAction = () => {
+    // this.sm.value
+  };
+
+  getPlayer = (playerId: string) => {
+    const targetPlayer = this.players.find((player) => player.id === playerId);
+
+    if (!targetPlayer) {
+      throw Error(`cant find player with id: ${playerId}`);
+    }
+
+    return targetPlayer;
+  };
+
+  getTokensByPlayer(playerId: string, color: ETokenColor, count: number) { }
 }
