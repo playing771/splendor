@@ -56,8 +56,8 @@ export class Game implements IGameShape<ICardShape> {
     this.smPlayers = this.initializePlayersSM();
 
     const smDefinition = createGameSMDefinition(this.players, {
-      startTurn: this.startTurnPlayerActionCreator,
-      endTurn: this.endTurnPlayerActionCreator
+      startPlayerTurn: this.startTurnPlayerActionCreator,
+      endPlayerTurn: this.endTurnPlayerActionCreator
     });
 
     this.sm = createStateMachine(EGameBasicState.Initialization, smDefinition);

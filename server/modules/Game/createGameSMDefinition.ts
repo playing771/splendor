@@ -13,8 +13,8 @@ export type TTurnEvent = 'next' | 'start' | 'end';
 export const createGameSMDefinition = (
   players: IPlayerShape[],
   actionCreators: {
-    startTurn: (playerId: string) => () => void;
-    endTurn: (playerId: string) => () => void;
+    startPlayerTurn: (playerId: string) => () => void;
+    endPlayerTurn: (playerId: string) => () => void;
   }
 ) => {
   const playerIds = players.map((player) => player.id);
@@ -31,8 +31,8 @@ export const createGameSMDefinition = (
 
     acc[current] = {
       actions: {
-        onEnter: actionCreators.startTurn(current),
-        onExit: actionCreators.endTurn(current)
+        onEnter: actionCreators.startPlayerTurn(current),
+        onExit: actionCreators.endPlayerTurn(current)
       },
       transitions: {
         next: {
