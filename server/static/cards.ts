@@ -64,7 +64,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
         [ETokenColor.Brown]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
-        [ETokenColor.Red]: 1,
+        [ETokenColor.Red]: 0,
         [ETokenColor.White]: 0,
       },
       score: 0

@@ -6,11 +6,11 @@ import { ETokenColor } from '../../interfaces/token';
 export class TableManager<C> implements ITableManagerShape<C> {
   table: TGameTableShape<C>;
 
-  takeToken(color: ETokenColor, count: number) {
+  takeTokens(color: ETokenColor, count: number) {
     this.table[color] += count;
   }
 
-  giveToken(color: ETokenColor, count: number) {
+  giveTokens(color: ETokenColor, count: number) {
     const targetTokenCount = this.table[color];
     if (count > targetTokenCount) {
       throw Error('No more token');
@@ -24,7 +24,7 @@ export class TableManager<C> implements ITableManagerShape<C> {
     return this.table[level].deck.getTop();
   }
 
-  giveCardFromTable(level: EDevDeckLevel, index: number): C {
+  public giveCardFromTable(level: EDevDeckLevel, index: number): C {
     const currentCard = this.table[level].cards[index];
     this.table[level].cards[index] = this.table[level].deck.getTop();
     return currentCard;

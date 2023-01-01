@@ -3,12 +3,16 @@ import { addStateLogger } from "../StateMachine/addStateLogger";
 export enum EPLayerState {
   Idle = "PLAYER_IDLE",
   Active = 'PLAYER_ACTIVE',
+  TooManyTokens = 'PLAYER_TOO_MANY_TOKENS',
   OutOfACtion = 'PLAYER_OUT_OF_ACTIONS'
 }
 
-export enum EPlayerActions {
-  BuyCard = 'BUY_CARD',
+export enum EPlayerAction {
   StartTurn = 'START_TURN',
+  BuyCard = 'BUY_CARD',
+  TakeTokens = 'TAKE_TOKENS',
+  TakeTokensOverLimit = 'TAKE_TOKENS_OVER_LIMIT',
+  ReturnTokens = 'RETURN_TOKENS',
   EndTurn = 'END_TURN'
 }
 
@@ -16,24 +20,37 @@ export const createPlayerSMDefinition = ()=> {
   const playerSMDefinition = {
     [EPLayerState.Idle]: {
       transitions: {
-        [EPlayerActions.StartTurn]: {
+        [EPlayerAction.StartTurn]: {
           target: EPLayerState.Active
         }
       }
     },
     [EPLayerState.Active]: {
       transitions: {
-        [EPlayerActions.BuyCard]: {
+        [EPlayerAction.TakeTokens]: {
           target: EPLayerState.OutOfACtion
         },
-        [EPlayerActions.EndTurn]: {
+        [EPlayerAction.TakeTokensOverLimit]: {
+          target: EPLayerState.TooManyTokens
+        },
+        [EPlayerAction.BuyCard]: {
+          target: EPLayerState.OutOfACtion
+        },
+        [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle
+        }
+      }
+    },
+    [EPLayerState.TooManyTokens]: {
+      transitions: {
+        [EPlayerAction.ReturnTokens]: {
+          target: EPLayerState.OutOfACtion
         }
       }
     },
     [EPLayerState.OutOfACtion]: {
       transitions: {
-        [EPlayerActions.EndTurn]: {
+        [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle
         }
       }

@@ -70,14 +70,14 @@ describe('Table functional', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
 
-    expect(tableManager.giveToken(ETokenColor.Blue, 2)).toBe(2)
+    expect(tableManager.giveTokens(ETokenColor.Blue, 2)).toBe(2)
     expect(tableManager.table.blue).toBe(3)
   })
 
   it('Test take token from table', ()=> {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
-    tableManager.takeToken(ETokenColor.Blue, 1)
+    tableManager.takeTokens(ETokenColor.Blue, 1)
 
     expect(tableManager.table.blue).toBe(6)
   })

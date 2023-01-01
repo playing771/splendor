@@ -1,7 +1,7 @@
 import { ETokenColor } from "./token";
 
 export type TCardCost = {
-  [key in ETokenColor]: number
+  [key in ETokenColor]?: number
 }
 
 export interface ICardShape {

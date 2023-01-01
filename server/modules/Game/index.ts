@@ -1,99 +1,154 @@
+import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../interfaces/card';
 import { EDevDeckLevel } from '../../interfaces/devDeck';
 import { IGameShape } from '../../interfaces/game';
 import { TGameTableConfig, TGameTableShape } from '../../interfaces/gameTable';
-import { IPlayerShape } from '../../interfaces/player';
+import { IPlayerConfig, IPlayerShape } from '../../interfaces/player';
 import { ITableManagerShape } from '../../interfaces/tableManager';
 import { ETokenColor } from '../../interfaces/token';
 import { CARDS_MAP_BY_LEVEL } from '../../static/cards';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
-import { addStateLogger } from '../StateMachine/addStateLogger';
-import { IStateMachine, TStateMachineDefinition } from '../StateMachine/models';
+import { IStateMachine } from '../StateMachine/models';
 import { TableManager } from '../TableManager';
+import { TOKENS_LIMIT } from './constants';
+import { countTokens } from './countTokens';
 import {
   createGameSMDefinition,
   EGameBasicState,
-  TTurnEvent,
+  TGameEvent,
 } from './createGameSMDefinition';
 import {
   createPlayerSMDefinition,
-  EPlayerActions,
+  EPlayerAction,
   EPLayerState,
 } from './createPlayerSMDefinition';
 
-const tableConfig: TGameTableConfig<ICardShape> = {
-  initialCountCard: 3,
-  [EDevDeckLevel.First]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.First]],
-  [EDevDeckLevel.Second]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.Second]],
-  [EDevDeckLevel.Third]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.Third]],
-  [ETokenColor.Blue]: 5,
-  [ETokenColor.Brown]: 5,
-  [ETokenColor.Gold]: 5,
-  [ETokenColor.Green]: 5,
-  [ETokenColor.Red]: 5,
-  [ETokenColor.White]: 5,
-};
+
+type PlayerId = string;
+type TGameState = PlayerId | EGameBasicState;
+
+interface IGameConfig {
+  players: IPlayerConfig[];
+  tableConfig: TGameTableConfig<ICardShape>
+}
 
 export class Game implements IGameShape<ICardShape> {
-  id: string;
-  table: TGameTableShape<ICardShape>;
-  tableManager: ITableManagerShape<ICardShape>;
+  public id: string;
+  public table: TGameTableShape<ICardShape>;
 
-  sm: IStateMachine<string | EGameBasicState, TTurnEvent>;
+  private players: IPlayerShape[];
+  private tableManager: ITableManagerShape<ICardShape>;
+  private sm: IStateMachine<TGameState, TGameEvent>;
+  private smPlayers: {
+    [playerId: PlayerId]: IStateMachine<EPLayerState, EPlayerAction>;
+  };
 
-  players: IPlayerShape[];
-  smPlayers: { [playerId: string]: IStateMachine<EPLayerState, EPlayerActions> };
-
-  constructor(players: Array<{ id: string; name: string }>) {
+  constructor({ players, tableConfig }: IGameConfig) {
     this.id = `${Math.random()}`;
 
     this.table = new GameTable(tableConfig);
     this.tableManager = new TableManager(this.table);
 
-    this.players = players.map(({ id, name }) => new Player(name, id));
+    this.players = players.map((playerConfig) => new Player(playerConfig));
     this.smPlayers = this.initializePlayersSM();
 
-    const smDefinition = createGameSMDefinition(this.players, {
-      startPlayerTurn: this.startTurnPlayerActionCreator,
-      endPlayerTurn: this.endTurnPlayerActionCreator
+    const gameSMDefinition = createGameSMDefinition(this.players, {
+      [EPlayerAction.StartTurn]: this.startTurnPlayerActionCreator,
+      [EPlayerAction.EndTurn]: this.endTurnPlayerActionCreator,
     });
 
-    this.sm = createStateMachine(EGameBasicState.Initialization, smDefinition);
-
-    this.startGame();
+    this.sm = createStateMachine(
+      EGameBasicState.Initialization,
+      gameSMDefinition
+    );
+    this.start();
   }
 
   private initializePlayersSM = () => {
     return this.players.reduce((acc, current) => {
       const playerStateMachine = createStateMachine<
         EPLayerState,
-        EPlayerActions
+        EPlayerAction
       >(EPLayerState.Idle, createPlayerSMDefinition());
 
       acc[current.id] = playerStateMachine;
 
       return acc;
-    }, {} as { [key: string]: IStateMachine<EPLayerState, EPlayerActions> });
-  }
+    }, {} as { [key: string]: IStateMachine<EPLayerState, EPlayerAction> });
+  };
 
-
-  startGame = () => {
+  public start = () => {
     this.sm.dispatchTransition('start');
   };
 
-  startTurnPlayerActionCreator = (playerId: string) => () => {
-    this.smPlayers[playerId].dispatchTransition(EPlayerActions.StartTurn);
+  public move = () => {
+    this.sm.dispatchTransition('next');
   };
 
-  endTurnPlayerActionCreator = (playerId: string) => () => {
-    this.smPlayers[playerId].dispatchTransition(EPlayerActions.EndTurn);
+  public getState = () => {
+    return this.sm.value;
   };
 
-  dispatchPlayerAction = () => {
-    // this.sm.value
+  public getPlayerState = (playerId: string) => {
+    return this.smPlayers[playerId].value;
   };
+
+  public dispatchPlayerAction = (playerId: string, action: EPlayerAction) => {
+    this.smPlayers[playerId].dispatchTransition(action);
+  };
+
+  public showPlayerTokens = (playerId: string) => {
+    const { tokens, tokensCount } = this.getPlayer(playerId);
+    return { count: tokensCount, tokens };
+  }
+
+  public giveTokensToPlayer(
+    playerId: string,
+    tokens: { [key in ETokenColor]?: number }
+  ) {
+    const targetPlayer = this.getPlayer(playerId);
+
+    for (const color of getKeys(tokens)) {
+      if (typeof tokens[color] === 'number') {
+        const count = this.tableManager.giveTokens(
+          color,
+          tokens[color] as number
+        );
+        targetPlayer.getTokens(color, count);
+      }
+    }
+
+    this.dispatchPlayerAction(
+      playerId,
+      targetPlayer.tokensCount <= TOKENS_LIMIT
+        ? EPlayerAction.TakeTokens
+        : EPlayerAction.TakeTokensOverLimit
+    );
+  }
+
+  public buyCardByPlayer = (playerId: string, deckLvl: EDevDeckLevel, cardIdex: number): ICardShape => {
+    const targetPlayer = this.getPlayer(playerId);
+
+    const card = this.tableManager.giveCardFromTable(deckLvl, cardIdex);
+    targetPlayer.buyCard(card);
+    // targetPlayer.
+
+    return card;
+  }
+
+  private startTurnPlayerActionCreator = (playerId: string) => () => {
+    this.dispatchPlayerAction(playerId, EPlayerAction.StartTurn);
+  };
+
+  private endTurnPlayerActionCreator = (playerId: string) => () => {
+    this.dispatchPlayerAction(playerId, EPlayerAction.EndTurn);
+  };
+
+  // private takeTokensPlayerActionCreator = (playerId: string) => ()=> {
+  //   this.dispatchPlayerAction(playerId, EPlayerAction.TakeTokens);
+  // }
 
   getPlayer = (playerId: string) => {
     const targetPlayer = this.players.find((player) => player.id === playerId);
@@ -104,6 +159,4 @@ export class Game implements IGameShape<ICardShape> {
 
     return targetPlayer;
   };
-
-  getTokensByPlayer(playerId: string, color: ETokenColor, count: number) { }
 }

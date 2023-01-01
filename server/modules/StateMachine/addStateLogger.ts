@@ -5,6 +5,7 @@ const createLogStateTranzition =
     console.log(`${context} ${state} ${variant === 'to' ? 'BEGINS' : 'ENDS'}`);
 
 export const addStateLogger = (smDefinition: TStateMachineDefinition, context: string = '') => {
+  return
   // mutating actions object
   Object.keys(smDefinition).forEach((state) => {
     // persisting original onExit onEnter callbacks

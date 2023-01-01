@@ -1,6 +1,7 @@
 import { IPlayerShape } from '../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
+import { EPlayerAction } from './createPlayerSMDefinition';
 
 // export type TGameState = 'INITIALIZATION' | 'GAME_ENDED';
 export enum EGameBasicState {
@@ -8,21 +9,20 @@ export enum EGameBasicState {
   RoundStarted = 'ROUND_STARTED',
   GameEnded = 'GAME_ENDED',
 }
-export type TTurnEvent = 'next' | 'start' | 'end';
+export type TGameEvent = 'next' | 'start' | 'end';
 
 export const createGameSMDefinition = (
   players: IPlayerShape[],
   actionCreators: {
-    startPlayerTurn: (playerId: string) => () => void;
-    endPlayerTurn: (playerId: string) => () => void;
+    [EPlayerAction.StartTurn]: (playerId: string) => () => void;
+    [EPlayerAction.EndTurn]: (playerId: string) => () => void;
   }
 ) => {
   const playerIds = players.map((player) => player.id);
   const firstPlayerId = playerIds[0];
 
-
   // generating state machine definition for turns with correct players count
-  const definition = playerIds.reduce((acc, current, index) => {
+  const gameSMDefinition = playerIds.reduce((acc, current, index) => {
     const nextPlayerIndex = index + 1;
     const isLastPlyer = nextPlayerIndex === players.length;
     const nextState = isLastPlyer
@@ -31,8 +31,8 @@ export const createGameSMDefinition = (
 
     acc[current] = {
       actions: {
-        onEnter: actionCreators.startPlayerTurn(current),
-        onExit: actionCreators.endPlayerTurn(current)
+        onEnter: actionCreators[EPlayerAction.StartTurn](current),
+        onExit: actionCreators[EPlayerAction.EndTurn](current),
       },
       transitions: {
         next: {
@@ -44,17 +44,17 @@ export const createGameSMDefinition = (
       },
     };
     return acc;
-  }, {} as TStateMachineDefinition<string, TTurnEvent>);
+  }, {} as TStateMachineDefinition<string, TGameEvent>);
 
   // adding INITIALIZATION and GAME_ENDED states to generated definition
-  const finalDefinition: TStateMachineDefinition<
+  const finalGameSMDefinition: TStateMachineDefinition<
     string | EGameBasicState,
-    TTurnEvent
+    TGameEvent
   > = {
-    ...definition,
+    ...gameSMDefinition,
     [EGameBasicState.Initialization]: {
       actions: {
-        onExit: () => console.log('Test'),
+        // onExit: () => console.log('End of Initialization'),
       },
       transitions: {
         start: {
@@ -78,7 +78,7 @@ export const createGameSMDefinition = (
     },
   };
 
-  addStateLogger(finalDefinition, 'GAME_STATE:');
+  addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
 
-  return finalDefinition;
+  return finalGameSMDefinition;
 };
