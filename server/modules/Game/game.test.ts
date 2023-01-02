@@ -4,7 +4,7 @@ import { EDevDeckLevel } from '../../interfaces/devDeck';
 import { TGameTableConfig } from '../../interfaces/gameTable';
 import { IPlayerConfig } from '../../interfaces/player';
 import { ETokenColor } from '../../interfaces/token';
-import { CARDS_MAP_BY_LEVEL } from '../../static/cards';
+import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { EGameBasicState } from './createGameSMDefinition';
 import { EPlayerAction, EPLayerState } from './createPlayerSMDefinition';
 
@@ -23,15 +23,14 @@ const FIRST_PLAYER = PLAYERS[0];
 
 const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
   initialCardsOnTableCount: 3,
-  [EDevDeckLevel.First]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.First]],
-  [EDevDeckLevel.Second]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.Second]],
-  [EDevDeckLevel.Third]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.Third]],
   [ETokenColor.Blue]: 5,
   [ETokenColor.Black]: 5,
   [ETokenColor.Gold]: 5,
   [ETokenColor.Green]: 5,
   [ETokenColor.Red]: 5,
   [ETokenColor.White]: 5,
+
+  ...populateCardsByLevelFromPool([]) // TODO:
 };
 
 const GAME_CONFIG = {

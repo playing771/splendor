@@ -71,7 +71,7 @@ describe('Table functional', () => {
     const tableManager = new TableManager(table);
 
     expect(tableManager.giveTokens(ETokenColor.Blue, 2)).toBe(2)
-    expect(tableManager.table.blue).toBe(3)
+    expect(tableManager.table.Blue).toBe(3)
   })
 
   it('Test take token from table', ()=> {
@@ -79,7 +79,7 @@ describe('Table functional', () => {
     const tableManager = new TableManager(table);
     tableManager.takeTokens(ETokenColor.Blue, 1)
 
-    expect(tableManager.table.blue).toBe(6)
+    expect(tableManager.table.Blue).toBe(6)
   })
 
 });

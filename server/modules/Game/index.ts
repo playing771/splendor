@@ -6,7 +6,6 @@ import { TGameTableConfig, TGameTableShape } from '../../interfaces/gameTable';
 import { IPlayerConfig, IPlayerShape } from '../../interfaces/player';
 import { ITableManagerShape } from '../../interfaces/tableManager';
 import { ETokenColor } from '../../interfaces/token';
-import { CARDS_MAP_BY_LEVEL } from '../../static/cards';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
