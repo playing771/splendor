@@ -9,7 +9,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Blue,
       cost: {
         [ETokenColor.Blue]: 0,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -19,10 +19,10 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
     },
     {
       id: "first_two",
-      color: ETokenColor.Brown,
+      color: ETokenColor.Black,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 0,
+        [ETokenColor.Black]: 0,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -35,7 +35,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Red,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -48,7 +48,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Blue,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -61,7 +61,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.White,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 0,
@@ -76,7 +76,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Red,
       cost: {
         [ETokenColor.Blue]: 0,
-        [ETokenColor.Brown]: 2,
+        [ETokenColor.Black]: 2,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -89,7 +89,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.White,
       cost: {
         [ETokenColor.Blue]: 0,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -102,7 +102,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Green,
       cost: {
         [ETokenColor.Blue]: 2,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -115,7 +115,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Blue,
       cost: {
         [ETokenColor.Blue]: 0,
-        [ETokenColor.Brown]: 2,
+        [ETokenColor.Black]: 2,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 1,
         [ETokenColor.Red]: 1,
@@ -125,10 +125,10 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
     },
     {
       id: "second_five",
-      color: ETokenColor.Brown,
+      color: ETokenColor.Black,
       cost: {
         [ETokenColor.Blue]: 0,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 2,
         [ETokenColor.Red]: 1,
@@ -143,7 +143,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Green,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 2,
         [ETokenColor.Red]: 2,
@@ -156,7 +156,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Blue,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 2,
         [ETokenColor.Red]: 3,
@@ -169,7 +169,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.White,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 2,
         [ETokenColor.Red]: 2,
@@ -179,10 +179,10 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
     },
     {
       id: "third_four",
-      color: ETokenColor.Brown,
+      color: ETokenColor.Black,
       cost: {
         [ETokenColor.Blue]: 3,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 3,
         [ETokenColor.Red]: 2,
@@ -195,7 +195,7 @@ export const CARDS_MAP_BY_LEVEL: { [key in EDevDeckLevel]: ICardShape[] } = {
       color: ETokenColor.Green,
       cost: {
         [ETokenColor.Blue]: 1,
-        [ETokenColor.Brown]: 1,
+        [ETokenColor.Black]: 1,
         [ETokenColor.Gold]: 0,
         [ETokenColor.Green]: 2,
         [ETokenColor.Red]: 2,

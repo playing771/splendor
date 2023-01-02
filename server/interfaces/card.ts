@@ -1,3 +1,4 @@
+import { EDevDeckLevel } from "./devDeck";
 import { ETokenColor } from "./token";
 
 export type TCardCost = {
@@ -9,6 +10,7 @@ export interface ICardShape {
   color: ETokenColor;
   score: number;
   cost: TCardCost
+  lvl: EDevDeckLevel
 }
 
 // const card_one: ICardShape = {
@@ -17,7 +19,7 @@ export interface ICardShape {
 //   score: 7,
 //   cost: {
 //     [ECardColor.Blue]: 1,
-//     [ECardColor.Brown]: 4,
+//     [ECardColor.Black]: 4,
 //     [ECardColor.White]: 0,
 //     [ECardColor.Red]: 0,
 //     [ECardColor.Green]: 0,

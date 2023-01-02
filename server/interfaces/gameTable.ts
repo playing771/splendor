@@ -12,7 +12,7 @@ export type TGameTableShape<C> = {
   [EDevDeckLevel.Second]: TGameTableRowShape<C>;
   [EDevDeckLevel.Third]: TGameTableRowShape<C>;
   [ETokenColor.Blue]: number,
-  [ETokenColor.Brown]: number,
+  [ETokenColor.Black]: number,
   [ETokenColor.Gold]: number,
   [ETokenColor.Green]: number,
   [ETokenColor.Red]: number,
@@ -27,11 +27,12 @@ export type TGameTableConfig<C> = {
   [EDevDeckLevel.First]: Array<C>;
   [EDevDeckLevel.Second]: Array<C>;
   [EDevDeckLevel.Third]: Array<C>;
+
   [ETokenColor.Blue]: number,
-  [ETokenColor.Brown]: number,
+  [ETokenColor.Black]: number,
   [ETokenColor.Gold]: number,
   [ETokenColor.Green]: number,
   [ETokenColor.Red]: number,
   [ETokenColor.White]: number,
-  initialCountCard: number
+  initialCardsOnTableCount: number
 };

@@ -1,7 +1,7 @@
 import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../interfaces/card';
 import { EDevDeckLevel } from '../../interfaces/devDeck';
-import { IGameShape } from '../../interfaces/game';
+import { IGameConfig, IGameShape } from '../../interfaces/game';
 import { TGameTableConfig, TGameTableShape } from '../../interfaces/gameTable';
 import { IPlayerConfig, IPlayerShape } from '../../interfaces/player';
 import { ITableManagerShape } from '../../interfaces/tableManager';
@@ -29,10 +29,7 @@ import {
 type PlayerId = string;
 type TGameState = PlayerId | EGameBasicState;
 
-interface IGameConfig {
-  players: IPlayerConfig[];
-  tableConfig: TGameTableConfig<ICardShape>
-}
+
 
 export class Game implements IGameShape<ICardShape> {
   public id: string;
@@ -45,7 +42,7 @@ export class Game implements IGameShape<ICardShape> {
     [playerId: PlayerId]: IStateMachine<EPLayerState, EPlayerAction>;
   };
 
-  constructor({ players, tableConfig }: IGameConfig) {
+  constructor({ players, tableConfig }: IGameConfig & { players: IPlayerConfig[]}) {
     this.id = `${Math.random()}`;
 
     this.table = new GameTable(tableConfig);

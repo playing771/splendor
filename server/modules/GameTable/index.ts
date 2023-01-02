@@ -13,7 +13,7 @@ export class GameTable<C> implements TGameTableShape<C> {
   [EDevDeckLevel.Third]: TGameTableRowShape<C>;
 
   [ETokenColor.Blue]: number;
-  [ETokenColor.Brown]: number;
+  [ETokenColor.Black]: number;
   [ETokenColor.Gold]: number;
   [ETokenColor.Green]: number;
   [ETokenColor.Red]: number;
@@ -31,7 +31,7 @@ export class GameTable<C> implements TGameTableShape<C> {
         name: `${level} level deck`,
       })
 
-      const topcards = deck.getTopCards(config.initialCountCard);
+      const topcards = deck.getTopCards(config.initialCardsOnTableCount);
       this[level] = {
         cards: topcards,
         deck,

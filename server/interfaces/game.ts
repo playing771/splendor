@@ -1,5 +1,6 @@
-import { TGameTableShape } from "./gameTable";
-import { IPlayerShape } from "./player";
+import { ICardShape } from "./card";
+import { TGameTableConfig, TGameTableShape } from "./gameTable";
+import { IPlayerConfig, IPlayerShape } from "./player";
 import { ITableManagerShape } from "./tableManager";
 
 export interface IGameShape<C> {
@@ -7,4 +8,6 @@ export interface IGameShape<C> {
   id: string;
 }
 
-
+export interface IGameConfig {
+  tableConfig: TGameTableConfig<ICardShape>
+}

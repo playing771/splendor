@@ -22,12 +22,12 @@ const PLAYERS: IPlayerConfig[] = [
 const FIRST_PLAYER = PLAYERS[0];
 
 const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
-  initialCountCard: 3,
+  initialCardsOnTableCount: 3,
   [EDevDeckLevel.First]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.First]],
   [EDevDeckLevel.Second]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.Second]],
   [EDevDeckLevel.Third]: [...CARDS_MAP_BY_LEVEL[EDevDeckLevel.Third]],
   [ETokenColor.Blue]: 5,
-  [ETokenColor.Brown]: 5,
+  [ETokenColor.Black]: 5,
   [ETokenColor.Gold]: 5,
   [ETokenColor.Green]: 5,
   [ETokenColor.Red]: 5,
@@ -48,7 +48,7 @@ describe('Game functionality', () => {
         [ETokenColor.Blue]: 0,
         [ETokenColor.Red]: 0,
         [ETokenColor.Green]: 0,
-        [ETokenColor.Brown]: 0,
+        [ETokenColor.Black]: 0,
         [ETokenColor.Gold]: 0,
         [ETokenColor.White]: 0,
       }
@@ -113,14 +113,14 @@ describe('Game functionality', () => {
     game.giveTokensToPlayer(FIRST_PLAYER.id, {
       [ETokenColor.Blue]: 1,
       [ETokenColor.Red]: 1,
-      [ETokenColor.Brown]: 1
+      [ETokenColor.Black]: 1
     });
 
     expect(game.getPlayer(FIRST_PLAYER.id).tokensCount).toBe(3);
     expect(game.getPlayer(FIRST_PLAYER.id).tokens).toEqual({
       [ETokenColor.Blue]: 1,
       [ETokenColor.Red]: 1,
-      [ETokenColor.Brown]: 1,
+      [ETokenColor.Black]: 1,
       [ETokenColor.Green]: 0,
       [ETokenColor.Gold]: 0,
       [ETokenColor.White]: 0,
@@ -132,7 +132,7 @@ describe('Game functionality', () => {
       ...GAME_CONFIG, players: [{
         name: 'max', id: FIRST_PLAYER.id, tokens: {
           [ETokenColor.Blue]: 5,
-          [ETokenColor.Brown]: 3,
+          [ETokenColor.Black]: 3,
           [ETokenColor.Green]: 3
         }
       }]

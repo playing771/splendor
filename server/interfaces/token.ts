@@ -1,10 +1,10 @@
 export enum ETokenColor {
-  Gold = 'gold',
-  Red = 'red',
-  Blue = 'blue',
-  White = 'white',
-  Brown = 'brown',
-  Green = 'green',
+  Gold = 'Gold',
+  Red = 'Red',
+  Blue = 'Blue',
+  White = 'White',
+  Black = 'Black',
+  Green = 'Green',
 }
 
 export interface ITokenShape {

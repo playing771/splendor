@@ -5,7 +5,7 @@ import { ETokenColor } from '../../interfaces/token';
 import { TableManager } from '.';
 
 const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {
-  initialCountCard: 4,
+  initialCardsOnTableCount: 4,
   [EDevDeckLevel.First]: [
     { id: 'one_first' },
     { id: 'two_first' },
@@ -28,7 +28,7 @@ const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {
     { id: 'five_third' },
   ],
   [ETokenColor.Blue]: 5,
-  [ETokenColor.Brown]: 5,
+  [ETokenColor.Black]: 5,
   [ETokenColor.Gold]: 5,
   [ETokenColor.Green]: 5,
   [ETokenColor.Red]: 5,
