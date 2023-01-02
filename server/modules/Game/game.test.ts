@@ -6,7 +6,8 @@ import { IPlayerConfig } from '../../interfaces/player';
 import { ETokenColor } from '../../interfaces/token';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { EGameBasicState } from './createGameSMDefinition';
-import { EPlayerAction, EPLayerState } from './createPlayerSMDefinition';
+import { EPLayerState } from './createPlayerSMDefinition';
+import { MOCKED_CARDS_POOL } from './mockedCards';
 
 const PLAYERS: IPlayerConfig[] = [
   {
@@ -30,7 +31,7 @@ const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
   [ETokenColor.Red]: 5,
   [ETokenColor.White]: 5,
 
-  ...populateCardsByLevelFromPool([]) // TODO:
+  ...populateCardsByLevelFromPool(MOCKED_CARDS_POOL)
 };
 
 const GAME_CONFIG = {
@@ -138,8 +139,8 @@ describe('Game functionality', () => {
     });
     game.move();
 
-    console.log('game',game.getPlayer(FIRST_PLAYER.id));
-    
+    console.log('game', game.getPlayer(FIRST_PLAYER.id));
+
 
     const cardBought = game.buyCardByPlayer(FIRST_PLAYER.id, EDevDeckLevel.First, 0);
     console.log(game.getPlayer(FIRST_PLAYER.id).cardsBought);

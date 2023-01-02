@@ -6,6 +6,7 @@ export interface IBaseDeckConfig<C> {
 export interface IBaseDeckShape<C> {
   name: string;
   cards: Array<C>;
-  getTop(): C;
+  getTop(): C | null;
   getTopCards(count:number): C[];
+  shuffle(): void;
 }

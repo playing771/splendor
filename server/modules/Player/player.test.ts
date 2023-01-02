@@ -1,5 +1,6 @@
 import { Player } from '.';
 import { ICardShape } from '../../interfaces/card';
+import { EDevDeckLevel } from '../../interfaces/devDeck';
 import { ETokenColor } from '../../interfaces/token';
 
 const CARD_MOCKED_ONE: ICardShape = {
@@ -10,6 +11,7 @@ const CARD_MOCKED_ONE: ICardShape = {
   },
   id: 'CARD_ID_1',
   score: 0,
+  lvl: EDevDeckLevel.First
 };
 
 const CARD_MOCKED_TWO: ICardShape = {
@@ -20,6 +22,7 @@ const CARD_MOCKED_TWO: ICardShape = {
   },
   id: 'CARD_ID_2',
   score: 0,
+  lvl: EDevDeckLevel.First
 };
 
 describe('Player functionality', () => {
@@ -38,8 +41,8 @@ describe('Player functionality', () => {
     expect(player.cardsBought[CARD_MOCKED_ONE.color][0].id).toBe(
       CARD_MOCKED_ONE.id
     );
-    expect(player.tokens.blue).toBe(1);
-    expect(player.tokens.red).toBe(1);
+    expect(player.tokens[ETokenColor.Blue]).toBe(1);
+    expect(player.tokens[ETokenColor.Red]).toBe(1);
   });
 
   it('can buy a card for a cost minus tokens from bought cards', () => {
@@ -58,7 +61,7 @@ describe('Player functionality', () => {
     expect(player.cardsBought[CARD_MOCKED_TWO.color][1].id).toBe(
       CARD_MOCKED_TWO.id
     );
-    expect(player.tokens.blue).toBe(2);
-    expect(player.tokens.red).toBe(1);
+    expect(player.tokens[ETokenColor.Blue]).toBe(2);
+    expect(player.tokens[ETokenColor.Red]).toBe(1);
   });
 });
