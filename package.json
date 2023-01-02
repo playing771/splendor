@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start:client": "vite",
-    "start:server": "yarn tsc && nodemon --inspect ./ 80",
+    "start:server": "yarn tsc",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "jest",
