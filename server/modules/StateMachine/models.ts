@@ -22,4 +22,5 @@ export interface IStateMachineTransition<S> {
 export interface IStateMachine<S extends PropertyKey = string,T extends PropertyKey = string> {
   value: S;
   dispatchTransition: (event: T) => void;
+  definition: TStateMachineDefinition<S,T>
 }

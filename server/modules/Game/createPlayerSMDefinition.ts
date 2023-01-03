@@ -16,7 +16,15 @@ export enum EPlayerAction {
   EndTurn = 'END_TURN'
 }
 
-export const createPlayerSMDefinition = ()=> {
+
+export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
+  [EPLayerState.Idle]: false,
+  [EPLayerState.Active]: true,
+  [EPLayerState.OutOfACtion]: true,
+  [EPLayerState.TooManyTokens]: true
+}
+
+export const createPlayerSMDefinition = () => {
   const playerSMDefinition = {
     [EPLayerState.Idle]: {
       transitions: {
@@ -59,6 +67,7 @@ export const createPlayerSMDefinition = ()=> {
 
   addStateLogger(playerSMDefinition, 'PLAYER_STATE:');
 
-  
+
   return playerSMDefinition
 }
+
