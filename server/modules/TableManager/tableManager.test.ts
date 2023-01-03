@@ -33,6 +33,7 @@ const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {
   [ETokenColor.Green]: 5,
   [ETokenColor.Red]: 5,
   [ETokenColor.White]: 5,
+  willShuffleDecks: false
 };
 
 
@@ -41,7 +42,7 @@ describe('Table functional', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
     
-    expect(tableManager.giveCardFromDeck(EDevDeckLevel.First).id).toBe(
+    expect(tableManager.giveCardFromDeck(EDevDeckLevel.First)?.id).toBe(
       'one_first'
     );
   });
@@ -50,7 +51,7 @@ describe('Table functional', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
 
-    expect(tableManager.giveCardFromDeck(EDevDeckLevel.Second).id).toBe(
+    expect(tableManager.giveCardFromDeck(EDevDeckLevel.Second)?.id).toBe(
       'one_second'
     )
   });
@@ -71,7 +72,7 @@ describe('Table functional', () => {
     const tableManager = new TableManager(table);
 
     expect(tableManager.giveTokens(ETokenColor.Blue, 2)).toBe(2)
-    expect(tableManager.table.Blue).toBe(3)
+    expect(tableManager.table.tokens[ETokenColor.Blue]).toBe(3)
   })
 
   it('Test take token from table', ()=> {
@@ -79,7 +80,7 @@ describe('Table functional', () => {
     const tableManager = new TableManager(table);
     tableManager.takeTokens(ETokenColor.Blue, 1)
 
-    expect(tableManager.table.Blue).toBe(6)
+    expect(tableManager.table.tokens[ETokenColor.Blue]).toBe(6)
   })
 
 });

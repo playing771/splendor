@@ -7,16 +7,23 @@ export type TGameTableRowShape<C> = {
   cards: Array<C>;
 }
 
+export type TGameTableRowSafeShape<C> = {
+  deck: number;
+  cards: Array<C>;
+}
+
+export type TGameTableSafeState<C> = {
+  [key in ETokenColor]: number;
+} & { [key in EDevDeckLevel]: TGameTableRowSafeShape<C>}
+
 export type TGameTableShape<C> = {
   [EDevDeckLevel.First]: TGameTableRowShape<C>;
   [EDevDeckLevel.Second]: TGameTableRowShape<C>;
   [EDevDeckLevel.Third]: TGameTableRowShape<C>;
-  [ETokenColor.Blue]: number,
-  [ETokenColor.Black]: number,
-  [ETokenColor.Gold]: number,
-  [ETokenColor.Green]: number,
-  [ETokenColor.Red]: number,
-  [ETokenColor.White]: number,
+  tokens: {
+    [key in ETokenColor]:number;
+  }
+  getSafeState(): TGameTableSafeState<C>
 };
 
 export type Test = {
@@ -34,5 +41,6 @@ export type TGameTableConfig<C> = {
   [ETokenColor.Green]: number,
   [ETokenColor.Red]: number,
   [ETokenColor.White]: number,
-  initialCardsOnTableCount: number
+  initialCardsOnTableCount: number,
+  willShuffleDecks?: boolean
 };

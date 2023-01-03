@@ -87,6 +87,10 @@ export class Game implements IGameShape<ICardShape> {
     return this.sm.value;
   };
 
+  public getSafeState = ()=> {
+    return this.table.getSafeState()
+  }
+
   public getPlayerState = (playerId: string) => {
     return this.smPlayers[playerId].value;
   };

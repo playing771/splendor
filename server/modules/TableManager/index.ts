@@ -6,27 +6,34 @@ import { ETokenColor } from '../../interfaces/token';
 export class TableManager<C> implements ITableManagerShape<C> {
   table: TGameTableShape<C>;
 
+  constructor(table: TGameTableShape<C>) {
+    this.table = table;
+  }
+
   takeTokens(color: ETokenColor, count: number) {
-    this.table[color] += count;
+    this.table.tokens[color] += count;
   }
 
   giveTokens(color: ETokenColor, count: number) {
-    const targetTokenCount = this.table[color];
+    const targetTokenCount = this.table.tokens[color];
     if (count > targetTokenCount) {
       throw Error('No more token');
     }
 
-    this.table[color] = targetTokenCount - count;
+    this.table.tokens[color] = targetTokenCount - count;
     return count;
   }
 
-  giveCardFromDeck(level: EDevDeckLevel): C {
+  giveCardFromDeck(level: EDevDeckLevel): C | null {
     return this.table[level].deck.getTop();
   }
 
   public giveCardFromTable(level: EDevDeckLevel, index: number): C {
     const currentCard = this.table[level].cards[index];
-    this.table[level].cards[index] = this.table[level].deck.getTop();
+    const topCardFromDeck = this.table[level].deck.getTop();
+    if (topCardFromDeck !== null) {
+      this.table[level].cards[index] = topCardFromDeck;
+    }
     return currentCard;
   }
 
@@ -35,9 +42,5 @@ export class TableManager<C> implements ITableManagerShape<C> {
   }
   holdCard(): C {
     throw new Error('Method not implemented.');
-  }
-  
-  constructor(table: TGameTableShape<C>) {
-    this.table = table;
   }
 }
