@@ -54,13 +54,13 @@ export class GameTable<C> implements TGameTableShape<C> {
   getSafeState(): TGameTableSafeState<C> {
     return {
       ...this.getSafeDecksState(),
-      ...this.getTokensState()
+      tokens: this.getTokensState()
     }
   }
 
   private getTokensState() {
     return Object.values(ETokenColor).reduce((acc, color) => {
-      acc[color] = this[color];
+      acc[color] = this.tokens[color];
       return acc;
     }, {} as { [key in ETokenColor]: number })
   }

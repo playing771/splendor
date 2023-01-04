@@ -1,7 +1,7 @@
 import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
 import { EDevDeckLevel } from '../../../interfaces/devDeck';
-import { IGameConfig, IGameShape } from '../../../interfaces/game';
+import { EPlayerAction, EPLayerState, IGameConfig, IGameShape } from '../../../interfaces/game';
 import { IPlayerConfig } from '../../../interfaces/player';
 import { ETokenColor } from '../../../interfaces/token';
 import { GameTable } from '../GameTable';
@@ -18,8 +18,6 @@ import {
 import {
   STATES_AVAILABLE_FOR_ACTION,
   createPlayerSMDefinition,
-  EPlayerAction,
-  EPLayerState,
 } from './createPlayerSMDefinition';
 
 type PlayerId = string;
@@ -73,7 +71,7 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public getSafeState() {
-    return this.table.getSafeState();
+    return {table: this.table.getSafeState(), players: this.players};
   }
 
   public getPlayerState(playerId: string) {
@@ -101,6 +99,7 @@ export class Game implements IGameShape<ICardShape> {
 
   public getPlayerAvailableActions(playerId: string) {
     const playerStateMachine = this.smPlayers[playerId];
+    if (!playerStateMachine) throw Error(`cant find stateMachine for player ID ${playerId}`);
     const stateHasActions = STATES_AVAILABLE_FOR_ACTION[playerStateMachine.value]
 
     return stateHasActions ? getKeys(

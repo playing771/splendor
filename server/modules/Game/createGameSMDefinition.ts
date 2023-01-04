@@ -1,12 +1,12 @@
+import { EPlayerAction } from '../../../interfaces/game';
 import { IPlayerShape } from '../../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
-import { EPlayerAction } from './createPlayerSMDefinition';
 
 // export type TGameState = 'INITIALIZATION' | 'GAME_ENDED';
 export enum EGameBasicState {
   Initialization = 'INITIALIZATION',
-  RoundStarted = 'ROUND_STARTED',
+  // RoundStarted = 'ROUND_STARTED',
   GameEnded = 'GAME_ENDED',
 }
 export type TGameEvent = 'next' | 'start' | 'end';
@@ -26,7 +26,7 @@ export const createGameSMDefinition = (
     const nextPlayerIndex = index + 1;
     const isLastPlyer = nextPlayerIndex === players.length;
     const nextState = isLastPlyer
-      ? EGameBasicState.RoundStarted
+      ? players[0].id
       : playerIds[nextPlayerIndex];
 
     acc[current] = {
@@ -58,17 +58,17 @@ export const createGameSMDefinition = (
       },
       transitions: {
         start: {
-          target: EGameBasicState.RoundStarted,
+          target: firstPlayerId
         },
       },
     },
-    [EGameBasicState.RoundStarted]: {
-      transitions: {
-        next: {
-          target: firstPlayerId,
-        },
-      },
-    },
+    // [EGameBasicState.RoundStarted]: {
+    //   transitions: {
+    //     next: {
+    //       target: firstPlayerId,
+    //     },
+    //   },
+    // },
     [EGameBasicState.GameEnded]: {
       transitions: {
         end: {
@@ -78,7 +78,7 @@ export const createGameSMDefinition = (
     },
   };
 
-  // addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
+  addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
 
   return finalGameSMDefinition;
 };

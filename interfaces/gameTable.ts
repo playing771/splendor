@@ -13,21 +13,17 @@ export type TGameTableRowSafeShape<C> = {
 }
 
 export type TGameTableSafeState<C> = {
-  [key in ETokenColor]: number;
-} & { [key in EDevDeckLevel]: TGameTableRowSafeShape<C>}
+  tokens: { [key in ETokenColor]: number };
+} & { [key in EDevDeckLevel]: TGameTableRowSafeShape<C> }
 
 export type TGameTableShape<C> = {
   [EDevDeckLevel.First]: TGameTableRowShape<C>;
   [EDevDeckLevel.Second]: TGameTableRowShape<C>;
   [EDevDeckLevel.Third]: TGameTableRowShape<C>;
   tokens: {
-    [key in ETokenColor]:number;
+    [key in ETokenColor]: number;
   }
 };
-
-export type Test = {
-  [key in ETokenColor]: number
-}
 
 export type TGameTableConfig<C> = {
   [EDevDeckLevel.First]: Array<C>;
