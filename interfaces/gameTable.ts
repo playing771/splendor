@@ -1,4 +1,4 @@
-import { DevDeck } from '../modules/DevDeck';
+import { DevDeck } from '../server/modules/DevDeck';
 import { EDevDeckLevel, IDevDeckShape } from './devDeck';
 import { ETokenColor } from './token';
 
@@ -23,7 +23,6 @@ export type TGameTableShape<C> = {
   tokens: {
     [key in ETokenColor]:number;
   }
-  getSafeState(): TGameTableSafeState<C>
 };
 
 export type Test = {

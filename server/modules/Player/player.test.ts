@@ -1,7 +1,7 @@
 import { Player } from '.';
-import { ICardShape } from '../../interfaces/card';
-import { EDevDeckLevel } from '../../interfaces/devDeck';
-import { ETokenColor } from '../../interfaces/token';
+import { ICardShape } from '../../../interfaces/card';
+import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { ETokenColor } from '../../../interfaces/token';
 
 const CARD_MOCKED_ONE: ICardShape = {
   color: ETokenColor.Blue,

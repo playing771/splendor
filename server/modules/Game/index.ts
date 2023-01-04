@@ -1,11 +1,9 @@
 import { getKeys } from '../../../utils/typescript';
-import { ICardShape } from '../../interfaces/card';
-import { EDevDeckLevel } from '../../interfaces/devDeck';
-import { IGameConfig, IGameShape } from '../../interfaces/game';
-import { TGameTableShape } from '../../interfaces/gameTable';
-import { IPlayerConfig, IPlayerShape } from '../../interfaces/player';
-import { ITableManagerShape } from '../../interfaces/tableManager';
-import { ETokenColor } from '../../interfaces/token';
+import { ICardShape } from '../../../interfaces/card';
+import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { IGameConfig, IGameShape } from '../../../interfaces/game';
+import { IPlayerConfig } from '../../../interfaces/player';
+import { ETokenColor } from '../../../interfaces/token';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
@@ -29,10 +27,10 @@ type TGameState = PlayerId | EGameBasicState;
 
 export class Game implements IGameShape<ICardShape> {
   public id: string;
-  public table: TGameTableShape<ICardShape>;
+  public table: GameTable<ICardShape>;
 
-  private players: IPlayerShape[];
-  private tableManager: ITableManagerShape<ICardShape>;
+  private players: Player[];
+  private tableManager: TableManager<ICardShape>;
   private sm: IStateMachine<TGameState, TGameEvent>;
   private smPlayers: {
     [playerId: PlayerId]: IStateMachine<EPLayerState, EPlayerAction>;

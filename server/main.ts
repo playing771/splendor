@@ -1,14 +1,12 @@
-import { ICardShape } from './interfaces/card';
-import { EDevDeckLevel } from './interfaces/devDeck';
-import { IGameConfig } from './interfaces/game';
-import { ETokenColor } from './interfaces/token';
+import { ICardShape } from '../interfaces/card';
+import { EDevDeckLevel } from '../interfaces/devDeck';
+import { IGameConfig } from '../interfaces/game';
+import { ETokenColor } from '../interfaces/token';
 import { getCardsFromCSV } from './modules/Card/getCardsFromCSV';
 import { populateCardsByLevelFromPool } from './modules/DevDeck/populateCardByLevelFromPool';
 import { Game } from './modules/Game';
 
 const cardsPool = getCardsFromCSV();
-
-console.log(cardsPool);
 
 const DEFAULT_GAME_SETUP: IGameConfig = {
   tableConfig: {
@@ -29,3 +27,11 @@ const game = new Game({
   players: [{ id: 'fd', name: 'Max' }],
   ...DEFAULT_GAME_SETUP,
 });
+
+
+
+game.move();
+
+console.log(game.getPlayerAvailableActions('fd'))
+
+// game.act()

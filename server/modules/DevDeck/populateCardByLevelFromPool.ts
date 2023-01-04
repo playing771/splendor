@@ -1,5 +1,5 @@
-import { ICardShape } from "../../interfaces/card";
-import { EDevDeckLevel } from "../../interfaces/devDeck";
+import { ICardShape } from "../../../interfaces/card";
+import { EDevDeckLevel } from "../../../interfaces/devDeck";
 
 export const populateCardsByLevelFromPool = (cardsPool: ICardShape[]) => {
   return Object.values(EDevDeckLevel).reduce((acc, lvl) => {

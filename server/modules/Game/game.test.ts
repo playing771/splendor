@@ -1,9 +1,9 @@
 import { Game } from '.';
-import { ICardShape } from '../../interfaces/card';
-import { EDevDeckLevel } from '../../interfaces/devDeck';
-import { TGameTableConfig } from '../../interfaces/gameTable';
-import { IPlayerConfig } from '../../interfaces/player';
-import { ETokenColor } from '../../interfaces/token';
+import { ICardShape } from '../../../interfaces/card';
+import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { TGameTableConfig } from '../../../interfaces/gameTable';
+import { IPlayerConfig } from '../../../interfaces/player';
+import { ETokenColor } from '../../../interfaces/token';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { EGameBasicState } from './createGameSMDefinition';
 import { EPlayerAction, EPLayerState } from './createPlayerSMDefinition';

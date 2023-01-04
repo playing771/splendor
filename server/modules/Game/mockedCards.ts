@@ -1,6 +1,6 @@
-import { ICardShape } from "../../interfaces/card";
-import { EDevDeckLevel } from "../../interfaces/devDeck";
-import { ETokenColor } from "../../interfaces/token";
+import { ICardShape } from "../../../interfaces/card";
+import { EDevDeckLevel } from "../../../interfaces/devDeck";
+import { ETokenColor } from "../../../interfaces/token";
 
 export const MOCKED_CARDS_POOL: ICardShape[] = [
   {

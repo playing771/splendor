@@ -1,4 +1,4 @@
-import { IPlayerShape } from '../../interfaces/player';
+import { IPlayerShape } from '../../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
 import { EPlayerAction } from './createPlayerSMDefinition';
@@ -78,7 +78,7 @@ export const createGameSMDefinition = (
     },
   };
 
-  addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
+  // addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
 
   return finalGameSMDefinition;
 };

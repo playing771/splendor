@@ -1,12 +1,12 @@
-import { EDevDeckLevel } from '../../interfaces/devDeck';
+import { EDevDeckLevel } from '../../../interfaces/devDeck';
 import {
   TGameTableConfig,
   TGameTableRowSafeShape,
   TGameTableRowShape,
   TGameTableSafeState,
   TGameTableShape,
-} from '../../interfaces/gameTable';
-import { ETokenColor } from '../../interfaces/token';
+} from '../../../interfaces/gameTable';
+import { ETokenColor } from '../../../interfaces/token';
 import { DevDeck } from '../DevDeck';
 
 export class GameTable<C> implements TGameTableShape<C> {

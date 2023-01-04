@@ -1,7 +1,7 @@
-import { EDevDeckLevel } from '../../interfaces/devDeck';
-import { TGameTableShape } from '../../interfaces/gameTable';
-import { ITableManagerShape } from '../../interfaces/tableManager';
-import { ETokenColor } from '../../interfaces/token';
+import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { TGameTableShape } from '../../../interfaces/gameTable';
+import { ITableManagerShape } from '../../../interfaces/tableManager';
+import { ETokenColor } from '../../../interfaces/token';
 
 export class TableManager<C> implements ITableManagerShape<C> {
   table: TGameTableShape<C>;

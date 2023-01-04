@@ -1,11 +1,11 @@
-import { ICardShape, TCardCost } from '../../interfaces/card';
-import { ETokenColor } from '../../interfaces/token';
+import { ICardShape, TCardCost } from '../../../interfaces/card';
+import { ETokenColor } from '../../../interfaces/token';
 import {
   IPlayerConfig,
   IPlayerShape,
   TPlayerCardsBought,
   TPlayerTokens,
-} from '../../interfaces/player';
+} from '../../../interfaces/player';
 import { countTokens } from '../Game/countTokens';
 import { getKeys } from '../../../utils/typescript';
 

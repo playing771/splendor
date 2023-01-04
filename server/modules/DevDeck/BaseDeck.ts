@@ -1,4 +1,4 @@
-import { IBaseDeckShape, IBaseDeckConfig } from "../../interfaces/baseDeck";
+import { IBaseDeckShape, IBaseDeckConfig } from "../../../interfaces/baseDeck";
 
 export class BaseDeck<C> implements IBaseDeckShape<C> {
   cards: Array<C>;

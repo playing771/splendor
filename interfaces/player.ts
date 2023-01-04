@@ -15,11 +15,6 @@ export interface IPlayerShape {
   tokens: TPlayerTokens,
   cardsBought: { [key in ETokenColor]: ICardShape[] };
   cardsHolded: ICardShape[];
-
-  getTokens(color: ETokenColor, count: number): void;
-  spendTokens(color: ETokenColor, count: number): void;
-  payCost(cost: TCardCost): void;
-  buyCard(card: ICardShape): void;
   tokensCount:number;
 }
 
