@@ -49,8 +49,6 @@ export class GameTable<C> implements TGameTableShape<C> {
   }
 
 
-
-
   getSafeState(): TGameTableSafeState<C> {
     return {
       ...this.getSafeDecksState(),

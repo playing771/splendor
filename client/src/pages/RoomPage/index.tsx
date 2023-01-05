@@ -1,29 +1,15 @@
-import axios, { AxiosError } from 'axios';
-import { ChangeEventHandler, SyntheticEvent, useEffect, useState } from 'react';
+import { AxiosError } from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ILoginDTO, IRoomUsersDTO } from '../../../../interfaces/api';
-import { IUser } from '../../../../server/services/UserService';
+import { IRoomUsersDTO } from '../../../../interfaces/api';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
-import { useGlobalState } from '../../context';
+import { useRequest } from '../../utils/useRequest';
 
 export function RoomPage() {
   const [error, setError] = useState<Nullable<string>>(null);
-  const [users, setUsers] = useState<IUser[]>([])
   const navigate = useNavigate()
-
-  useEffect(() => {
-    (async function request() {
-      try {
-        const response = await Api.get<IRoomUsersDTO>('room/users');
-        setUsers(response.data.users);
-      } catch (error: unknown) {
-        const axiosError = error as AxiosError;
-        setError(axiosError.message);
-      }
-    })();
-  }, []);
-
+  const {data: usersData} = useRequest<IRoomUsersDTO>('room/users');
 
   const handleStart = (e: any) => {
     (async function request() {
@@ -44,8 +30,6 @@ export function RoomPage() {
     navigate('/game');
   }
 
-
-
   return (
     <div
       style={{
@@ -62,7 +46,7 @@ export function RoomPage() {
       <button onClick={handleResumeGame}>Resume game</button>
       {error && <h3>{error}</h3>}
       <ul>
-        {users.map(({ id, name }) => <li key={id}>
+        {usersData?.users.map(({ id, name }) => <li key={id}>
           <p>
             {id}
           </p>
