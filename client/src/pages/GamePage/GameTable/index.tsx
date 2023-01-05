@@ -10,28 +10,33 @@ import { GameTableTokens } from './GameTableTokens';
 import { useRequest } from '../../../utils/useRequest';
 
 import './styles.css';
+import { useWebsockets } from '../../../utils/useWebsockets';
 
 const levels = Object.values(EDevDeckLevel).reverse();
 
 export const GameTable = () => {
-  const { userId, username } = useGlobalState();
+  // const { userId, username } = useGlobalState();
   const { data: gameState, error: gameStateError } = useRequest<IGameStateDTO>('game/state')
-  const { data: availableActions, error: availableActionsError } = useRequest<IGameAvailableActionsDTO>(`game/availableActions/${userId}`)
+  const { data: availableActions, error: availableActionsError } = useRequest<IGameAvailableActionsDTO>(`game/availableActions`)
   const navigate = useNavigate();
+  const ws = useWebsockets();
 
+  ws.onopen = (e)=> {
+    console.log('OPEN',e);
+    
+  }
 
-  useEffect(() => {
-    if (!userId) {
-      navigate('/login')
-    }
+  ws.onmessage = (e)=>{
+    console.log('MESSAGE',e.type,e.data);
+    
+  }
 
-  }, [userId])
 
   console.log('availableActions', availableActions);
 
 
   const showAvailableActions = async () => {
-    const response = await Api.get<IGameAvailableActionsDTO>(`game/availableActions/${userId}`);
+    const response = await Api.get<IGameAvailableActionsDTO>(`game/availableActions`);
 
     console.log('response', response.data);
 
@@ -54,6 +59,7 @@ export const GameTable = () => {
         const cardsCountInDeck = table[lvl].deck;
         return (
           <DeckLevelRow
+            key={lvl}
             cardsCountInDeck={cardsCountInDeck}
             cards={cards}
             lvl={lvl}

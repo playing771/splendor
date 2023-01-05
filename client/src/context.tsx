@@ -16,10 +16,6 @@ export const globalStateContext = React.createContext({} as IGlobalState);
 export const useGlobalState = () => {
   const context = useContext(globalStateContext);
 
-
-  console.log('context',context);
-  
-
   if (context.userId === undefined) {
     throw Error('cant user useGlobalState outside of globalStateContext');
   }

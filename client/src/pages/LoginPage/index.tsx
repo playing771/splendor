@@ -21,7 +21,7 @@ export function LoginPage() {
 
     try {
 
-      const response = await Api.get<ILoginDTO>(`auth/login/${username}`);
+      const response = await Api.post<ILoginDTO>(`auth/login/${username}`);
       console.log('login response',response);
       
       setUserState({ username: response.data.name, userId: response.data.id })

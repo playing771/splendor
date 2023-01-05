@@ -1,69 +1,151 @@
-import express, { json } from 'express'
+import express from 'express';
+import session from 'express-session';
 import cors from 'cors';
-import { IGameAvailableActionsDTO, IGameStateDTO, ILoginDTO } from '../../interfaces/api'
+import {
+  IGameAvailableActionsDTO,
+  IGameStateDTO,
+  ILoginDTO,
+} from '../../interfaces/api';
 import { userService } from '../services/UserService';
 import { gameService } from '../services/GameService';
 import { WebSocketServer } from 'ws';
+import { connectionService } from '../services/ConnectionService';
+import http from 'http';
 
-const app = express()
-const REST_PORT = 3000;
-const WEBSOCKETS_PORT = 8080;
-const wss = new WebSocketServer({ port: WEBSOCKETS_PORT });
+// middleware to test if authenticated
+function isAuthenticated(req, res, next) {
+  if (req.session.userId) next();
+  else res.sendStatus(401);
+}
+declare module 'express-session' {
+  interface SessionData {
+    userId?: string;
+  }
+}
+
+const app = express();
+const APP_PORT = 8080;
+const SECRET = 'FCP_UNLIMITED';
+
+const sessionMiddleware = session({
+  secret: SECRET,
+  resave: false,
+  saveUninitialized: false,
+
+  cookie: {
+    // secure: false,
+    // httpOnly: false
+    // secure: true,
+    // httpOnly: true,
+  },
+});
+
+const corsMiddleware = cors({
+  credentials: true,
+  origin: 'http://localhost:5173',
+});
 
 export const Api = () => {
+  app.use(corsMiddleware);
+  app.use(sessionMiddleware);
 
-  app.use(cors());
+  app.post('/auth/login/:username', (req, res) => {
+    const { username } = req.params;
+    const userId = req.session.userId;
 
-  app.get('/auth/login/:username', (req, res) => {
-    const { username } = req.params
+    if (!!userId) {
+      const user = userService.get(userId);
+      if (!user) {
+        return res.sendStatus(500);
+      }
+      return res.status(200).json(user);
+    }
+
     const user: ILoginDTO = userService.add(username);
-    return res.status(200).json(user)
-  })
 
-  app.get('/room/users', (req, res) => {
-    const currentGame = gameService.games[0];
+    console.log(`Updating session for user ${user.name} ${user.id}`);
+
+    req.session.userId = user.id;
+
+    return res.status(200).json(user);
+  });
+
+  app.get('/room/users', isAuthenticated, (req, res) => {
     const users = userService.users;
     res.status(200).json({ users });
-  })
+  });
 
-  app.get('/game/state', (req, res) => {
+  app.get('/game/state', isAuthenticated, (req, res) => {
     const currentGame = gameService.games[0];
     if (currentGame) {
-      const safeState: IGameStateDTO = currentGame.getSafeState()
+      const safeState: IGameStateDTO = currentGame.getSafeState();
       res.status(200).json(safeState);
     } else {
       res.status(500);
     }
+  });
 
-  })
-
-  app.get('/game/start', (req, res) => {
+  app.get('/game/start', isAuthenticated, (req, res) => {
     gameService.create();
     res.sendStatus(200);
-  })
+  });
 
-  app.get('/game/availableActions/:userId', (req, res) => {
+  app.get('/game/availableActions', isAuthenticated, (req, res) => {
     const currentGame = gameService.games[0];
-    if (!currentGame) {
+    if (currentGame) {
+      const userId = req.session.userId!;
+      const response: IGameAvailableActionsDTO = {
+        availableActions: currentGame.getPlayerAvailableActions(userId),
+      };
+      res.status(200).json(response);
+    } else {
       res.sendStatus(500);
     }
-    const { userId } = req.params;
-    const response: IGameAvailableActionsDTO = { availableActions: currentGame.getPlayerAvailableActions(userId) }
-    res.status(200).json(response);
-  })
+  });
 
-  app.listen(REST_PORT, () => {
-    console.log(`App listening on port ${REST_PORT}`)
-  })
+  // app.listen(REST_PORT, () => {
+  //   console.log(`App listening on port ${REST_PORT}`)
+  // })
 
-  
+  //
+  // Create an HTTP server.
+  //
+  const server = http.createServer(app);
 
-  wss.on('connection', function connection(ws) {
-    ws.on('message', function message(data) {
-      console.log('received: %s', data);
+  const wss = new WebSocketServer({ noServer: true });
+
+  server.on('upgrade', function (request, socket, head) {
+    console.log('Parsing session from request...');
+
+    sessionMiddleware(request, {}, () => {
+      if (!request.session.userId) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+        socket.destroy();
+        return;
+      }
+
+      console.log('Session is parsed!');
+
+      wss.handleUpgrade(request, socket, head, function (ws) {
+        wss.emit('connection', ws, request);
+      });
     });
+  });
+
+  wss.on('connection', function connection(ws, request) {
+    console.log('request.session', request.session);
+    const userId = request.session.userId;
+    connectionService.add(userId, ws);
+
+    console.log(request.url);
 
     ws.send('something');
   });
 
-}
+  //
+  // Start the server.
+  //
+  server.listen(APP_PORT, function () {
+    console.log(`Listening on http://localhost:${APP_PORT}`);
+  });
+};
