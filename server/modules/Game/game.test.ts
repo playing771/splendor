@@ -1,12 +1,11 @@
 import { Game } from '.';
 import { ICardShape } from '../../../interfaces/card';
 import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { EPlayerAction, EPLayerState } from '../../../interfaces/game';
 import { TGameTableConfig } from '../../../interfaces/gameTable';
 import { IPlayerConfig } from '../../../interfaces/player';
 import { ETokenColor } from '../../../interfaces/token';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
-import { EGameBasicState } from './createGameSMDefinition';
-import { EPlayerAction, EPLayerState } from './createPlayerSMDefinition';
 import { MOCKED_CARDS_POOL } from './mockedCards';
 
 const PLAYERS: IPlayerConfig[] = [
@@ -21,6 +20,7 @@ const PLAYERS: IPlayerConfig[] = [
 ];
 
 const FIRST_PLAYER = PLAYERS[0];
+const SECOND_PLAYER = PLAYERS[1];
 
 const MOCKED_CARDS_POOL_BY_LVL =
   populateCardsByLevelFromPool(MOCKED_CARDS_POOL);
@@ -65,47 +65,44 @@ describe('Game functionality', () => {
   it('can change game state', () => {
     const game = new Game(GAME_CONFIG);
 
-    expect(game.getState()).toBe(EGameBasicState.RoundStarted);
-
-    game.move();
     expect(game.getState()).toBe(FIRST_PLAYER.id);
 
-    game.move();
-    expect(game.getState()).toBe(PLAYERS[1].id);
+    game.dispatchPlayerAction(FIRST_PLAYER.id, EPlayerAction.EndTurn);
+    expect(game.getState()).toBe(SECOND_PLAYER.id);
 
-    game.move();
-    expect(game.getState()).toBe(EGameBasicState.RoundStarted);
-
-    game.move();
+    game.dispatchPlayerAction(SECOND_PLAYER.id, EPlayerAction.EndTurn);
     expect(game.getState()).toBe(FIRST_PLAYER.id);
   });
 
   it('can change active players state', () => {
     const game = new Game(GAME_CONFIG);
 
-    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Idle);
-    expect(game.getPlayerState(PLAYERS[1].id)).toBe(EPLayerState.Idle);
-
-    game.move();
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Active);
-    expect(game.getPlayerState(PLAYERS[1].id)).toBe(EPLayerState.Idle);
+    expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Idle);
 
-    game.move();
+    game.dispatchPlayerAction(FIRST_PLAYER.id, EPlayerAction.EndTurn);
+
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Idle);
-    expect(game.getPlayerState(PLAYERS[1].id)).toBe(EPLayerState.Active);
+    expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Active);
 
-    game.move();
-    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Idle);
-    expect(game.getPlayerState(PLAYERS[1].id)).toBe(EPLayerState.Idle);
+    game.dispatchPlayerAction(SECOND_PLAYER.id, EPlayerAction.EndTurn);
 
-    game.move();
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Active);
-    expect(game.getPlayerState(PLAYERS[1].id)).toBe(EPLayerState.Idle);
+    expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Idle);
+
+    game.dispatchPlayerAction(FIRST_PLAYER.id, EPlayerAction.EndTurn);
+    
+    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Idle);
+    expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Active);
+
+    game.dispatchPlayerAction(SECOND_PLAYER.id, EPlayerAction.EndTurn);
+
+    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Active);
+    expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Idle);
   });
 
   it('can show player tokens', () => {
     const game = new Game(GAME_CONFIG);
-    game.move();
 
     expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('count');
     expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('tokens');
@@ -113,7 +110,6 @@ describe('Game functionality', () => {
 
   it('can give tokens to player', () => {
     const game = new Game(GAME_CONFIG);
-    game.move();
 
     expect(game.getPlayer(FIRST_PLAYER.id).tokensCount).toBe(0);
 
@@ -166,7 +162,6 @@ describe('Game functionality', () => {
         },
       ],
     });
-    game.move();
 
     const CARD_TO_TAKE =
       MOCKED_CARDS_POOL_BY_LVL[EDevDeckLevel.First].slice(-1)[0];
@@ -201,7 +196,6 @@ describe('Game functionality', () => {
 
   it('can show available actions for player', () => {
     const game = new Game(GAME_CONFIG);
-    game.move();
 
     expect(game.getPlayerAvailableActions(FIRST_PLAYER.id)).toEqual([
       EPlayerAction.TakeTokens,
@@ -209,9 +203,7 @@ describe('Game functionality', () => {
       EPlayerAction.BuyCard,
       EPlayerAction.EndTurn,
     ]);
-    expect(game.getPlayerAvailableActions(PLAYERS[1].id)).toHaveLength(0);
-
-    console.log(game.getPlayerAvailableActions(FIRST_PLAYER.id));
+    expect(game.getPlayerAvailableActions(SECOND_PLAYER.id)).toHaveLength(0);
     
   });
 });

@@ -1,7 +1,12 @@
 import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
 import { EDevDeckLevel } from '../../../interfaces/devDeck';
-import { EPlayerAction, EPLayerState, IGameConfig, IGameShape } from '../../../interfaces/game';
+import {
+  EPlayerAction,
+  EPLayerState,
+  IGameConfig,
+  IGameShape,
+} from '../../../interfaces/game';
 import { IPlayerConfig } from '../../../interfaces/player';
 import { ETokenColor } from '../../../interfaces/token';
 import { GameTable } from '../GameTable';
@@ -47,8 +52,9 @@ export class Game implements IGameShape<ICardShape> {
     this.smPlayers = this.initializePlayersSM();
 
     const gameSMDefinition = createGameSMDefinition(this.players, {
-      [EPlayerAction.StartTurn]: this.startTurnPlayerActionCreator,
-      [EPlayerAction.EndTurn]: this.endTurnPlayerActionCreator,
+      startTurn: this.startTurnPlayerActionCreator,
+      endTurn: this.endTurnPlayerActionCreator,
+      move: this.move,
     });
 
     this.sm = createStateMachine(
@@ -58,11 +64,11 @@ export class Game implements IGameShape<ICardShape> {
     this.start();
   }
 
-  public start() {
+  public start = () => {
     this.sm.dispatchTransition('start');
   }
 
-  public move() {
+  public move = () => {
     this.sm.dispatchTransition('next');
   }
 
@@ -71,7 +77,7 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public getSafeState() {
-    return {table: this.table.getSafeState(), players: this.players};
+    return { table: this.table.getSafeState(), players: this.players };
   }
 
   public getPlayerState(playerId: string) {
@@ -94,17 +100,23 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public dispatchPlayerAction(playerId: string, action: EPlayerAction) {
+    console.log('dispatchPlayerAction',action);
+    
     this.smPlayers[playerId].dispatchTransition(action);
   }
 
   public getPlayerAvailableActions(playerId: string) {
     const playerStateMachine = this.smPlayers[playerId];
-    if (!playerStateMachine) throw Error(`cant find stateMachine for player ID ${playerId}`);
-    const stateHasActions = STATES_AVAILABLE_FOR_ACTION[playerStateMachine.value]
+    if (!playerStateMachine)
+      throw Error(`cant find stateMachine for player ID ${playerId}`);
+    const stateHasActions =
+      STATES_AVAILABLE_FOR_ACTION[playerStateMachine.value];
 
-    return stateHasActions ? getKeys(
-      playerStateMachine.definition[playerStateMachine.value].transitions
-    ) : []
+    return stateHasActions
+      ? getKeys(
+        playerStateMachine.definition[playerStateMachine.value].transitions
+      )
+      : [];
   }
 
   public giveTokensToPlayer(
@@ -150,7 +162,10 @@ export class Game implements IGameShape<ICardShape> {
       const playerStateMachine = createStateMachine<
         EPLayerState,
         EPlayerAction
-      >(EPLayerState.Idle, createPlayerSMDefinition());
+      >(
+        EPLayerState.Idle,
+        createPlayerSMDefinition({ move: this.move })
+      );
 
       acc[current.id] = playerStateMachine;
 
@@ -165,8 +180,4 @@ export class Game implements IGameShape<ICardShape> {
   private endTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(playerId, EPlayerAction.EndTurn);
   };
-
-  // private takeTokensPlayerActionCreator = (playerId: string) => ()=> {
-  //   this.dispatchPlayerAction(playerId, EPlayerAction.TakeTokens);
-  // }
 }

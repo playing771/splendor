@@ -1,5 +1,6 @@
 import { EPLayerState, EPlayerAction } from "../../../interfaces/game";
 import { addStateLogger } from "../StateMachine/addStateLogger";
+import { TStateMachineDefinition } from "../StateMachine/models";
 
 
 export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
@@ -9,9 +10,12 @@ export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
   [EPLayerState.TooManyTokens]: true
 }
 
-export const createPlayerSMDefinition = () => {
-  const playerSMDefinition = {
+export const createPlayerSMDefinition = (actions: { move: () => void }) => {
+  const playerSMDefinition: TStateMachineDefinition<EPLayerState, EPlayerAction> = {
     [EPLayerState.Idle]: {
+      actions: {
+        onEnter: actions.move // after start of IDLE call next turn of the game state machine
+      },
       transitions: {
         [EPlayerAction.StartTurn]: {
           target: EPLayerState.Active
@@ -30,7 +34,8 @@ export const createPlayerSMDefinition = () => {
           target: EPLayerState.OutOfAction
         },
         [EPlayerAction.EndTurn]: {
-          target: EPLayerState.Idle
+          target: EPLayerState.Idle,
+          // action: actions.move
         }
       }
     },
@@ -44,7 +49,8 @@ export const createPlayerSMDefinition = () => {
     [EPLayerState.OutOfAction]: {
       transitions: {
         [EPlayerAction.EndTurn]: {
-          target: EPLayerState.Idle
+          target: EPLayerState.Idle,
+          // action: actions.move
         }
       }
     }

@@ -3,19 +3,19 @@ import { IPlayerShape } from '../../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
 
-// export type TGameState = 'INITIALIZATION' | 'GAME_ENDED';
 export enum EGameBasicState {
   Initialization = 'INITIALIZATION',
-  // RoundStarted = 'ROUND_STARTED',
+  RoundStarted = 'ROUND_STARTED',
   GameEnded = 'GAME_ENDED',
 }
 export type TGameEvent = 'next' | 'start' | 'end';
 
 export const createGameSMDefinition = (
   players: IPlayerShape[],
-  actionCreators: {
-    [EPlayerAction.StartTurn]: (playerId: string) => () => void;
-    [EPlayerAction.EndTurn]: (playerId: string) => () => void;
+  actions: {
+    move: () => void;
+    startTurn: (playerId: string) => () => void;
+    endTurn: (playerId: string) => () => void;
   }
 ) => {
   const playerIds = players.map((player) => player.id);
@@ -26,13 +26,14 @@ export const createGameSMDefinition = (
     const nextPlayerIndex = index + 1;
     const isLastPlyer = nextPlayerIndex === players.length;
     const nextState = isLastPlyer
-      ? players[0].id
+      ? EGameBasicState.RoundStarted
       : playerIds[nextPlayerIndex];
 
     acc[current] = {
       actions: {
-        onEnter: actionCreators[EPlayerAction.StartTurn](current),
-        onExit: actionCreators[EPlayerAction.EndTurn](current),
+        // activate current player under active GAME STATE
+        onEnter: actions.startTurn(current),
+        // onExit: actions.endTurn(current)
       },
       transitions: {
         next: {
@@ -58,17 +59,20 @@ export const createGameSMDefinition = (
       },
       transitions: {
         start: {
-          target: firstPlayerId
+          target: EGameBasicState.RoundStarted,
         },
       },
     },
-    // [EGameBasicState.RoundStarted]: {
-    //   transitions: {
-    //     next: {
-    //       target: firstPlayerId,
-    //     },
-    //   },
-    // },
+    [EGameBasicState.RoundStarted]: {
+      actions: {
+        onEnter: actions.move, // we need this state only for ONE player setup, so just skip it to FIRST player state
+      },
+      transitions: {
+        next: {
+          target: firstPlayerId,
+        },
+      },
+    },
     [EGameBasicState.GameEnded]: {
       transitions: {
         end: {

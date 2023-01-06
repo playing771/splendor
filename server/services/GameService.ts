@@ -1,28 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IGameConfig } from '../../interfaces/game';
+import { EPlayerAction, IGameConfig } from '../../interfaces/game';
 import { ETokenColor } from '../../interfaces/token';
 import { getCardsFromCSV } from '../modules/Card/getCardsFromCSV';
 import { populateCardsByLevelFromPool } from '../modules/DevDeck/populateCardByLevelFromPool';
 import { Game } from '../modules/Game';
+import { DEFAULT_GAME_SETUP } from '../modules/Game/constants';
+import { connectionService } from './ConnectionService';
 import { userService, UserService } from './UserService';
 
 
-const cardsPool = getCardsFromCSV();
 
-const DEFAULT_GAME_SETUP: IGameConfig = {
-  tableConfig: {
-    initialCardsOnTableCount: 4,
 
-    [ETokenColor.Black]: 8,
-    [ETokenColor.Blue]: 8,
-    [ETokenColor.Gold]: 5,
-    [ETokenColor.Green]: 8,
-    [ETokenColor.Red]: 8,
-    [ETokenColor.White]: 8,
 
-    ...populateCardsByLevelFromPool(cardsPool),
-  },
-};
 
 export class GameService {
   public games: Game[]
@@ -38,17 +27,42 @@ export class GameService {
       ...DEFAULT_GAME_SETUP,
     });
     this.games.push(game)
-    return this.games[this.games.length -1];
+    return this.games[this.games.length - 1];
   }
 
   remove(id: string) {
-    this.games = this.games.filter((usr)=>usr.id !== id);
+    this.games = this.games.filter((game) => game.id !== id);
   }
 
   get(id: string) {
-    const game = this.games.find((usr)=>usr.id === id);
+    const game = this.games.find((game) => game.id === id);
     if (!game) throw Error(`no game with ID ${id}`)
     return game;
+  }
+
+  dispatch(action: EPlayerAction, userId: string) {
+    const ws = connectionService.get(userId)
+
+    if (!ws) throw Error(`no connection for user ID ${userId}`)
+
+
+    const currentGame = this.games[0]; // TODO: 
+
+    currentGame.dispatchPlayerAction(userId, action);
+    const safeState = currentGame.getSafeState();
+    const connections = connectionService.getAll();
+
+    for (const connection of connections) {
+      const availableActions = currentGame.getPlayerAvailableActions(userId);
+      const message = {
+        actions: availableActions,
+        state: safeState
+      }
+      ws.send(JSON.stringify(message));
+    }
+    
+    
+    
   }
 }
 

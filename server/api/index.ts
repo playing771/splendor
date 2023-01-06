@@ -11,6 +11,7 @@ import { gameService } from '../services/GameService';
 import { WebSocketServer } from 'ws';
 import { connectionService } from '../services/ConnectionService';
 import http from 'http';
+import { EPlayerAction } from '../../interfaces/game';
 
 // middleware to test if authenticated
 function isAuthenticated(req, res, next) {
@@ -48,6 +49,7 @@ const corsMiddleware = cors({
 export const Api = () => {
   app.use(corsMiddleware);
   app.use(sessionMiddleware);
+  app.use(express.json());
 
   app.post('/auth/login/:username', (req, res) => {
     const { username } = req.params;
@@ -89,6 +91,20 @@ export const Api = () => {
     gameService.create();
     res.sendStatus(200);
   });
+
+  app.post('/game/dispatch', isAuthenticated, (req, res)=> {
+    const payload: {action?: EPlayerAction} = req.body;
+    const userId = req.session.userId;
+
+    if (payload.action && userId) {
+      gameService.dispatch(payload.action, userId);
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
+    }
+    
+    
+  })
 
   app.get('/game/availableActions', isAuthenticated, (req, res) => {
     const currentGame = gameService.games[0];
@@ -137,9 +153,17 @@ export const Api = () => {
     const userId = request.session.userId;
     connectionService.add(userId, ws);
 
-    console.log(request.url);
+    ws.on('message', function (message) {
+      //
+      // Here we can now use session parameters.
+      //
+      console.log(`Received message ${message} from user ${userId}`);
+    });
+  
+    ws.on('close', function () {
+      connectionService.delete(userId);
+    });
 
-    ws.send('something');
   });
 
   //

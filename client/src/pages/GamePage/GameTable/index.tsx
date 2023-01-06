@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import { EDevDeckLevel } from '../../../../../interfaces/devDeck';
-import { IGameAvailableActionsDTO, IGameStateDTO } from '../../../../../interfaces/api';
+import {
+  IGameAvailableActionsDTO,
+  IGameStateDTO,
+} from '../../../../../interfaces/api';
 import { Api } from '../../../Api';
 import { useGlobalState } from '../../../context';
 import { useNavigate } from 'react-router-dom';
@@ -11,38 +14,34 @@ import { useRequest } from '../../../utils/useRequest';
 
 import './styles.css';
 import { useWebsockets } from '../../../utils/useWebsockets';
+import { EPlayerAction } from '../../../../../interfaces/game';
 
 const levels = Object.values(EDevDeckLevel).reverse();
 
 export const GameTable = () => {
   // const { userId, username } = useGlobalState();
-  const { data: gameState, error: gameStateError } = useRequest<IGameStateDTO>('game/state')
-  const { data: availableActions, error: availableActionsError } = useRequest<IGameAvailableActionsDTO>(`game/availableActions`)
+  const { data: gameState, error: gameStateError } =
+    useRequest<IGameStateDTO>('game/state');
+  const { data: availableActions, error: availableActionsError } =
+    useRequest<IGameAvailableActionsDTO>(`game/availableActions`);
   const navigate = useNavigate();
   const ws = useWebsockets();
 
-  ws.onopen = (e)=> {
-    console.log('OPEN',e);
-    
-  }
+  ws.onopen = (e) => {
+    console.log('OPEN', e);
+  };
 
-  ws.onmessage = (e)=>{
-    console.log('MESSAGE',e.type,e.data);
-    
-  }
-
+  ws.onmessage = (e) => {
+    console.log('MESSAGE', e.type, e.data);
+  };
 
   console.log('availableActions', availableActions);
 
+  const handleDispatchAction = (action: EPlayerAction) => async () => {
+    const response = await Api.post('game/dispatch', { action });
+  };
 
-  const showAvailableActions = async () => {
-    const response = await Api.get<IGameAvailableActionsDTO>(`game/availableActions`);
-
-    console.log('response', response.data);
-
-  }
-
-  const mergedError = availableActionsError || gameStateError
+  const mergedError = availableActionsError || gameStateError;
 
   if (mergedError) return <h1>Error: {mergedError}</h1>;
 
@@ -67,7 +66,7 @@ export const GameTable = () => {
         );
       })}
       <GameTableTokens tokens={table.tokens} />
-      <button onClick={showAvailableActions}>Get available actions</button>
+      <button onClick={handleDispatchAction(EPlayerAction.EndTurn)}>End turn</button>
     </div>
   );
 };

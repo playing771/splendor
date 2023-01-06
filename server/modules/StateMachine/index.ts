@@ -13,15 +13,18 @@ export const createStateMachine = <S extends PropertyKey, T extends PropertyKey>
       if (!targetTransition) {
         throw Error(`no transition for event: ${event as string} in currentState: ${currentState as string}`)
       }
-
+      
       const targetStateMachineState = targetTransition.target;
       const targetStateMachineDefinition = smDefinition[targetStateMachineState];
-
-      targetTransition.action && targetTransition.action();
+      
+      
+      
       currentStateMachineDefinition.actions?.onExit && currentStateMachineDefinition.actions.onExit();
-      targetStateMachineDefinition.actions?.onEnter && targetStateMachineDefinition.actions.onEnter();
-
       stateMachine.value = targetStateMachineState;
+      targetStateMachineDefinition.actions?.onEnter && targetStateMachineDefinition.actions.onEnter();
+      targetTransition.action && targetTransition.action();
+      // console.log('stateMachine',stateMachine);
+      
     },
     definition: smDefinition
   }
