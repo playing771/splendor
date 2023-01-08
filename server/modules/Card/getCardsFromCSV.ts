@@ -2,7 +2,7 @@ import { parse } from 'csv-parse/sync';
 import fs from 'fs';
 import path from 'path';
 import { ICardShape, TCardCost } from '../../../interfaces/card';
-import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { EDeckLevel } from '../../../interfaces/devDeck';
 import { ETokenColor } from '../../../interfaces/token';
 
 const pathToCSV = path.join('server', 'cards.csv');
@@ -35,10 +35,10 @@ export const getCardsFromCSV = () => {
     score: Number.parseFloat(dto.Score),
     lvl:
       dto.Level === '1'
-        ? EDevDeckLevel.First
+        ? EDeckLevel.First
         : dto.Level === '2'
-        ? EDevDeckLevel.Second
-        : EDevDeckLevel.Third,
+        ? EDeckLevel.Second
+        : EDeckLevel.Third,
   }));
 
   return cards;

@@ -92,18 +92,26 @@ export const Api = () => {
     res.sendStatus(200);
   });
 
-  app.post('/game/dispatch', isAuthenticated, (req, res)=> {
-    const payload: {action?: EPlayerAction} = req.body;
+  app.post('/game/dispatch', isAuthenticated, (req, res) => {
+    const payload: { action?: EPlayerAction, data?: any } = req.body;
     const userId = req.session.userId;
 
     if (payload.action && userId) {
-      gameService.dispatch(payload.action, userId);
-      res.sendStatus(200);
+      try {
+        gameService.dispatch(payload.action, userId, payload.data);
+        res.sendStatus(200);
+      } catch (error) {
+        
+        const err = error as Error;
+        
+        res.status(500).send(err.message);
+      }
+
     } else {
       res.sendStatus(500);
     }
-    
-    
+
+
   })
 
   app.get('/game/availableActions', isAuthenticated, (req, res) => {
@@ -153,13 +161,19 @@ export const Api = () => {
     const userId = request.session.userId;
     connectionService.add(userId, ws);
 
-    ws.on('message', function (message) {
-      //
-      // Here we can now use session parameters.
-      //
-      console.log(`Received message ${message} from user ${userId}`);
-    });
-  
+    const gameState = gameService.getGameState(userId);
+    const message = JSON.stringify(gameState);
+
+    ws.send(message);
+
+    // ws.on('message', function (message) {
+    //   //
+    //   // Here we can now use session parameters.
+    //   //
+    //   console.log(`Received message ${message} from user ${userId}`);
+
+    // });
+
     ws.on('close', function () {
       connectionService.delete(userId);
     });

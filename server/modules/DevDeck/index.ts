@@ -1,8 +1,8 @@
-import { EDevDeckLevel, IDevDeckConfig, IDevDeckShape } from "../../../interfaces/devDeck";
+import { EDeckLevel, IDevDeckConfig, IDevDeckShape } from "../../../interfaces/devDeck";
 import { BaseDeck } from "./BaseDeck";
 
 export class DevDeck<C> extends BaseDeck<C> implements IDevDeckShape<C>  {
-  level: EDevDeckLevel;
+  level: EDeckLevel;
   
   constructor({level, ...rest}: IDevDeckConfig<C>) {
     super(rest);

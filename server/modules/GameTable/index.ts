@@ -1,4 +1,4 @@
-import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { EDeckLevel } from '../../../interfaces/devDeck';
 import {
   TGameTableConfig,
   TGameTableRowSafeShape,
@@ -10,16 +10,16 @@ import { ETokenColor } from '../../../interfaces/token';
 import { DevDeck } from '../DevDeck';
 
 export class GameTable<C> implements TGameTableShape<C> {
-  [EDevDeckLevel.First]: TGameTableRowShape<C>;
-  [EDevDeckLevel.Second]: TGameTableRowShape<C>;
-  [EDevDeckLevel.Third]: TGameTableRowShape<C>;
+  [EDeckLevel.First]: TGameTableRowShape<C>;
+  [EDeckLevel.Second]: TGameTableRowShape<C>;
+  [EDeckLevel.Third]: TGameTableRowShape<C>;
   
   tokens: TGameTableShape<C>['tokens']
 
   constructor(config: TGameTableConfig<C>) {
     const { willShuffleDecks = true } = config;
     // Rows initialize    
-    Object.values(EDevDeckLevel).forEach((level) => {
+    Object.values(EDeckLevel).forEach((level) => {
       const initialCards = config[level];
 
       const deck = new DevDeck({
@@ -64,13 +64,13 @@ export class GameTable<C> implements TGameTableShape<C> {
   }
 
   private getSafeDecksState() {
-    return Object.values(EDevDeckLevel).reduce((acc, lvl) => {
+    return Object.values(EDeckLevel).reduce((acc, lvl) => {
       acc[lvl] = {
         deck: this[lvl].deck.cards.length,
         cards: this[lvl].cards
       }
       return acc;
-    }, {} as { [key in EDevDeckLevel]: TGameTableRowSafeShape<C> })
+    }, {} as { [key in EDeckLevel]: TGameTableRowSafeShape<C> })
   }
 
 }

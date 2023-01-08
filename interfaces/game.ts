@@ -1,5 +1,6 @@
+import { Player } from "../server/modules/Player";
 import { ICardShape } from "./card";
-import { TGameTableConfig, TGameTableShape } from "./gameTable";
+import { TGameTableConfig, TGameTableSafeState, TGameTableShape } from "./gameTable";
 
 export interface IGameShape<C> {
   id: string;
@@ -24,4 +25,13 @@ export enum EPlayerAction {
   TakeTokensOverLimit = 'TAKE_TOKENS_OVER_LIMIT',
   ReturnTokens = 'RETURN_TOKENS',
   EndTurn = 'END_TURN'
+}
+
+export interface IGameMessage {
+  actions: EPlayerAction[];
+  state: {
+    table: TGameTableSafeState<ICardShape>;
+    players: Player[];
+  };
+  isYourTurn: boolean;
 }

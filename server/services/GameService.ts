@@ -8,13 +8,8 @@ import { DEFAULT_GAME_SETUP } from '../modules/Game/constants';
 import { connectionService } from './ConnectionService';
 import { userService, UserService } from './UserService';
 
-
-
-
-
-
 export class GameService {
-  public games: Game[]
+  public games: Game[];
 
   constructor(games: Game[] = []) {
     this.games = games;
@@ -26,7 +21,7 @@ export class GameService {
       players: users,
       ...DEFAULT_GAME_SETUP,
     });
-    this.games.push(game)
+    this.games.push(game);
     return this.games[this.games.length - 1];
   }
 
@@ -36,33 +31,39 @@ export class GameService {
 
   get(id: string) {
     const game = this.games.find((game) => game.id === id);
-    if (!game) throw Error(`no game with ID ${id}`)
+    if (!game) throw Error(`no game with ID ${id}`);
     return game;
   }
 
-  dispatch(action: EPlayerAction, userId: string) {
-    const ws = connectionService.get(userId)
-
-    if (!ws) throw Error(`no connection for user ID ${userId}`)
-
-
-    const currentGame = this.games[0]; // TODO: 
-
-    currentGame.dispatchPlayerAction(userId, action);
+  getGameState(userId: string) {
+    const currentGame = this.games[0]; // TODO:
     const safeState = currentGame.getSafeState();
-    const connections = connectionService.getAll();
+    const availableActions = currentGame.getPlayerAvailableActions(userId);
+    const gameState = {
+      actions: availableActions,
+      state: safeState,
+      isYourTurn: currentGame.checkPlayerIsActive(userId),
+    };
 
-    for (const connection of connections) {
-      const availableActions = currentGame.getPlayerAvailableActions(userId);
-      const message = {
-        actions: availableActions,
-        state: safeState
-      }
-      ws.send(JSON.stringify(message));
+    return gameState;
+  }
+
+  dispatch(action: EPlayerAction, userId: string, data?: any) {
+    const ws = connectionService.get(userId);
+
+    if (!ws) throw Error(`no connection for user ID ${userId}`);
+
+    const currentGame = this.games[0]; // TODO:
+    currentGame.dispatchPlayerAction(userId, action, data);
+
+    for (const { id } of currentGame.players) {
+      const connection = connectionService.get(id);
+
+      const gameState = this.getGameState(id);
+      const message = JSON.stringify(gameState);
+
+      connection.send(message);
     }
-    
-    
-    
   }
 }
 

@@ -1,6 +1,6 @@
 import { Player } from '.';
 import { ICardShape } from '../../../interfaces/card';
-import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { EDeckLevel } from '../../../interfaces/devDeck';
 import { ETokenColor } from '../../../interfaces/token';
 
 const CARD_MOCKED_ONE: ICardShape = {
@@ -11,7 +11,7 @@ const CARD_MOCKED_ONE: ICardShape = {
   },
   id: 'CARD_ID_1',
   score: 0,
-  lvl: EDevDeckLevel.First
+  lvl: EDeckLevel.First
 };
 
 const CARD_MOCKED_TWO: ICardShape = {
@@ -22,7 +22,7 @@ const CARD_MOCKED_TWO: ICardShape = {
   },
   id: 'CARD_ID_2',
   score: 0,
-  lvl: EDevDeckLevel.First
+  lvl: EDeckLevel.First
 };
 
 describe('Player functionality', () => {

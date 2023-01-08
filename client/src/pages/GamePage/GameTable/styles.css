@@ -1,8 +1,16 @@
 .GameTable {
   display: flex;
+}
+
+
+.GameTable_mainColumn {
+  display: flex;
   flex-direction: column;
   row-gap: 12px;
+  flex: 1;
 }
+
+
 
 .DeckLevelRow {
   display: flex;
@@ -32,6 +40,12 @@
   background-color: #9e9e9e;
   padding: 12px;
   border-radius: 12px;
+  transition: opacity 0.5s;
+}
+
+.Card:hover{
+  cursor: pointer;
+  opacity: 0.7;
 }
 
 .Card_header {
@@ -68,16 +82,16 @@
 }
 
 .Card_costItem__Red {
-  background-color: #C12E35;
+  background-color: #c12e35;
 }
 .Card_costItem__Black {
-  background-color: #14150C;
+  background-color: #14150c;
 }
 .Card_costItem__Blue {
   background-color: #224173;
 }
 .Card_costItem__White {
-  background-color: #DFD4CA;
+  background-color: #dfd4ca;
 }
 .Card_costItem__Green {
   background-color: #166735;
@@ -94,9 +108,14 @@
   background-color: #204127;
 }
 
+.GameTable_sideColumn {
+  padding: 24px;
+}
+
 .GameTableTokens {
   display: flex;
-  column-gap: 12px;
+  flex-direction: column;
+  row-gap: 12px;
   justify-content: center;
   margin-top: 24px;
 }
@@ -114,20 +133,20 @@
 }
 
 .GameTableTokens_item__Red {
-  border-color: #C12E35;
+  border-color: #c12e35;
 }
 .GameTableTokens_item__Black {
-  border-color: #14150C;
+  border-color: #14150c;
 }
 .GameTableTokens_item__Blue {
   border-color: #224173;
 }
 .GameTableTokens_item__White {
-  border-color: #DFD4CA;
+  border-color: #dfd4ca;
 }
 .GameTableTokens_item__Green {
   border-color: #166735;
 }
 .GameTableTokens_item__Gold {
-  border-color: #F5EA42;
+  border-color: #f5ea42;
 }

@@ -16,11 +16,13 @@ export class ConnectionService {
     this.connections.delete(userId);
   }
 
-  get(userId:string){
-    return this.connections.get(userId)
+  get(userId: string) {
+    const connection = this.connections.get(userId);
+    if (!connection) throw Error(`cant find connection for userId ${userId}`)
+    return connection;
   }
 
-  getAll(){
+  getAll() {
     return this.connections.values()
   }
 }

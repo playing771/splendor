@@ -1,5 +1,5 @@
 import { DevDeck } from '../server/modules/DevDeck';
-import { EDevDeckLevel, IDevDeckShape } from './devDeck';
+import { EDeckLevel, IDevDeckShape } from './devDeck';
 import { ETokenColor } from './token';
 
 export type TGameTableRowShape<C> = {
@@ -14,21 +14,21 @@ export type TGameTableRowSafeShape<C> = {
 
 export type TGameTableSafeState<C> = {
   tokens: { [key in ETokenColor]: number };
-} & { [key in EDevDeckLevel]: TGameTableRowSafeShape<C> }
+} & { [key in EDeckLevel]: TGameTableRowSafeShape<C> }
 
 export type TGameTableShape<C> = {
-  [EDevDeckLevel.First]: TGameTableRowShape<C>;
-  [EDevDeckLevel.Second]: TGameTableRowShape<C>;
-  [EDevDeckLevel.Third]: TGameTableRowShape<C>;
+  [EDeckLevel.First]: TGameTableRowShape<C>;
+  [EDeckLevel.Second]: TGameTableRowShape<C>;
+  [EDeckLevel.Third]: TGameTableRowShape<C>;
   tokens: {
     [key in ETokenColor]: number;
   }
 };
 
 export type TGameTableConfig<C> = {
-  [EDevDeckLevel.First]: Array<C>;
-  [EDevDeckLevel.Second]: Array<C>;
-  [EDevDeckLevel.Third]: Array<C>;
+  [EDeckLevel.First]: Array<C>;
+  [EDeckLevel.Second]: Array<C>;
+  [EDeckLevel.Third]: Array<C>;
 
   [ETokenColor.Blue]: number,
   [ETokenColor.Black]: number,

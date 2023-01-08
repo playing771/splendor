@@ -15,7 +15,7 @@ const smDefinition: TStateMachineDefinition<TState, TTransition> = {
   ACTIVE: {
     transitions: {
       finish: {
-        action: () => null,
+        action: () => true,
         target: 'FINISHED',
       },
     },
@@ -23,7 +23,7 @@ const smDefinition: TStateMachineDefinition<TState, TTransition> = {
   FINISHED: {
     transitions: {
       sleep: {
-        action: () => null,
+        action: () => true,
         target: 'IDLE',
       },
     },
@@ -51,7 +51,7 @@ describe('StateMachine functionality', () => {
   it('calls actions before/after dispatchTransition state', () => {
     const onExitMocked = jest.fn();
     const onEnterMocked = jest.fn();
-    const onActionMocked = jest.fn();
+    const onActionMocked = jest.fn().mockReturnValue(true);
 
     smDefinition.IDLE.actions = {
       onExit: onExitMocked,
@@ -59,6 +59,7 @@ describe('StateMachine functionality', () => {
     smDefinition.ACTIVE.actions = {
       onEnter: onEnterMocked,
     };
+
     smDefinition.IDLE.transitions.activate!.action = onActionMocked;
 
     const sm = createStateMachine('IDLE', smDefinition);

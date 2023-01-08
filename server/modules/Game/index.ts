@@ -1,6 +1,6 @@
 import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
-import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { EDeckLevel } from '../../../interfaces/devDeck';
 import {
   EPlayerAction,
   EPLayerState,
@@ -32,7 +32,7 @@ export class Game implements IGameShape<ICardShape> {
   public id: string;
   public table: GameTable<ICardShape>;
 
-  private players: Player[];
+  public players: Player[];
   private tableManager: TableManager<ICardShape>;
   private sm: IStateMachine<TGameState, TGameEvent>;
   private smPlayers: {
@@ -66,11 +66,13 @@ export class Game implements IGameShape<ICardShape> {
 
   public start = () => {
     this.sm.dispatchTransition('start');
-  }
+    return true
+  };
 
   public move = () => {
     this.sm.dispatchTransition('next');
-  }
+    return true
+  };
 
   public getState() {
     return this.sm.value;
@@ -94,15 +96,23 @@ export class Game implements IGameShape<ICardShape> {
     return targetPlayer;
   }
 
+  public checkPlayerIsActive(playerId: string) {
+    return this.sm.value === playerId;
+  }
+
   public showPlayerTokens(playerId: string) {
     const { tokens, tokensCount } = this.getPlayer(playerId);
     return { count: tokensCount, tokens };
   }
 
-  public dispatchPlayerAction(playerId: string, action: EPlayerAction) {
-    console.log('dispatchPlayerAction',action);
-    
-    this.smPlayers[playerId].dispatchTransition(action);
+  public dispatchPlayerAction(
+    playerId: string,
+    action: EPlayerAction,
+    data?: string
+  ) {
+    console.log('dispatchPlayerAction', action, data);
+
+    this.smPlayers[playerId].dispatchTransition(action, data);
   }
 
   public getPlayerAvailableActions(playerId: string) {
@@ -143,41 +153,65 @@ export class Game implements IGameShape<ICardShape> {
     );
   }
 
-  public buyCardByPlayer(
-    playerId: string,
-    deckLvl: EDevDeckLevel,
-    cardIdex: number
-  ): ICardShape {
+  public buyCardByPlayer(playerId: string, cardId?: string): ICardShape {
     const targetPlayer = this.getPlayer(playerId);
 
-    const card = this.tableManager.giveCardFromTable(deckLvl, cardIdex);
-    targetPlayer.buyCard(card);
-    // targetPlayer.
+    if (!cardId) throw Error('cant buy a card without cardId provided')
+
+    const [targetCard] = this.tableManager.findCardOnTable(cardId);
+    console.log('trying to buy a card');
+    
+    targetPlayer.buyCard(targetCard);
+
+    console.log('card bought');
+    
+    const card = this.tableManager.giveCardFromTable(cardId);
 
     return card;
   }
 
   private initializePlayersSM() {
-    return this.players.reduce((acc, current) => {
+    return this.players.reduce((acc, player) => {
       const playerStateMachine = createStateMachine<
         EPLayerState,
         EPlayerAction
       >(
         EPLayerState.Idle,
-        createPlayerSMDefinition({ move: this.move })
+        createPlayerSMDefinition({
+          move: this.move,
+          buyCard: this.buyCardPlayerActionCreator(player.id),
+          // activateNextPlayer: this.startTurnPlayerActionCreator()
+        })
       );
 
-      acc[current.id] = playerStateMachine;
+      acc[player.id] = playerStateMachine;
 
       return acc;
     }, {} as { [key: string]: IStateMachine<EPLayerState, EPlayerAction> });
   }
 
   private startTurnPlayerActionCreator = (playerId: string) => () => {
+    console.log('startTurnPlayerActionCreator',playerId);
+    
     this.dispatchPlayerAction(playerId, EPlayerAction.StartTurn);
+    return true
   };
 
   private endTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(playerId, EPlayerAction.EndTurn);
+    return true
   };
+
+  private buyCardPlayerActionCreator =
+    (playerId: string) => (cardId?: string) => {
+      console.log('buyCardPlayerActionCreator TRY');
+      
+      this.buyCardByPlayer(playerId, cardId);
+
+      console.log('buyCardPlayerActionCreator SUCCESS');
+      
+      this.dispatchPlayerAction(playerId, EPlayerAction.BuyCard, cardId);
+
+      return true
+    };
 }

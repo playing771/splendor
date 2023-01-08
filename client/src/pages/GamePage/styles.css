@@ -1,0 +1,12 @@
+.StatusBar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.StatusBar_yourTurn {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}

@@ -4,7 +4,7 @@ import { ETokenColor } from "../../../../../interfaces/token";
 export const GameTableTokens = ({
   tokens,
 }: {
-  tokens: IGameStateDTO['table']['tokens'];
+  tokens: IGameStateDTO['state']['table']['tokens'];
 }) => {
   const tokensList = Object.values(ETokenColor);
   return (

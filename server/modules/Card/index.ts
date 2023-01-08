@@ -1,5 +1,5 @@
 import { ICardShape, TCardCost } from '../../interfaces/card'
-import { EDevDeckLevel } from '../../interfaces/devDeck';
+import { EDeckLevel } from '../../interfaces/devDeck';
 import { ETokenColor } from '../../interfaces/token';
 
 export class Card implements ICardShape {
@@ -7,7 +7,7 @@ export class Card implements ICardShape {
   color: ETokenColor;
   score: number;
   cost: TCardCost;
-  lvl: EDevDeckLevel;
+  lvl: EDeckLevel;
 
   constructor({ id, score, color, cost, lvl }: ICardShape) {
     this.id = id;

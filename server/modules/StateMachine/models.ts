@@ -16,11 +16,11 @@ export interface IStateMachineActions {
 
 export interface IStateMachineTransition<S> {
   target: S,
-  action?: () => void;
+  action?: (data?: string) => boolean;
 }
 
 export interface IStateMachine<S extends PropertyKey = string,T extends PropertyKey = string> {
   value: S;
-  dispatchTransition: (event: T) => void;
+  dispatchTransition: (event: T, data?: string) => void;
   definition: TStateMachineDefinition<S,T>
 }

@@ -1,5 +1,5 @@
 import { ICardShape } from "../../../interfaces/card";
-import { EDevDeckLevel } from "../../../interfaces/devDeck";
+import { EDeckLevel } from "../../../interfaces/devDeck";
 import { ETokenColor } from "../../../interfaces/token";
 
 export const MOCKED_CARDS_POOL: ICardShape[] = [
@@ -15,7 +15,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 0,
-    lvl: EDevDeckLevel.First
+    lvl: EDeckLevel.First
   },
   {
     id: "first_two",
@@ -29,7 +29,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 1,
-    lvl: EDevDeckLevel.First
+    lvl: EDeckLevel.First
   },
   {
     id: "first_three",
@@ -43,7 +43,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 1,
     },
     score: 1,
-    lvl: EDevDeckLevel.First
+    lvl: EDeckLevel.First
   },
   {
     id: "first_four",
@@ -57,7 +57,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 1,
     },
     score: 0,
-    lvl: EDevDeckLevel.First
+    lvl: EDeckLevel.First
   },
   {
     id: "first_five",
@@ -71,7 +71,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 0,
-    lvl: EDevDeckLevel.First
+    lvl: EDeckLevel.First
   },
   {
     id: "second_one",
@@ -85,7 +85,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 1,
-    lvl: EDevDeckLevel.Second
+    lvl: EDeckLevel.Second
   },
   {
     id: "second_two",
@@ -99,7 +99,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 2,
     },
     score: 1,
-    lvl: EDevDeckLevel.Second
+    lvl: EDeckLevel.Second
   },
   {
     id: "second_three",
@@ -113,7 +113,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 2,
-    lvl: EDevDeckLevel.Second
+    lvl: EDeckLevel.Second
   },
   {
     id: "second_four",
@@ -127,7 +127,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 2,
-    lvl: EDevDeckLevel.Second
+    lvl: EDeckLevel.Second
   },
   {
     id: "second_five",
@@ -141,7 +141,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 0,
     },
     score: 2,
-    lvl: EDevDeckLevel.Second
+    lvl: EDeckLevel.Second
   },
   {
     id: "third_one",
@@ -155,7 +155,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 3,
     },
     score: 4,
-    lvl: EDevDeckLevel.Third
+    lvl: EDeckLevel.Third
   },
   {
     id: "third_two",
@@ -169,7 +169,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 1,
     },
     score: 4,
-    lvl: EDevDeckLevel.Third
+    lvl: EDeckLevel.Third
   },
   {
     id: "third_three",
@@ -183,7 +183,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 1,
     },
     score: 4,
-    lvl: EDevDeckLevel.Third
+    lvl: EDeckLevel.Third
   },
   {
     id: "third_four",
@@ -197,7 +197,7 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 1,
     },
     score: 4,
-    lvl: EDevDeckLevel.Third
+    lvl: EDeckLevel.Third
   },
   {
     id: "third_five",
@@ -211,6 +211,6 @@ export const MOCKED_CARDS_POOL: ICardShape[] = [
       [ETokenColor.White]: 1,
     },
     score: 4,
-    lvl: EDevDeckLevel.Third
+    lvl: EDeckLevel.Third
   }
 ];

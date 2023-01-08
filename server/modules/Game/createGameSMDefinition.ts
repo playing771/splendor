@@ -13,9 +13,9 @@ export type TGameEvent = 'next' | 'start' | 'end';
 export const createGameSMDefinition = (
   players: IPlayerShape[],
   actions: {
-    move: () => void;
-    startTurn: (playerId: string) => () => void;
-    endTurn: (playerId: string) => () => void;
+    move: () => boolean;
+    startTurn: (playerId: string) => () => boolean;
+    endTurn: (playerId: string) => () => boolean;
   }
 ) => {
   const playerIds = players.map((player) => player.id);
@@ -25,19 +25,23 @@ export const createGameSMDefinition = (
   const gameSMDefinition = playerIds.reduce((acc, current, index) => {
     const nextPlayerIndex = index + 1;
     const isLastPlyer = nextPlayerIndex === players.length;
-    const nextState = isLastPlyer
+    const nextPLayerIdState = isLastPlyer
       ? EGameBasicState.RoundStarted
       : playerIds[nextPlayerIndex];
 
     acc[current] = {
       actions: {
         // activate current player under active GAME STATE
-        onEnter: actions.startTurn(current),
+        // onEnter: actions.startTurn(current),
         // onExit: actions.endTurn(current)
       },
       transitions: {
         next: {
-          target: nextState,
+          target: nextPLayerIdState,
+          // should start ACTIVE state only for players. So for last player we need to skip this action, because next is RoundStarted state)
+          action: isLastPlyer
+            ? undefined
+            : actions.startTurn(nextPLayerIdState), 
         },
         end: {
           target: EGameBasicState.GameEnded,
@@ -70,6 +74,7 @@ export const createGameSMDefinition = (
       transitions: {
         next: {
           target: firstPlayerId,
+          action: actions.startTurn(firstPlayerId),
         },
       },
     },

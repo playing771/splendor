@@ -1,5 +1,5 @@
 import { ICardShape } from '../interfaces/card';
-import { EDevDeckLevel } from '../interfaces/devDeck';
+import { EDeckLevel } from '../interfaces/devDeck';
 import { EPlayerAction, IGameConfig, IGameShape } from '../interfaces/game';
 import { ETokenColor } from '../interfaces/token';
 import { Api } from './api';
@@ -26,8 +26,15 @@ const game = new Game({
 
 // game.move()
 game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-// game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
 // game.dispatchPlayerAction('TWO', EPlayerAction.EndTurn);
+// game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
 
 
 // console.log(game.smPlayers)

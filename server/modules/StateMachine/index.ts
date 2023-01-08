@@ -5,7 +5,7 @@ import { IStateMachine, TStateMachineDefinition } from "./models";
 export const createStateMachine = <S extends PropertyKey, T extends PropertyKey>(initialState: S, smDefinition: TStateMachineDefinition<S, T>) => {
   const stateMachine: IStateMachine<S,T> = {
     value: initialState,
-    dispatchTransition: (event: T) => {
+    dispatchTransition: (event: T, data?: string) => {
       const currentState = stateMachine.value;
       const currentStateMachineDefinition = smDefinition[currentState];
 
@@ -19,10 +19,15 @@ export const createStateMachine = <S extends PropertyKey, T extends PropertyKey>
       
       
       
+      if (targetTransition.action) {
+        const result = targetTransition.action(data);
+        if (!result) return;
+      }
+      
+      
       currentStateMachineDefinition.actions?.onExit && currentStateMachineDefinition.actions.onExit();
       stateMachine.value = targetStateMachineState;
       targetStateMachineDefinition.actions?.onEnter && targetStateMachineDefinition.actions.onEnter();
-      targetTransition.action && targetTransition.action();
       // console.log('stateMachine',stateMachine);
       
     },

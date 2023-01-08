@@ -1,6 +1,6 @@
 import { Game } from '.';
 import { ICardShape } from '../../../interfaces/card';
-import { EDevDeckLevel } from '../../../interfaces/devDeck';
+import { EDeckLevel } from '../../../interfaces/devDeck';
 import { EPlayerAction, EPLayerState } from '../../../interfaces/game';
 import { TGameTableConfig } from '../../../interfaces/gameTable';
 import { IPlayerConfig } from '../../../interfaces/player';
@@ -164,9 +164,9 @@ describe('Game functionality', () => {
     });
 
     const CARD_TO_TAKE =
-      MOCKED_CARDS_POOL_BY_LVL[EDevDeckLevel.First].slice(-1)[0];
+      MOCKED_CARDS_POOL_BY_LVL[EDeckLevel.First].slice(-1)[0];
 
-    game.buyCardByPlayer(FIRST_PLAYER.id, EDevDeckLevel.First, 0);
+    game.buyCardByPlayer(FIRST_PLAYER.id,game.table[EDeckLevel.First].cards[0].id);
 
     expect(
       game.getPlayer(FIRST_PLAYER.id).cardsBought[CARD_TO_TAKE.color][0].id
