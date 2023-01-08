@@ -7,7 +7,7 @@ import {
   IGameConfig,
   IGameShape,
 } from '../../../interfaces/game';
-import { IPlayerConfig } from '../../../interfaces/player';
+import { IPlayerConfig, TPlayerTokens } from '../../../interfaces/player';
 import { ETokenColor } from '../../../interfaces/token';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
@@ -180,6 +180,7 @@ export class Game implements IGameShape<ICardShape> {
         createPlayerSMDefinition({
           move: this.move,
           buyCard: this.buyCardPlayerActionCreator(player.id),
+          // takeTokens: this.takeTokensPlayerActionCreator(player.id)
           // activateNextPlayer: this.startTurnPlayerActionCreator()
         })
       );
@@ -204,14 +205,16 @@ export class Game implements IGameShape<ICardShape> {
 
   private buyCardPlayerActionCreator =
     (playerId: string) => (cardId?: string) => {
-      console.log('buyCardPlayerActionCreator TRY');
-      
-      this.buyCardByPlayer(playerId, cardId);
 
-      console.log('buyCardPlayerActionCreator SUCCESS');
-      
+      this.buyCardByPlayer(playerId, cardId);
       this.dispatchPlayerAction(playerId, EPlayerAction.BuyCard, cardId);
 
       return true
     };
+
+  // private takeTokensPlayerActionCreator = (playerId: string) => (tokens: Partial<TPlayerTokens>)=> {
+  //   this.giveTokensToPlayer(playerId, tokens);
+
+  //   return true
+  // }
 }

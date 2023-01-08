@@ -27,12 +27,8 @@ const game = new Game({
 // game.move()
 game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
 game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
-game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
+
+
 // game.dispatchPlayerAction('TWO', EPlayerAction.EndTurn);
 // game.dispatchPlayerAction('ONE', EPlayerAction.EndTurn);
 

@@ -54,7 +54,17 @@ export class GameService {
     if (!ws) throw Error(`no connection for user ID ${userId}`);
 
     const currentGame = this.games[0]; // TODO:
-    currentGame.dispatchPlayerAction(userId, action, data);
+
+    switch (action) {
+      case EPlayerAction.TakeTokens:
+        currentGame.giveTokensToPlayer(userId, data);
+        break;
+
+      default:
+        // TODO: make same as TakeTokens
+        currentGame.dispatchPlayerAction(userId, action, data);
+        break;
+    }
 
     for (const { id } of currentGame.players) {
       const connection = connectionService.get(id);

@@ -1,4 +1,5 @@
 import { EPLayerState, EPlayerAction } from '../../../interfaces/game';
+import { TPlayerTokens } from '../../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
 
@@ -12,6 +13,7 @@ export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
 export const createPlayerSMDefinition = (actions: {
   move: () => boolean;
   buyCard: (cardId?: string) => boolean;
+  // takeTokens: (tokens: Partial<TPlayerTokens>) => boolean;
   // activateNextPlayer: () => void;
 }) => {
   const playerSMDefinition: TStateMachineDefinition<
@@ -32,13 +34,14 @@ export const createPlayerSMDefinition = (actions: {
       transitions: {
         [EPlayerAction.TakeTokens]: {
           target: EPLayerState.OutOfAction,
+          // action: (tokens) => actions.takeTokens(tokens as Partial<TPlayerTokens>),
         },
         [EPlayerAction.TakeTokensOverLimit]: {
           target: EPLayerState.TooManyTokens,
         },
         [EPlayerAction.BuyCard]: {
           target: EPLayerState.OutOfAction,
-          action: (cardId) => actions.buyCard(cardId),
+          action: (cardId) => actions.buyCard(cardId as string),
         },
         [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle,

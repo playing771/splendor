@@ -77,15 +77,15 @@ export const Api = () => {
     res.status(200).json({ users });
   });
 
-  app.get('/game/state', isAuthenticated, (req, res) => {
-    const currentGame = gameService.games[0];
-    if (currentGame) {
-      const safeState: IGameStateDTO = currentGame.getSafeState();
-      res.status(200).json(safeState);
-    } else {
-      res.status(500);
-    }
-  });
+  // app.get('/game/state', isAuthenticated, (req, res) => {
+  //   const currentGame = gameService.games[0];
+  //   if (currentGame) {
+  //     const safeState: IGameStateDTO = currentGame.getSafeState();
+  //     res.status(200).json(safeState);
+  //   } else {
+  //     res.status(500);
+  //   }
+  // });
 
   app.get('/game/start', isAuthenticated, (req, res) => {
     gameService.create();
@@ -95,7 +95,8 @@ export const Api = () => {
   app.post('/game/dispatch', isAuthenticated, (req, res) => {
     const payload: { action?: EPlayerAction, data?: any } = req.body;
     const userId = req.session.userId;
-
+    console.log('/game/dispatch', payload );
+    
     if (payload.action && userId) {
       try {
         gameService.dispatch(payload.action, userId, payload.data);

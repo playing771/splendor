@@ -1,3 +1,5 @@
+import { TPlayerTokens } from "../../../interfaces/player";
+
 export type TStateMachineDefinition<S extends PropertyKey = string, T extends PropertyKey = string> = {
   [key in S]: IStateMachineState<S, T>
 }
@@ -16,7 +18,7 @@ export interface IStateMachineActions {
 
 export interface IStateMachineTransition<S> {
   target: S,
-  action?: (data?: string) => boolean;
+  action?: (data?: string | Partial<TPlayerTokens>) => boolean;
 }
 
 export interface IStateMachine<S extends PropertyKey = string,T extends PropertyKey = string> {

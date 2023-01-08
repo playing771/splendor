@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../interfaces/api';
 import { EPlayerAction } from '../../../../interfaces/game';
+import { TPlayerTokens } from '../../../../interfaces/player';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
@@ -8,7 +9,7 @@ import { GameTable } from './GameTable';
 
 import './styles.css';
 
-interface IProps {}
+interface IProps { }
 
 export const GamePage = (props: IProps) => {
   const [gameState, setGameState] = useState<IGameStateDTO>();
@@ -24,7 +25,7 @@ export const GamePage = (props: IProps) => {
     setError('Unknown error');
   }, []);
 
-  const handleDispatchAction = (action: EPlayerAction) => async (data: any) => {
+  const handleDispatchAction = (action: EPlayerAction) => async (data?: string | Partial<TPlayerTokens>) => {
     console.log('action - data', action, data);
 
     await Api.post('game/dispatch', { action, data });
@@ -49,11 +50,13 @@ export const GamePage = (props: IProps) => {
       <div className="StatusBar">
         {error && <h3>Error: {error}</h3>}
         {isYourTurn && <h3 className="StatusBar_yourTurn">Your turn</h3>}
+        <h3 style={{display:'block'}}>Available actions: {gameState.actions.join("; ")}</h3>
       </div>
       <GameTable
         table={state.table}
         isYourTurn={isYourTurn}
         onCardClick={handleCardClick}
+        onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeTokens)}
       />
       <button disabled={!isYourTurn} onClick={handleEndTurnClick}>
         End turn

@@ -117,6 +117,7 @@
   flex-direction: column;
   row-gap: 12px;
   justify-content: center;
+  align-items: center;
   margin-top: 24px;
 }
 
@@ -130,6 +131,15 @@
   border-width: 4px;
   border-style: double;
   font-size: 24px;
+}
+
+.GameTableTokens_item__active {
+  cursor: pointer;
+  
+}
+
+.GameTableTokens_item__active:hover{
+  opacity: 0.8;
 }
 
 .GameTableTokens_item__Red {
