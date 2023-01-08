@@ -11,9 +11,9 @@ export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
 };
 
 export const createPlayerSMDefinition = (actions: {
-  move: () => boolean;
-  buyCard: (cardId?: string) => boolean;
-  // takeTokens: (tokens: Partial<TPlayerTokens>) => boolean;
+  move: () => void;
+  // buyCard: (cardId?: string) => void;
+  // takeTokens: (tokens: Partial<TPlayerTokens>) => void;
   // activateNextPlayer: () => void;
 }) => {
   const playerSMDefinition: TStateMachineDefinition<
@@ -41,7 +41,6 @@ export const createPlayerSMDefinition = (actions: {
         },
         [EPlayerAction.BuyCard]: {
           target: EPLayerState.OutOfAction,
-          action: (cardId) => actions.buyCard(cardId as string),
         },
         [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle,

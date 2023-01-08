@@ -15,7 +15,7 @@ const smDefinition: TStateMachineDefinition<TState, TTransition> = {
   ACTIVE: {
     transitions: {
       finish: {
-        action: () => true,
+        action: () => {},
         target: 'FINISHED',
       },
     },
@@ -23,7 +23,7 @@ const smDefinition: TStateMachineDefinition<TState, TTransition> = {
   FINISHED: {
     transitions: {
       sleep: {
-        action: () => true,
+        action: () => {},
         target: 'IDLE',
       },
     },

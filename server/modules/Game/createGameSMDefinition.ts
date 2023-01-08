@@ -13,9 +13,9 @@ export type TGameEvent = 'next' | 'start' | 'end';
 export const createGameSMDefinition = (
   players: IPlayerShape[],
   actions: {
-    move: () => boolean;
-    startTurn: (playerId: string) => () => boolean;
-    endTurn: (playerId: string) => () => boolean;
+    move: () => void;
+    startTurn: (playerId: string) => () => void;
+    endTurn: (playerId: string) => () => void;
   }
 ) => {
   const playerIds = players.map((player) => player.id);

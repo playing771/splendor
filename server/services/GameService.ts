@@ -1,14 +1,9 @@
-import { v4 as uuidv4 } from 'uuid';
 import { IGameStateDTO } from '../../interfaces/api';
-import { EPlayerAction, IGameConfig } from '../../interfaces/game';
-import { IPlayerShape } from '../../interfaces/player';
-import { ETokenColor } from '../../interfaces/token';
-import { getCardsFromCSV } from '../modules/Card/getCardsFromCSV';
-import { populateCardsByLevelFromPool } from '../modules/DevDeck/populateCardByLevelFromPool';
+import { EPlayerAction } from '../../interfaces/game';
 import { Game } from '../modules/Game';
 import { DEFAULT_GAME_SETUP } from '../modules/Game/constants';
 import { connectionService } from './ConnectionService';
-import { userService, UserService } from './UserService';
+import { userService } from './UserService';
 
 export class GameService {
   public games: Game[];
@@ -62,16 +57,7 @@ export class GameService {
 
     const currentGame = this.games[0]; // TODO:
 
-    switch (action) {
-      case EPlayerAction.TakeTokens:
-        currentGame.giveTokensToPlayer(userId, data);
-        break;
-
-      default:
-        // TODO: make same as TakeTokens
-        currentGame.dispatchPlayerAction(userId, action, data);
-        break;
-    }
+    currentGame.dispatch(userId, action, data);
 
     for (const { id } of currentGame.players) {
       const connection = connectionService.get(id);

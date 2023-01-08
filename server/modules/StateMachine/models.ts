@@ -18,11 +18,13 @@ export interface IStateMachineActions {
 
 export interface IStateMachineTransition<S> {
   target: S,
-  action?: (data?: string | Partial<TPlayerTokens>) => boolean;
+  action?: (data?: string | Partial<TPlayerTokens>) => void;
 }
 
-export interface IStateMachine<S extends PropertyKey = string,T extends PropertyKey = string> {
+export interface IStateMachine<S extends PropertyKey = string, T extends PropertyKey = string> {
   value: S;
   dispatchTransition: (event: T, data?: string) => void;
-  definition: TStateMachineDefinition<S,T>
+
+  checkTransition: (event: T) => boolean;
+  definition: TStateMachineDefinition<S, T>
 }

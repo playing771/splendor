@@ -10,6 +10,7 @@ export const createStateMachine = <S extends PropertyKey, T extends PropertyKey>
       const currentStateMachineDefinition = smDefinition[currentState];
 
       const targetTransition = currentStateMachineDefinition.transitions[event];
+
       if (!targetTransition) {
         throw Error(`no transition for event: ${event as string} in currentState: ${currentState as string}`)
       }
@@ -19,10 +20,12 @@ export const createStateMachine = <S extends PropertyKey, T extends PropertyKey>
       
       
       
-      if (targetTransition.action) {
-        const result = targetTransition.action(data);
-        if (!result) return;
-      }
+      // if (targetTransition.action) {
+      //   const result = 
+      //   if (!result) return;
+      // }
+
+      targetTransition.action && targetTransition.action(data);
       
       
       currentStateMachineDefinition.actions?.onExit && currentStateMachineDefinition.actions.onExit();
@@ -30,6 +33,15 @@ export const createStateMachine = <S extends PropertyKey, T extends PropertyKey>
       targetStateMachineDefinition.actions?.onEnter && targetStateMachineDefinition.actions.onEnter();
       // console.log('stateMachine',stateMachine);
       
+    },
+    checkTransition: (event: T) => {
+      const currentState = stateMachine.value;
+      const currentStateMachineDefinition = smDefinition[currentState];
+
+      const targetTransition = currentStateMachineDefinition.transitions[event];
+      const transitionExistsInCurrentState = !!targetTransition;
+
+      return transitionExistsInCurrentState;
     },
     definition: smDefinition
   }

@@ -1,13 +1,13 @@
+import { v4 as uuidv4 } from 'uuid';
 import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
-import { EDeckLevel } from '../../../interfaces/devDeck';
 import {
   EPlayerAction,
   EPLayerState,
   IGameConfig,
   IGameShape,
 } from '../../../interfaces/game';
-import { IPlayerConfig, TPlayerTokens } from '../../../interfaces/player';
+import { IPlayerConfig } from '../../../interfaces/player';
 import { ETokenColor } from '../../../interfaces/token';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
@@ -24,6 +24,7 @@ import {
   STATES_AVAILABLE_FOR_ACTION,
   createPlayerSMDefinition,
 } from './createPlayerSMDefinition';
+import { useId } from 'react';
 
 type PlayerId = string;
 type TGameState = PlayerId | EGameBasicState;
@@ -43,7 +44,7 @@ export class Game implements IGameShape<ICardShape> {
     players,
     tableConfig,
   }: IGameConfig & { players: IPlayerConfig[] }) {
-    this.id = `${Math.random()}`;
+    this.id =uuidv4();
 
     this.table = new GameTable(tableConfig);
     this.tableManager = new TableManager(this.table);
@@ -105,7 +106,32 @@ export class Game implements IGameShape<ICardShape> {
     return { count: tokensCount, tokens };
   }
 
-  public dispatchPlayerAction(
+  public dispatch(userId:string, action: EPlayerAction, data?: any) {
+
+    const actionIsAllowed = this.smPlayers[userId].checkTransition(action);
+    console.log('actionIsAllowed',actionIsAllowed);
+    
+    if (!actionIsAllowed) {
+      throw Error(`cant dispatch ${action} for ${userId} now (player state: ${this.smPlayers[userId].value})`)
+    }
+
+    switch (action) {
+      case EPlayerAction.TakeTokens:
+        this.giveTokensToPlayer(userId, data);
+        break;
+
+      case EPlayerAction.BuyCard: {
+        this.buyCardByPlayer(userId, data)
+        break;
+      }
+      default:
+        // TODO: make same as TakeTokens for all actions
+        this.dispatchPlayerAction(userId, action, data);
+        break;
+    }
+  }
+
+  private dispatchPlayerAction(
     playerId: string,
     action: EPlayerAction,
     data?: string
@@ -129,7 +155,7 @@ export class Game implements IGameShape<ICardShape> {
       : [];
   }
 
-  public giveTokensToPlayer(
+  private giveTokensToPlayer(
     playerId: string,
     tokens: { [key in ETokenColor]?: number }
   ) {
@@ -155,7 +181,7 @@ export class Game implements IGameShape<ICardShape> {
 
   }
 
-  public buyCardByPlayer(playerId: string, cardId?: string): ICardShape {
+  private buyCardByPlayer(playerId: string, cardId?: string): ICardShape {
     const targetPlayer = this.getPlayer(playerId);
 
     if (!cardId) throw Error('cant buy a card without cardId provided')
@@ -170,6 +196,8 @@ export class Game implements IGameShape<ICardShape> {
 
     const card = this.tableManager.giveCardFromTable(cardId);
 
+    this.dispatchPlayerAction(playerId, EPlayerAction.BuyCard, cardId);
+
     return card;
   }
 
@@ -182,7 +210,7 @@ export class Game implements IGameShape<ICardShape> {
         EPLayerState.Idle,
         createPlayerSMDefinition({
           move: this.move,
-          buyCard: this.buyCardPlayerActionCreator(player.id),
+          // buyCard: this.buyCardPlayerActionCreator(player.id),
           // takeTokens: this.takeTokensPlayerActionCreator(player.id)
           // activateNextPlayer: this.startTurnPlayerActionCreator()
         })
@@ -198,22 +226,20 @@ export class Game implements IGameShape<ICardShape> {
     console.log('startTurnPlayerActionCreator', playerId);
 
     this.dispatchPlayerAction(playerId, EPlayerAction.StartTurn);
-    return true
   };
 
   private endTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(playerId, EPlayerAction.EndTurn);
-    return true
   };
 
-  private buyCardPlayerActionCreator =
-    (playerId: string) => (cardId?: string) => {
+  // private buyCardPlayerActionCreator =
+  //   (playerId: string) => (cardId?: string) => {
 
-      this.buyCardByPlayer(playerId, cardId);
-      this.dispatchPlayerAction(playerId, EPlayerAction.BuyCard, cardId);
+  //     this.buyCardByPlayer(playerId, cardId);
+  //     this.dispatchPlayerAction(playerId, EPlayerAction.BuyCard, cardId);
 
-      return true
-    };
+  //     return true
+  //   };
 
   // private takeTokensPlayerActionCreator = (playerId: string) => (tokens: Partial<TPlayerTokens>)=> {
   //   this.giveTokensToPlayer(playerId, tokens);
