@@ -1,0 +1,67 @@
+.Card {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 100px;
+  background-color: #9e9e9e;
+  padding: 12px;
+  border-radius: 12px;
+  transition: background-color 0.5s;
+  border: 1px solid #6d6d6d;
+}
+
+.Card:hover{
+  cursor: pointer;
+  background-color: #bdbdbd;
+  z-index: 999;
+}
+
+.Card_header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Card_headerScore {
+  /* flex: 1; */
+  font-size: 24px;
+}
+
+.Card_headerColor {
+  /* flex: 1; */
+}
+
+.Card_cost {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+  margin-right: auto;
+  row-gap: 4px;
+}
+
+.Card_costItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+}
+
+.Card_costItem__Red {
+  background-color: #c12e35;
+}
+.Card_costItem__Black {
+  background-color: #14150c;
+}
+.Card_costItem__Blue {
+  background-color: #224173;
+}
+.Card_costItem__White {
+  background-color: #dfd4ca;
+}
+.Card_costItem__Green {
+  background-color: #166735;
+}

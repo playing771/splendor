@@ -7,10 +7,12 @@ import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
 import { TableTokensList } from './TokensList';
+import { ETokenColor } from '../../../../interfaces/token';
+import { Card } from './Card';
 
 import './styles.css';
 
-interface IProps { }
+interface IProps {}
 
 export const GamePage = (props: IProps) => {
   const [gameState, setGameState] = useState<IGameStateDTO>();
@@ -26,11 +28,13 @@ export const GamePage = (props: IProps) => {
     setError('Unknown error');
   }, []);
 
-  const handleDispatchAction = (action: EPlayerAction) => async (data?: string | Partial<TPlayerTokens>) => {
-    console.log('action - data', action, data);
+  const handleDispatchAction =
+    (action: EPlayerAction) =>
+    async (data?: string | Partial<TPlayerTokens>) => {
+      console.log('action - data', action, data);
 
-    await Api.post('game/dispatch', { action, data });
-  };
+      await Api.post('game/dispatch', { action, data });
+    };
 
   const handleEndTurnClick = () => {
     handleDispatchAction(EPlayerAction.EndTurn)();
@@ -44,15 +48,17 @@ export const GamePage = (props: IProps) => {
 
   if (!gameState) return <h1>...loading</h1>;
 
-  const { availableActions, playerState, players, table, isPlayerActive } = gameState;
+  const { availableActions, playerState, players, table, isPlayerActive } =
+    gameState;
 
   return (
     <div>
-
       <div className="StatusBar">
         {error && <h3>Error: {error}</h3>}
         {isPlayerActive && <h3 className="StatusBar_yourTurn">Your turn</h3>}
-        <h3 style={{ display: 'block' }}>Available actions: {availableActions.join("; ")}</h3>
+        <h3 style={{ display: 'block' }}>
+          Available actions: {availableActions.join('; ')}
+        </h3>
       </div>
 
       <GameTable
@@ -62,11 +68,45 @@ export const GamePage = (props: IProps) => {
         onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeTokens)}
       />
 
+      <TableTokensList tokens={playerState.tokens} orientaion="horizontal" />
+
+      <div style={{ display: 'flex', columnGap: 12 }}>
+        {Object.values(ETokenColor).map((color) => {
+          return (
+            <ul
+              key={color}
+              style={{
+                flexBasis: 100,
+                flexGrow: 0,
+                flexShrink: 1,
+                position: 'relative',
+              }}
+            >
+              {playerState.cardsBought[color].map((card, index) => {
+                return (
+                  <li
+                    key={card.id}
+                    style={{
+                      position: 'absolute',
+                      top: 0 + index * 30,
+                      left: 0,
+                      right: 0,
+                      height: 180,
+                      display: 'flex  ',
+                    }}
+                  >
+                    <Card {...card} />
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })}
+      </div>
+
       <button disabled={!isPlayerActive} onClick={handleEndTurnClick}>
         End turn
       </button>
-
-      <TableTokensList tokens={playerState.tokens} orientaion="horizontal"/>
     </div>
   );
 };
