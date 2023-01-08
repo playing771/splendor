@@ -3,7 +3,6 @@ import session from 'express-session';
 import cors from 'cors';
 import {
   IGameAvailableActionsDTO,
-  IGameStateDTO,
   ILoginDTO,
 } from '../../interfaces/api';
 import { userService } from '../services/UserService';

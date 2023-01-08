@@ -1,0 +1,52 @@
+
+.TokensList {
+  display: flex;
+}
+
+.TokensList__horizontal {
+  flex-direction: row;
+}
+
+.TokensList__vertical {
+  flex-direction: column
+}
+
+.TokensList_item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border-width: 4px;
+  border-style: double;
+  font-size: 24px;
+}
+
+.TokensList_item__active {
+  cursor: pointer;
+  
+}
+
+.TokensList_item__active:hover{
+  opacity: 0.8;
+}
+
+.TokensList_item__Red {
+  border-color: #c12e35;
+}
+.TokensList_item__Black {
+  border-color: #14150c;
+}
+.TokensList_item__Blue {
+  border-color: #224173;
+}
+.TokensList_item__White {
+  border-color: #dfd4ca;
+}
+.TokensList_item__Green {
+  border-color: #166735;
+}
+.TokensList_item__Gold {
+  border-color: #f5ea42;
+}

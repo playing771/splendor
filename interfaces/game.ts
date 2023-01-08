@@ -1,6 +1,7 @@
 import { Player } from "../server/modules/Player";
 import { ICardShape } from "./card";
 import { TGameTableConfig, TGameTableSafeState, TGameTableShape } from "./gameTable";
+import { IPlayerShape } from "./player";
 
 export interface IGameShape<C> {
   id: string;
@@ -28,10 +29,9 @@ export enum EPlayerAction {
 }
 
 export interface IGameMessage {
-  actions: EPlayerAction[];
-  state: {
-    table: TGameTableSafeState<ICardShape>;
-    players: Player[];
-  };
-  isYourTurn: boolean;
+  availableActions: EPlayerAction[];
+  table: TGameTableSafeState<ICardShape>;
+  players: IPlayerShape[];
+  playerState: IPlayerShape;
+  isPlayerActive: boolean;
 }

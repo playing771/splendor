@@ -13,15 +13,15 @@ import { TPlayerTokens } from '../../../../../interfaces/player';
 const levels = Object.values(EDeckLevel).reverse();
 
 export const GameTable = ({
-  isYourTurn,
+  isPlayerActive,
   table,
   onCardClick,
   onTakeTokensSubmit
 }: {
-  isYourTurn: boolean;
+  isPlayerActive: boolean;
   table: TGameTableSafeState<ICardShape>;
   onCardClick: (cardId:string)=>void
-  onTakeTokensSubmit: (tokens: TPlayerTokens) =>void;
+  onTakeTokensSubmit: (tokens: Partial<TPlayerTokens>) =>void;
 }) => {
   
   
@@ -45,7 +45,7 @@ export const GameTable = ({
 
       </div>
       <div className="GameTable_sideColumn">
-        <GameTableTokens tokens={table.tokens} onTakeTokensSubmit={onTakeTokensSubmit}/>
+        <GameTableTokens tokens={table.tokens} onTakeTokensSubmit={onTakeTokensSubmit}  />
       </div>
     </div>
   );

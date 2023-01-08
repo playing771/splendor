@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../../interfaces/api';
 import { TPlayerTokens } from '../../../../../interfaces/player';
 import { ETokenColor } from '../../../../../interfaces/token';
+import { TableTokensList, TokensToTakeList } from '../TokensList';
 
 const tokensList = Object.values(ETokenColor);
 
@@ -14,18 +15,29 @@ const emptyTokensToTake = {
   [ETokenColor.White]: 0,
 };
 
-export const GameTableTokens = ({ tokens, onTakeTokensSubmit }: { tokens: TPlayerTokens, onTakeTokensSubmit: (tokens: TPlayerTokens)=> void }) => {
+
+export const GameTableTokens = ({
+  tokens,
+  onTakeTokensSubmit,
+}: {
+  tokens: TPlayerTokens;
+  onTakeTokensSubmit: (tokens: Partial<TPlayerTokens>) => void;
+}) => {
   const [canTakeTokens, setCanTakeTokens] = useState(false);
   const [tokensToTake, setTokensToTake] =
-    useState<TPlayerTokens>(emptyTokensToTake);
+    useState<Partial<TPlayerTokens>>(emptyTokensToTake);
 
-  const tokensRemaining = Object.values(ETokenColor).reduce((acc, color) => {
-    acc[color] = acc[color] - tokensToTake[color];
-    return acc;
-  }, { ...tokens })
+  const tokensRemaining = Object.values(ETokenColor).reduce(
+    (acc, color) => {
+      acc[color] = acc[color] - (tokensToTake[color] || 0);
+      return acc;
+    },
+    { ...tokens }
+  );
 
-  const tokensToTakeCount = Object.values(tokensToTake).reduce((acc, count) => acc += count)
-  console.log('tokensToTakeCount', tokensToTakeCount);
+  const tokensToTakeCount = Object.values(tokensToTake).reduce(
+    (acc, count) => acc += count
+    , 0);
 
   const handleToggleTakeTokens = () => {
     if (canTakeTokens) {
@@ -34,22 +46,28 @@ export const GameTableTokens = ({ tokens, onTakeTokensSubmit }: { tokens: TPlaye
     setCanTakeTokens((prev) => !prev);
   };
 
-  const handleTokenTakeClick = (color: ETokenColor) => () => {
-    if (canTakeTokens && color !== ETokenColor.Gold && tokensRemaining[color] > 0) {
-      setTokensToTake((prev) => ({ ...prev, [color]: prev[color] + 1 }));
-    }
-  };
+  const handleTokenTakeClick = useCallback(
+    (color: ETokenColor) => {
+      if (
+        canTakeTokens &&
+        color !== ETokenColor.Gold &&
+        tokensRemaining[color] > 0
+      ) {
+        setTokensToTake((prev) => ({ ...prev, [color]: (prev[color] || 0) + 1 }));
+      }
+    },
+    [canTakeTokens, tokensRemaining]
+  );
 
-  const handleTokenReturnClick = (color: ETokenColor) => () => {
-
-    setTokensToTake((prev) => ({ ...prev, [color]: prev[color] - 1 }));
-
-  };
+  const handleTokenReturnClick = useCallback((color: ETokenColor) => {
+    setTokensToTake((prev) => ({ ...prev, [color]: (prev[color] || 0) - 1 }));
+  }, []);
 
   const handleSubmitTakeTokens = () => {
-    onTakeTokensSubmit(tokensToTake)
+    onTakeTokensSubmit(tokensToTake);
     setTokensToTake(emptyTokensToTake);
-  }
+    setCanTakeTokens(false);
+  };
 
   return (
     <div className="GameTableTokens">
@@ -58,26 +76,29 @@ export const GameTableTokens = ({ tokens, onTakeTokensSubmit }: { tokens: TPlaye
           <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
             {canTakeTokens ? 'Cancel' : 'Take tokens'}
           </button>
-          {tokensList.map((color) => {
-            return (
-              <div
-                key={color}
-                onClick={handleTokenTakeClick(color)}
-                className={`GameTableTokens_item GameTableTokens_item__${color} ${canTakeTokens &&
-                  color !== ETokenColor.Gold &&
-                  'GameTableTokens_item__active'
-                  }`}
-              >
-                {tokensRemaining[color]}
-              </div>
-            );
-          })}
+
+          <TableTokensList
+            tokens={tokensRemaining}
+            isActive={canTakeTokens}
+            onClick={handleTokenTakeClick}
+          />
+
         </div>
         <div>
-          <button disabled={!tokensToTakeCount} style={{ width: 130 }} onClick={handleSubmitTakeTokens}>
+          <button
+            disabled={!tokensToTakeCount}
+            style={{ width: 130 }}
+            onClick={handleSubmitTakeTokens}
+          >
             Submit
           </button>
-          {tokensList
+
+          <TokensToTakeList
+            tokens={tokensToTake}
+            isActive={true}
+            onClick={handleTokenReturnClick}
+          />
+          {/* {tokensList
             .filter((color) => tokensToTake[color] > 0)
             .map((color) => {
               return (
@@ -85,14 +106,15 @@ export const GameTableTokens = ({ tokens, onTakeTokensSubmit }: { tokens: TPlaye
                   <div
                     key={color}
                     onClick={handleTokenReturnClick(color)}
-                    className={`GameTableTokens_item GameTableTokens_item__${color} ${canTakeTokens && 'GameTableTokens_item__active'
-                      }`}
+                    className={`GameTableTokens_item GameTableTokens_item__${color} ${
+                      canTakeTokens && 'GameTableTokens_item__active'
+                    }`}
                   >
                     {tokensToTake[color]}
                   </div>
                 </div>
               );
-            })}
+            })} */}
         </div>
       </div>
     </div>

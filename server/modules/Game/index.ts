@@ -135,9 +135,16 @@ export class Game implements IGameShape<ICardShape> {
   ) {
     const targetPlayer = this.getPlayer(playerId);
 
+    this.dispatchPlayerAction(
+      playerId,
+      targetPlayer.tokensCount <= TOKENS_LIMIT
+        ? EPlayerAction.TakeTokens
+        : EPlayerAction.TakeTokensOverLimit
+    );
+
     for (const color of getKeys(tokens)) {
       if (typeof tokens[color] === 'number') {
-        const count = this.tableManager.giveTokens(
+        const count = this.tableManager.removeTokens(
           color,
           tokens[color] as number
         );
@@ -145,12 +152,7 @@ export class Game implements IGameShape<ICardShape> {
       }
     }
 
-    this.dispatchPlayerAction(
-      playerId,
-      targetPlayer.tokensCount <= TOKENS_LIMIT
-        ? EPlayerAction.TakeTokens
-        : EPlayerAction.TakeTokensOverLimit
-    );
+
   }
 
   public buyCardByPlayer(playerId: string, cardId?: string): ICardShape {
@@ -159,12 +161,13 @@ export class Game implements IGameShape<ICardShape> {
     if (!cardId) throw Error('cant buy a card without cardId provided')
 
     const [targetCard] = this.tableManager.findCardOnTable(cardId);
-    console.log('trying to buy a card');
-    
-    targetPlayer.buyCard(targetCard);
 
-    console.log('card bought');
-    
+    const tokensSpent = targetPlayer.buyCard(targetCard);
+
+    Object.values(ETokenColor).forEach((color) => {
+      this.tableManager.addTokens(color, tokensSpent[color])
+    })
+
     const card = this.tableManager.giveCardFromTable(cardId);
 
     return card;
@@ -192,8 +195,8 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   private startTurnPlayerActionCreator = (playerId: string) => () => {
-    console.log('startTurnPlayerActionCreator',playerId);
-    
+    console.log('startTurnPlayerActionCreator', playerId);
+
     this.dispatchPlayerAction(playerId, EPlayerAction.StartTurn);
     return true
   };

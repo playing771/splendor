@@ -13,11 +13,11 @@ export class TableManager<C extends { id: string }>
     this.table = table;
   }
 
-  takeTokens(color: ETokenColor, count: number) {
+  addTokens(color: ETokenColor, count: number) {
     this.table.tokens[color] += count;
   }
 
-  giveTokens(color: ETokenColor, count: number) {
+  removeTokens(color: ETokenColor, count: number) {
     const targetTokenCount = this.table.tokens[color];
     if (count > targetTokenCount) {
       throw Error('No more token');

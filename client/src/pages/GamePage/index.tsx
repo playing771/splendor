@@ -6,6 +6,7 @@ import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
+import { TableTokensList } from './TokensList';
 
 import './styles.css';
 
@@ -43,24 +44,29 @@ export const GamePage = (props: IProps) => {
 
   if (!gameState) return <h1>...loading</h1>;
 
-  const { state, isYourTurn } = gameState;
+  const { availableActions, playerState, players, table, isPlayerActive } = gameState;
 
   return (
     <div>
+
       <div className="StatusBar">
         {error && <h3>Error: {error}</h3>}
-        {isYourTurn && <h3 className="StatusBar_yourTurn">Your turn</h3>}
-        <h3 style={{display:'block'}}>Available actions: {gameState.actions.join("; ")}</h3>
+        {isPlayerActive && <h3 className="StatusBar_yourTurn">Your turn</h3>}
+        <h3 style={{ display: 'block' }}>Available actions: {availableActions.join("; ")}</h3>
       </div>
+
       <GameTable
-        table={state.table}
-        isYourTurn={isYourTurn}
+        table={table}
+        isPlayerActive={isPlayerActive}
         onCardClick={handleCardClick}
         onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeTokens)}
       />
-      <button disabled={!isYourTurn} onClick={handleEndTurnClick}>
+
+      <button disabled={!isPlayerActive} onClick={handleEndTurnClick}>
         End turn
       </button>
+
+      <TableTokensList tokens={playerState.tokens} orientaion="horizontal"/>
     </div>
   );
 };

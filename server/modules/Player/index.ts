@@ -52,6 +52,12 @@ export class Player implements IPlayerShape {
 
   payCost(cost: TCardCost) {
     const extraTokens = this.tokensFromCardsBought;
+
+    // tokensSpent = CardCost - TokensOfPlayerCards
+    const tokensSpent = Object.values(ETokenColor).reduce((acc, color)=>{
+      acc[color] = 0;
+      return acc;
+    }, {} as TPlayerTokens);
     for (const color of getKeys(cost)) {
       const tokensToSpend = Math.max(
         (cost[color] || 0) - (extraTokens[color] || 0),
@@ -59,13 +65,18 @@ export class Player implements IPlayerShape {
       );
 
       this.spendTokens(color, tokensToSpend);
+      tokensSpent[color] += tokensToSpend;
     }
+
+    return tokensSpent;
   }
 
   buyCard(card: ICardShape) {
     const { cost, color } = card;
-    this.payCost(cost);
+    const tokensSpent = this.payCost(cost);
     this.cardsBought[color].push(card);
+
+    return tokensSpent;
   }
 
   private calculateTokensFromBoughtCards(color: ETokenColor) {
@@ -85,5 +96,16 @@ export class Player implements IPlayerShape {
       acc[color] = this.calculateTokensFromBoughtCards(color);
       return acc;
     }, {} as TCardCost);
+  }
+
+  get state(): IPlayerShape{
+    return {
+      id: this.id,
+      cardsBought: this.cardsBought,
+      cardsHolded: this.cardsHolded,
+      name: this.name,
+      tokens: this.tokens,
+      tokensCount: this.tokensCount
+    }
   }
 }

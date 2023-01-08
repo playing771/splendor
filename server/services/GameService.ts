@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
+import { IGameStateDTO } from '../../interfaces/api';
 import { EPlayerAction, IGameConfig } from '../../interfaces/game';
+import { IPlayerShape } from '../../interfaces/player';
 import { ETokenColor } from '../../interfaces/token';
 import { getCardsFromCSV } from '../modules/Card/getCardsFromCSV';
 import { populateCardsByLevelFromPool } from '../modules/DevDeck/populateCardByLevelFromPool';
@@ -37,15 +39,20 @@ export class GameService {
 
   getGameState(userId: string) {
     const currentGame = this.games[0]; // TODO:
-    const safeState = currentGame.getSafeState();
+    const { players, table } = currentGame.getSafeState();
     const availableActions = currentGame.getPlayerAvailableActions(userId);
-    const gameState = {
-      actions: availableActions,
-      state: safeState,
-      isYourTurn: currentGame.checkPlayerIsActive(userId),
+
+    const playerState = currentGame.getPlayer(userId).state;
+
+    const state: IGameStateDTO = {
+      availableActions,
+      players,
+      table,
+      playerState,
+      isPlayerActive: currentGame.checkPlayerIsActive(userId),
     };
 
-    return gameState;
+    return state;
   }
 
   dispatch(action: EPlayerAction, userId: string, data?: any) {

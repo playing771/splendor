@@ -91,7 +91,7 @@ describe('Game functionality', () => {
     expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Idle);
 
     game.dispatchPlayerAction(FIRST_PLAYER.id, EPlayerAction.EndTurn);
-    
+
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Idle);
     expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Active);
 
@@ -166,7 +166,7 @@ describe('Game functionality', () => {
     const CARD_TO_TAKE =
       MOCKED_CARDS_POOL_BY_LVL[EDeckLevel.First].slice(-1)[0];
 
-    game.buyCardByPlayer(FIRST_PLAYER.id,game.table[EDeckLevel.First].cards[0].id);
+    game.buyCardByPlayer(FIRST_PLAYER.id, game.table[EDeckLevel.First].cards[0].id);
 
     expect(
       game.getPlayer(FIRST_PLAYER.id).cardsBought[CARD_TO_TAKE.color][0].id
@@ -192,7 +192,45 @@ describe('Game functionality', () => {
         PLAYER_INITIAL_TOKENS[ETokenColor.White] -
         (CARD_TO_TAKE.cost[ETokenColor.White] || 0),
     });
+    expect(game.table.tokens).toEqual({
+      [ETokenColor.Black]: GAME_CONFIG.tableConfig[ETokenColor.Black] + (CARD_TO_TAKE.cost[ETokenColor.Black] || 0),
+      [ETokenColor.Blue]: GAME_CONFIG.tableConfig[ETokenColor.Blue] + (CARD_TO_TAKE.cost[ETokenColor.Blue] || 0),
+      [ETokenColor.Gold]: GAME_CONFIG.tableConfig[ETokenColor.Gold] + (CARD_TO_TAKE.cost[ETokenColor.Gold] || 0),
+      [ETokenColor.Green]: GAME_CONFIG.tableConfig[ETokenColor.Green] + (CARD_TO_TAKE.cost[ETokenColor.Green] || 0),
+      [ETokenColor.Red]: GAME_CONFIG.tableConfig[ETokenColor.Red] + (CARD_TO_TAKE.cost[ETokenColor.Red] || 0),
+      [ETokenColor.White]: GAME_CONFIG.tableConfig[ETokenColor.White] + (CARD_TO_TAKE.cost[ETokenColor.White] || 0),
+    })
   });
+
+  it.only('lets use cards resources to pay for a card', () => {
+    const PLAYER_INITIAL_TOKENS = {
+      [ETokenColor.Blue]: 1,
+      [ETokenColor.Black]: 0,
+      [ETokenColor.Green]: 1,
+      [ETokenColor.Gold]: 0,
+      [ETokenColor.Red]: 0,
+      [ETokenColor.White]: 0,
+    };
+
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          name: 'max',
+          id: FIRST_PLAYER.id,
+          tokens: PLAYER_INITIAL_TOKENS,
+          cardsBought: {
+            [ETokenColor.Black]: [
+              { color: ETokenColor.Black, cost: {}, id: "SOME", lvl: EDeckLevel.First, score: 0 }
+            ]
+          }
+        },
+      ],
+    });
+    
+    game.buyCardByPlayer(FIRST_PLAYER.id, game.table[EDeckLevel.First].cards[0].id);
+    expect(game.table.tokens[ETokenColor.Black]).toBe(TABLE_CONFIG[ETokenColor.Black]);
+  })
 
   it('can show available actions for player', () => {
     const game = new Game(GAME_CONFIG);
@@ -204,6 +242,6 @@ describe('Game functionality', () => {
       EPlayerAction.EndTurn,
     ]);
     expect(game.getPlayerAvailableActions(SECOND_PLAYER.id)).toHaveLength(0);
-    
+
   });
 });
