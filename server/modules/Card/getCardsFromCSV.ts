@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { ICardShape, TCardCost } from '../../../interfaces/card';
 import { EDeckLevel } from '../../../interfaces/devDeck';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 
 const pathToCSV = path.join('server', 'cards.csv');
 
@@ -26,8 +26,8 @@ export const getCardsFromCSV = () => {
 
   const cards: ICardShape[] = cardsDTO.map((dto, index) => ({
     id: `${dto.Level}_${dto.Color}_${dto.Score}_${index}`,
-    color: ETokenColor[dto.Color],
-    cost: Object.values(ETokenColor).reduce((acc, color) => {
+    color: EGemColor[dto.Color],
+    cost: Object.values(EGemColor).reduce((acc, color) => {
       const price = Number.parseFloat(dto[color]) || 0;
       acc[color] = price;
       return acc;

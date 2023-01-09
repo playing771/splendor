@@ -7,13 +7,13 @@ export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
   [EPLayerState.Idle]: false,
   [EPLayerState.Active]: true,
   [EPLayerState.OutOfAction]: true,
-  [EPLayerState.TooManyTokens]: true,
+  [EPLayerState.TooManyGems]: true,
 };
 
 export const createPlayerSMDefinition = (actions: {
   move: () => void;
   // buyCard: (cardId?: string) => void;
-  // takeTokens: (tokens: Partial<TPlayerTokens>) => void;
+  // takeTokens: (gems: Partial<TPlayerTokens>) => void;
   // activateNextPlayer: () => void;
 }) => {
   const playerSMDefinition: TStateMachineDefinition<
@@ -32,12 +32,12 @@ export const createPlayerSMDefinition = (actions: {
     },
     [EPLayerState.Active]: {
       transitions: {
-        [EPlayerAction.TakeTokens]: {
+        [EPlayerAction.TakeGems]: {
           target: EPLayerState.OutOfAction,
-          // action: (tokens) => actions.takeTokens(tokens as Partial<TPlayerTokens>),
+          // action: (gems) => actions.takeTokens(gems as Partial<TPlayerTokens>),
         },
-        [EPlayerAction.TakeTokensOverLimit]: {
-          target: EPLayerState.TooManyTokens,
+        [EPlayerAction.TakeGemsOverLimit]: {
+          target: EPLayerState.TooManyGems,
         },
         [EPlayerAction.BuyCard]: {
           target: EPLayerState.OutOfAction,
@@ -48,9 +48,9 @@ export const createPlayerSMDefinition = (actions: {
         },
       },
     },
-    [EPLayerState.TooManyTokens]: {
+    [EPLayerState.TooManyGems]: {
       transitions: {
-        [EPlayerAction.ReturnTokens]: {
+        [EPlayerAction.ReturnGems]: {
           target: EPLayerState.OutOfAction,
         },
       },

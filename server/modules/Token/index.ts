@@ -1,7 +1,7 @@
-import { ETokenColor, ITokenShape } from "../../interfaces/token";
+import { EGemColor, ITokenShape } from "../../interfaces/gem";
 
 export class Token implements ITokenShape{
-  color: ETokenColor;
+  color: EGemColor;
 
   constructor({color}: ITokenShape) {
     this.color = color

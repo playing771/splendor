@@ -1,7 +1,7 @@
 import { ICardShape } from '../interfaces/card';
 import { EDeckLevel } from '../interfaces/devDeck';
 import { EPlayerAction, IGameConfig, IGameShape } from '../interfaces/game';
-import { ETokenColor } from '../interfaces/token';
+import { EGemColor } from '../interfaces/gem';
 import { Api } from './api';
 import { getCardsFromCSV } from './modules/Card/getCardsFromCSV';
 import { populateCardsByLevelFromPool } from './modules/DevDeck/populateCardByLevelFromPool';

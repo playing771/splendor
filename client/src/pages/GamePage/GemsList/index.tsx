@@ -1,34 +1,34 @@
 import React, { memo } from 'react';
 import { TPlayerTokens } from '../../../../../interfaces/player';
-import { ETokenColor } from '../../../../../interfaces/token';
+import { EGemColor } from '../../../../../interfaces/gem';
 import { getKeys } from '../../../../../utils/typescript';
 
 import './styles.css';
 
 interface ITableTokensProps extends IBasicTokensList {
-  tokens: TPlayerTokens;
+  gems: TPlayerTokens;
 }
 
 interface ITokensToTakeProps extends IBasicTokensList {
-  tokens: Partial<TPlayerTokens>;
+  gems: Partial<TPlayerTokens>;
 }
 
 interface IBasicTokensList {
   isActive?: boolean;
-  onClick?: (onClick: ETokenColor) => void;
+  onClick?: (onClick: EGemColor) => void;
   orientaion?: 'horizontal' | 'vertical';
 }
 
-const BasicTokensList = memo(
+const BasicGemsList = memo(
   ({
     tokensList,
     isActive,
     onClick,
     orientaion = 'vertical',
   }: IBasicTokensList & {
-    tokensList: Array<{ color: ETokenColor; value: number }>;
+    tokensList: Array<{ color: EGemColor; value: number }>;
   }) => {
-    const handleClick = (color: ETokenColor) => () => {
+    const handleClick = (color: EGemColor) => () => {
       onClick && onClick(color);
     };
 
@@ -41,7 +41,7 @@ const BasicTokensList = memo(
               onClick={handleClick(color)}
               className={`TokensList_item TokensList_item__${color} ${
                 isActive &&
-                color !== ETokenColor.Gold &&
+                color !== EGemColor.Gold &&
                 'TokensList_item__active'
               }`}
             >
@@ -54,28 +54,28 @@ const BasicTokensList = memo(
   }
 );
 
-export const TableTokensList = memo(
-  ({ tokens, ...rest }: ITableTokensProps) => {
-    const tokensList = getKeys(tokens).reduce((acc, color) => {
-      const value = tokens[color];
+export const TableGemsList = memo(
+  ({ gems, ...rest }: ITableTokensProps) => {
+    const tokensList = getKeys(gems).reduce((acc, color) => {
+      const value = gems[color];
       acc.push({ color, value });
       return acc;
-    }, [] as Array<{ color: ETokenColor; value: number }>);
+    }, [] as Array<{ color: EGemColor; value: number }>);
 
-    return <BasicTokensList tokensList={tokensList} {...rest} />;
+    return <BasicGemsList tokensList={tokensList} {...rest} />;
   }
 );
 
-export const TokensToTakeList = memo(
-  ({ tokens, ...rest }: ITokensToTakeProps) => {
-    const tokensList = getKeys(tokens).reduce((acc, color) => {
-      const value = tokens[color];
+export const GemsToTakeList = memo(
+  ({ gems, ...rest }: ITokensToTakeProps) => {
+    const tokensList = getKeys(gems).reduce((acc, color) => {
+      const value = gems[color];
       if (!!value) {
         acc.push({ color, value });
       }
       return acc;
-    }, [] as Array<{ color: ETokenColor; value: number }>);
+    }, [] as Array<{ color: EGemColor; value: number }>);
 
-    return <BasicTokensList tokensList={tokensList} {...rest} />;
+    return <BasicGemsList tokensList={tokensList} {...rest} />;
   }
 );

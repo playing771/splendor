@@ -1,6 +1,6 @@
 import { ICardShape } from "../../../../../interfaces/card";
 import { EDeckLevel } from "../../../../../interfaces/devDeck";
-import { ETokenColor } from "../../../../../interfaces/token";
+import { EGemColor } from "../../../../../interfaces/gem";
 import { Card } from "../Card";
 
 export const DeckLevelRow = ({

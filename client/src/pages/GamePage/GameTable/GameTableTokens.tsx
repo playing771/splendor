@@ -1,38 +1,38 @@
 import { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../../interfaces/api';
 import { TPlayerTokens } from '../../../../../interfaces/player';
-import { ETokenColor } from '../../../../../interfaces/token';
-import { TableTokensList, TokensToTakeList } from '../TokensList';
+import { EGemColor } from '../../../../../interfaces/gem';
+import { TableGemsList, GemsToTakeList } from '../GemsList';
 
-const tokensList = Object.values(ETokenColor);
+const tokensList = Object.values(EGemColor);
 
 const emptyTokensToTake = {
-  [ETokenColor.Black]: 0,
-  [ETokenColor.Red]: 0,
-  [ETokenColor.Green]: 0,
-  [ETokenColor.Blue]: 0,
-  [ETokenColor.Gold]: 0,
-  [ETokenColor.White]: 0,
+  [EGemColor.Black]: 0,
+  [EGemColor.Red]: 0,
+  [EGemColor.Green]: 0,
+  [EGemColor.Blue]: 0,
+  [EGemColor.Gold]: 0,
+  [EGemColor.White]: 0,
 };
 
 
 export const GameTableTokens = ({
-  tokens,
+  gems,
   onTakeTokensSubmit,
 }: {
-  tokens: TPlayerTokens;
-  onTakeTokensSubmit: (tokens: Partial<TPlayerTokens>) => void;
+  gems: TPlayerTokens;
+  onTakeTokensSubmit: (gems: Partial<TPlayerTokens>) => void;
 }) => {
   const [canTakeTokens, setCanTakeTokens] = useState(false);
   const [tokensToTake, setTokensToTake] =
     useState<Partial<TPlayerTokens>>(emptyTokensToTake);
 
-  const tokensRemaining = Object.values(ETokenColor).reduce(
+  const tokensRemaining = Object.values(EGemColor).reduce(
     (acc, color) => {
       acc[color] = acc[color] - (tokensToTake[color] || 0);
       return acc;
     },
-    { ...tokens }
+    { ...gems }
   );
 
   const tokensToTakeCount = Object.values(tokensToTake).reduce(
@@ -47,10 +47,10 @@ export const GameTableTokens = ({
   };
 
   const handleTokenTakeClick = useCallback(
-    (color: ETokenColor) => {
+    (color: EGemColor) => {
       if (
         canTakeTokens &&
-        color !== ETokenColor.Gold &&
+        color !== EGemColor.Gold &&
         tokensRemaining[color] > 0
       ) {
         setTokensToTake((prev) => ({ ...prev, [color]: (prev[color] || 0) + 1 }));
@@ -59,7 +59,7 @@ export const GameTableTokens = ({
     [canTakeTokens, tokensRemaining]
   );
 
-  const handleTokenReturnClick = useCallback((color: ETokenColor) => {
+  const handleTokenReturnClick = useCallback((color: EGemColor) => {
     setTokensToTake((prev) => ({ ...prev, [color]: (prev[color] || 0) - 1 }));
   }, []);
 
@@ -74,11 +74,11 @@ export const GameTableTokens = ({
       <div style={{ display: 'flex', columnGap: 8 }}>
         <div>
           <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
-            {canTakeTokens ? 'Cancel' : 'Take tokens'}
+            {canTakeTokens ? 'Cancel' : 'Take gems'}
           </button>
 
-          <TableTokensList
-            tokens={tokensRemaining}
+          <TableGemsList
+            gems={tokensRemaining}
             isActive={canTakeTokens}
             onClick={handleTokenTakeClick}
           />
@@ -93,8 +93,8 @@ export const GameTableTokens = ({
             Submit
           </button>
 
-          <TokensToTakeList
-            tokens={tokensToTake}
+          <GemsToTakeList
+            gems={tokensToTake}
             isActive={true}
             onClick={handleTokenReturnClick}
           />

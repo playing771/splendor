@@ -6,7 +6,7 @@ import {
   TGameTableSafeState,
   TGameTableShape,
 } from '../../../interfaces/gameTable';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 import { DevDeck } from '../DevDeck';
 
 export class GameTable<C> implements TGameTableShape<C> {
@@ -14,7 +14,7 @@ export class GameTable<C> implements TGameTableShape<C> {
   [EDeckLevel.Second]: TGameTableRowShape<C>;
   [EDeckLevel.Third]: TGameTableRowShape<C>;
   
-  tokens: TGameTableShape<C>['tokens']
+  gems: TGameTableShape<C>['gems']
 
   constructor(config: TGameTableConfig<C>) {
     const { willShuffleDecks = true } = config;
@@ -40,11 +40,11 @@ export class GameTable<C> implements TGameTableShape<C> {
       };
     });
   
-    this.tokens = Object.values(ETokenColor).reduce((acc, color) => {
+    this.gems = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = config[color];
 
       return acc
-    }, {} as TGameTableShape<C>['tokens']);
+    }, {} as TGameTableShape<C>['gems']);
 
   }
 
@@ -52,15 +52,15 @@ export class GameTable<C> implements TGameTableShape<C> {
   getSafeState(): TGameTableSafeState<C> {
     return {
       ...this.getSafeDecksState(),
-      tokens: this.getTokensState()
+      gems: this.getTokensState()
     }
   }
 
   private getTokensState() {
-    return Object.values(ETokenColor).reduce((acc, color) => {
-      acc[color] = this.tokens[color];
+    return Object.values(EGemColor).reduce((acc, color) => {
+      acc[color] = this.gems[color];
       return acc;
-    }, {} as { [key in ETokenColor]: number })
+    }, {} as { [key in EGemColor]: number })
   }
 
   private getSafeDecksState() {

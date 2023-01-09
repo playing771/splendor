@@ -2,7 +2,7 @@ import { GameTable } from '../GameTable';
 import { TableManager } from '.';
 import { EDeckLevel } from '../../../interfaces/devDeck';
 import { TGameTableConfig } from '../../../interfaces/gameTable';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 
 const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {
   initialCardsOnTableCount: 4,
@@ -27,12 +27,12 @@ const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {
     { id: 'four_third' },
     { id: 'five_third' },
   ],
-  [ETokenColor.Blue]: 5,
-  [ETokenColor.Black]: 5,
-  [ETokenColor.Gold]: 5,
-  [ETokenColor.Green]: 5,
-  [ETokenColor.Red]: 5,
-  [ETokenColor.White]: 5,
+  [EGemColor.Blue]: 5,
+  [EGemColor.Black]: 5,
+  [EGemColor.Gold]: 5,
+  [EGemColor.Green]: 5,
+  [EGemColor.Red]: 5,
+  [EGemColor.White]: 5,
   willShuffleDecks: false
 };
 
@@ -67,20 +67,20 @@ describe('Table functional', () => {
     expect(tableManager.table[EDeckLevel.Second].deck.cards).toHaveLength(0);
   });
   
-  it('give token from table', ()=> {
+  it('give gem from table', ()=> {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
 
-    expect(tableManager.removeTokens(ETokenColor.Blue, 2)).toBe(2)
-    expect(tableManager.table.tokens[ETokenColor.Blue]).toBe(3)
+    expect(tableManager.removeTokens(EGemColor.Blue, 2)).toBe(2)
+    expect(tableManager.table.gems[EGemColor.Blue]).toBe(3)
   })
 
-  it('take token from table', ()=> {
+  it('take gem from table', ()=> {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
-    tableManager.addTokens(ETokenColor.Blue, 1)
+    tableManager.addTokens(EGemColor.Blue, 1)
 
-    expect(tableManager.table.tokens[ETokenColor.Blue]).toBe(6)
+    expect(tableManager.table.gems[EGemColor.Blue]).toBe(6)
   })
 
 });

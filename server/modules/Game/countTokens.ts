@@ -1,4 +1,4 @@
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 
-export const countTokens = (tokens: { [key in ETokenColor]?: number }) =>
-  Object.values(tokens).reduce((summ, count) => (summ += count), 0);
+export const countTokens = (gems: { [key in EGemColor]?: number }) =>
+  Object.values(gems).reduce((summ, count) => (summ += count), 0);

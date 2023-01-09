@@ -1,7 +1,7 @@
 import { EDeckLevel } from '../../../interfaces/devDeck';
 import { TGameTableShape } from '../../../interfaces/gameTable';
 import { ITableManagerShape } from '../../../interfaces/tableManager';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 import { Nullable } from '../../../utils/typescript';
 
 export class TableManager<C extends { id: string }>
@@ -13,17 +13,17 @@ export class TableManager<C extends { id: string }>
     this.table = table;
   }
 
-  addTokens(color: ETokenColor, count: number) {
-    this.table.tokens[color] += count;
+  addTokens(color: EGemColor, count: number) {
+    this.table.gems[color] += count;
   }
 
-  removeTokens(color: ETokenColor, count: number) {
-    const targetTokenCount = this.table.tokens[color];
+  removeTokens(color: EGemColor, count: number) {
+    const targetTokenCount = this.table.gems[color];
     if (count > targetTokenCount) {
-      throw Error('No more token');
+      throw Error('No more gem');
     }
 
-    this.table.tokens[color] = targetTokenCount - count;
+    this.table.gems[color] = targetTokenCount - count;
     return count;
   }
 

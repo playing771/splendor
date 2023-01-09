@@ -6,8 +6,8 @@ import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
-import { TableTokensList } from './TokensList';
-import { ETokenColor } from '../../../../interfaces/token';
+import { TableGemsList } from './GemsList';
+import { EGemColor } from '../../../../interfaces/gem';
 import { Card } from './Card';
 
 import './styles.css';
@@ -65,13 +65,13 @@ export const GamePage = (props: IProps) => {
         table={table}
         isPlayerActive={isPlayerActive}
         onCardClick={handleCardClick}
-        onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeTokens)}
+        onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
       />
 
-      <TableTokensList tokens={playerState.tokens} orientaion="horizontal" />
+      <TableGemsList gems={playerState.gems} orientaion="horizontal" />
 
       <div style={{ display: 'flex', columnGap: 12 }}>
-        {Object.values(ETokenColor).map((color) => {
+        {Object.values(EGemColor).map((color) => {
           return (
             <ul
               key={color}

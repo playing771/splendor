@@ -1,6 +1,6 @@
 import { EDeckLevel } from "./devDeck";
 import { TGameTableShape } from "./gameTable";
-import { ETokenColor } from "./token";
+import { EGemColor } from "./gem";
 
 export interface ITableManagerShape<C>{
   table: TGameTableShape<C>;

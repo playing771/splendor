@@ -1,4 +1,4 @@
-export enum ETokenColor {
+export enum EGemColor {
   Gold = 'Gold',
   Red = 'Red',
   Blue = 'Blue',
@@ -8,5 +8,5 @@ export enum ETokenColor {
 }
 
 export interface ITokenShape {
-  color: ETokenColor
+  color: EGemColor
 }

@@ -21,7 +21,7 @@ export const GameTable = ({
   isPlayerActive: boolean;
   table: TGameTableSafeState<ICardShape>;
   onCardClick: (cardId:string)=>void
-  onTakeTokensSubmit: (tokens: Partial<TPlayerTokens>) =>void;
+  onTakeTokensSubmit: (gems: Partial<TPlayerTokens>) =>void;
 }) => {
   
   
@@ -45,7 +45,7 @@ export const GameTable = ({
 
       </div>
       <div className="GameTable_sideColumn">
-        <GameTableTokens tokens={table.tokens} onTakeTokensSubmit={onTakeTokensSubmit}  />
+        <GameTableTokens gems={table.gems} onTakeTokensSubmit={onTakeTokensSubmit}  />
       </div>
     </div>
   );

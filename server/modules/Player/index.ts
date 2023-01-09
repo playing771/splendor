@@ -1,5 +1,5 @@
 import { ICardShape, TCardCost } from '../../../interfaces/card';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 import {
   IPlayerConfig,
   IPlayerShape,
@@ -10,7 +10,7 @@ import { countTokens } from '../Game/countTokens';
 import { getKeys } from '../../../utils/typescript';
 
 export class Player implements IPlayerShape {
-  tokens: TPlayerTokens;
+  gems: TPlayerTokens;
   cardsBought: TPlayerCardsBought;
   cardsHolded: ICardShape[];
   name: string;
@@ -19,15 +19,15 @@ export class Player implements IPlayerShape {
   constructor({
     name,
     id,
-    tokens: initialTokens = {} as TPlayerTokens,
+    gems: initialTokens = {} as TPlayerTokens,
     cardsBought: initialCardsBought = {} as TPlayerCardsBought
   }: IPlayerConfig) {
-    this.tokens = Object.values(ETokenColor).reduce((acc, color) => {
+    this.gems = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = initialTokens[color] || 0;
       return acc;
     }, {} as TPlayerTokens);
 
-    this.cardsBought = Object.values(ETokenColor).reduce((acc, color) => {
+    this.cardsBought = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = initialCardsBought[color] || [];
       return acc;
     }, {} as TPlayerCardsBought);
@@ -37,24 +37,24 @@ export class Player implements IPlayerShape {
     this.id = id;
   }
 
-  getTokens(color: ETokenColor, count: number): void {
-    this.tokens[color] += count;
+  getTokens(color: EGemColor, count: number): void {
+    this.gems[color] += count;
   }
 
-  spendTokens(color: ETokenColor, count: number): void {
-    if (count > this.tokens[color]) {
+  spendTokens(color: EGemColor, count: number): void {
+    if (count > this.gems[color]) {
       throw Error(
-        `Player (id=${this.id}) doesn't have ${count} ${color} tokens `
+        `Player (id=${this.id}) doesn't have ${count} ${color} gems `
       );
     }
-    this.tokens[color] -= count;
+    this.gems[color] -= count;
   }
 
   payCost(cost: TCardCost) {
     const extraTokens = this.tokensFromCardsBought;
 
     // tokensSpent = CardCost - TokensOfPlayerCards
-    const tokensSpent = Object.values(ETokenColor).reduce((acc, color)=>{
+    const tokensSpent = Object.values(EGemColor).reduce((acc, color)=>{
       acc[color] = 0;
       return acc;
     }, {} as TPlayerTokens);
@@ -79,12 +79,12 @@ export class Player implements IPlayerShape {
     return tokensSpent;
   }
 
-  private calculateTokensFromBoughtCards(color: ETokenColor) {
+  private calculateTokensFromBoughtCards(color: EGemColor) {
     return this.cardsBought[color].length;
   }
 
   get tokensCount() {
-    return countTokens(this.tokens);
+    return countTokens(this.gems);
   }
 
   get cardsHoldedCount() {
@@ -104,7 +104,7 @@ export class Player implements IPlayerShape {
       cardsBought: this.cardsBought,
       cardsHolded: this.cardsHolded,
       name: this.name,
-      tokens: this.tokens,
+      gems: this.gems,
       tokensCount: this.tokensCount
     }
   }

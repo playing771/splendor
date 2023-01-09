@@ -1,13 +1,13 @@
 import { EDeckLevel } from "./devDeck";
-import { ETokenColor } from "./token";
+import { EGemColor } from "./gem";
 
 export type TCardCost = {
-  [key in ETokenColor]?: number
+  [key in EGemColor]?: number
 }
 
 export interface ICardShape {
   id: string;
-  color: ETokenColor;
+  color: EGemColor;
   score: number;
   cost: TCardCost
   lvl: EDeckLevel

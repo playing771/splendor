@@ -4,7 +4,7 @@ import { EDeckLevel } from '../../../interfaces/devDeck';
 import { EPlayerAction, EPLayerState } from '../../../interfaces/game';
 import { TGameTableConfig } from '../../../interfaces/gameTable';
 import { IPlayerConfig } from '../../../interfaces/player';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { MOCKED_CARDS_POOL } from './mockedCards';
 
@@ -28,12 +28,12 @@ const MOCKED_CARDS_POOL_BY_LVL =
 const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
   initialCardsOnTableCount: 3,
   willShuffleDecks: false,
-  [ETokenColor.Blue]: 5,
-  [ETokenColor.Black]: 5,
-  [ETokenColor.Gold]: 5,
-  [ETokenColor.Green]: 5,
-  [ETokenColor.Red]: 5,
-  [ETokenColor.White]: 5,
+  [EGemColor.Blue]: 5,
+  [EGemColor.Black]: 5,
+  [EGemColor.Gold]: 5,
+  [EGemColor.Green]: 5,
+  [EGemColor.Red]: 5,
+  [EGemColor.White]: 5,
   ...MOCKED_CARDS_POOL_BY_LVL,
 };
 
@@ -44,19 +44,19 @@ const GAME_CONFIG = {
 
 describe('Game functionality', () => {
   it.each([...PLAYERS])(
-    'initializes game with players without tokens',
+    'initializes game with players without gems',
     (player) => {
       const game = new Game(GAME_CONFIG);
 
       expect(game.showPlayerTokens(player.id)).toEqual({
         count: 0,
-        tokens: {
-          [ETokenColor.Blue]: 0,
-          [ETokenColor.Red]: 0,
-          [ETokenColor.Green]: 0,
-          [ETokenColor.Black]: 0,
-          [ETokenColor.Gold]: 0,
-          [ETokenColor.White]: 0,
+        gems: {
+          [EGemColor.Blue]: 0,
+          [EGemColor.Red]: 0,
+          [EGemColor.Green]: 0,
+          [EGemColor.Black]: 0,
+          [EGemColor.Gold]: 0,
+          [EGemColor.White]: 0,
         },
       });
     }
@@ -106,56 +106,60 @@ describe('Game functionality', () => {
     expect(game.getPlayerState(SECOND_PLAYER.id)).toBe(EPLayerState.Idle);
   });
 
-  it('can show player tokens', () => {
+  it('can show player gems', () => {
     const game = new Game(GAME_CONFIG);
 
     expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('count');
-    expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('tokens');
+    expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('gems');
   });
 
-  it('can give tokens to player', () => {
+  it('can give gems to player', () => {
     const game = new Game(GAME_CONFIG);
 
     expect(game.getPlayer(FIRST_PLAYER.id).tokensCount).toBe(0);
 
     const TOKENS_TO_TAKE = {
-      [ETokenColor.Blue]: 1,
-      [ETokenColor.Red]: 1,
-      [ETokenColor.Black]: 1,
+      [EGemColor.Blue]: 1,
+      [EGemColor.Red]: 1,
+      [EGemColor.Black]: 1,
     };
 
-    game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeTokens, TOKENS_TO_TAKE);
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, TOKENS_TO_TAKE);
 
-    expect(game.table.tokens[ETokenColor.Blue]).toBe(
-      TABLE_CONFIG[ETokenColor.Blue] - TOKENS_TO_TAKE[ETokenColor.Blue]
+    expect(game.table.gems[EGemColor.Blue]).toBe(
+      TABLE_CONFIG[EGemColor.Blue] - TOKENS_TO_TAKE[EGemColor.Blue]
     );
-    expect(game.table.tokens[ETokenColor.Red]).toBe(
-      TABLE_CONFIG[ETokenColor.Red] - TOKENS_TO_TAKE[ETokenColor.Red]
+    expect(game.table.gems[EGemColor.Red]).toBe(
+      TABLE_CONFIG[EGemColor.Red] - TOKENS_TO_TAKE[EGemColor.Red]
     );
-    expect(game.table.tokens[ETokenColor.Black]).toBe(
-      TABLE_CONFIG[ETokenColor.Black] - TOKENS_TO_TAKE[ETokenColor.Black]
+    expect(game.table.gems[EGemColor.Black]).toBe(
+      TABLE_CONFIG[EGemColor.Black] - TOKENS_TO_TAKE[EGemColor.Black]
     );
 
     expect(game.getPlayer(FIRST_PLAYER.id).tokensCount).toBe(3);
-    expect(game.getPlayer(FIRST_PLAYER.id).tokens).toEqual({
-      [ETokenColor.Blue]: 1,
-      [ETokenColor.Red]: 1,
-      [ETokenColor.Black]: 1,
-      [ETokenColor.Green]: 0,
-      [ETokenColor.Gold]: 0,
-      [ETokenColor.White]: 0,
+    expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
+      [EGemColor.Blue]: 1,
+      [EGemColor.Red]: 1,
+      [EGemColor.Black]: 1,
+      [EGemColor.Green]: 0,
+      [EGemColor.Gold]: 0,
+      [EGemColor.White]: 0,
     });
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
   });
 
+  it('can take 3 different gems', ()=> {
+    
+  })
+
   it('let player buy a card', () => {
     const PLAYER_INITIAL_TOKENS = {
-      [ETokenColor.Blue]: 5,
-      [ETokenColor.Black]: 3,
-      [ETokenColor.Green]: 3,
-      [ETokenColor.Gold]: 0,
-      [ETokenColor.Red]: 0,
-      [ETokenColor.White]: 0,
+      [EGemColor.Blue]: 5,
+      [EGemColor.Black]: 3,
+      [EGemColor.Green]: 3,
+      [EGemColor.Gold]: 0,
+      [EGemColor.Red]: 0,
+      [EGemColor.White]: 0,
     };
 
     const game = new Game({
@@ -164,7 +168,7 @@ describe('Game functionality', () => {
         {
           name: 'max',
           id: FIRST_PLAYER.id,
-          tokens: PLAYER_INITIAL_TOKENS,
+          gems: PLAYER_INITIAL_TOKENS,
         },
       ],
     });
@@ -182,57 +186,57 @@ describe('Game functionality', () => {
       game.getPlayer(FIRST_PLAYER.id).cardsBought[CARD_TO_TAKE.color][0].id
     ).toBe(CARD_TO_TAKE.id);
     expect(game.table.First.cards.length === 4);
-    expect(game.getPlayer(FIRST_PLAYER.id).tokens).toEqual({
-      [ETokenColor.Black]:
-        PLAYER_INITIAL_TOKENS[ETokenColor.Black] -
-        (CARD_TO_TAKE.cost[ETokenColor.Black] || 0),
-      [ETokenColor.Blue]:
-        PLAYER_INITIAL_TOKENS[ETokenColor.Blue] -
-        (CARD_TO_TAKE.cost[ETokenColor.Blue] || 0),
-      [ETokenColor.Gold]:
-        PLAYER_INITIAL_TOKENS[ETokenColor.Gold] -
-        (CARD_TO_TAKE.cost[ETokenColor.Gold] || 0),
-      [ETokenColor.Green]:
-        PLAYER_INITIAL_TOKENS[ETokenColor.Green] -
-        (CARD_TO_TAKE.cost[ETokenColor.Green] || 0),
-      [ETokenColor.Red]:
-        PLAYER_INITIAL_TOKENS[ETokenColor.Red] -
-        (CARD_TO_TAKE.cost[ETokenColor.Red] || 0),
-      [ETokenColor.White]:
-        PLAYER_INITIAL_TOKENS[ETokenColor.White] -
-        (CARD_TO_TAKE.cost[ETokenColor.White] || 0),
+    expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
+      [EGemColor.Black]:
+        PLAYER_INITIAL_TOKENS[EGemColor.Black] -
+        (CARD_TO_TAKE.cost[EGemColor.Black] || 0),
+      [EGemColor.Blue]:
+        PLAYER_INITIAL_TOKENS[EGemColor.Blue] -
+        (CARD_TO_TAKE.cost[EGemColor.Blue] || 0),
+      [EGemColor.Gold]:
+        PLAYER_INITIAL_TOKENS[EGemColor.Gold] -
+        (CARD_TO_TAKE.cost[EGemColor.Gold] || 0),
+      [EGemColor.Green]:
+        PLAYER_INITIAL_TOKENS[EGemColor.Green] -
+        (CARD_TO_TAKE.cost[EGemColor.Green] || 0),
+      [EGemColor.Red]:
+        PLAYER_INITIAL_TOKENS[EGemColor.Red] -
+        (CARD_TO_TAKE.cost[EGemColor.Red] || 0),
+      [EGemColor.White]:
+        PLAYER_INITIAL_TOKENS[EGemColor.White] -
+        (CARD_TO_TAKE.cost[EGemColor.White] || 0),
     });
-    expect(game.table.tokens).toEqual({
-      [ETokenColor.Black]:
-        GAME_CONFIG.tableConfig[ETokenColor.Black] +
-        (CARD_TO_TAKE.cost[ETokenColor.Black] || 0),
-      [ETokenColor.Blue]:
-        GAME_CONFIG.tableConfig[ETokenColor.Blue] +
-        (CARD_TO_TAKE.cost[ETokenColor.Blue] || 0),
-      [ETokenColor.Gold]:
-        GAME_CONFIG.tableConfig[ETokenColor.Gold] +
-        (CARD_TO_TAKE.cost[ETokenColor.Gold] || 0),
-      [ETokenColor.Green]:
-        GAME_CONFIG.tableConfig[ETokenColor.Green] +
-        (CARD_TO_TAKE.cost[ETokenColor.Green] || 0),
-      [ETokenColor.Red]:
-        GAME_CONFIG.tableConfig[ETokenColor.Red] +
-        (CARD_TO_TAKE.cost[ETokenColor.Red] || 0),
-      [ETokenColor.White]:
-        GAME_CONFIG.tableConfig[ETokenColor.White] +
-        (CARD_TO_TAKE.cost[ETokenColor.White] || 0),
+    expect(game.table.gems).toEqual({
+      [EGemColor.Black]:
+        GAME_CONFIG.tableConfig[EGemColor.Black] +
+        (CARD_TO_TAKE.cost[EGemColor.Black] || 0),
+      [EGemColor.Blue]:
+        GAME_CONFIG.tableConfig[EGemColor.Blue] +
+        (CARD_TO_TAKE.cost[EGemColor.Blue] || 0),
+      [EGemColor.Gold]:
+        GAME_CONFIG.tableConfig[EGemColor.Gold] +
+        (CARD_TO_TAKE.cost[EGemColor.Gold] || 0),
+      [EGemColor.Green]:
+        GAME_CONFIG.tableConfig[EGemColor.Green] +
+        (CARD_TO_TAKE.cost[EGemColor.Green] || 0),
+      [EGemColor.Red]:
+        GAME_CONFIG.tableConfig[EGemColor.Red] +
+        (CARD_TO_TAKE.cost[EGemColor.Red] || 0),
+      [EGemColor.White]:
+        GAME_CONFIG.tableConfig[EGemColor.White] +
+        (CARD_TO_TAKE.cost[EGemColor.White] || 0),
     });
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
   });
 
   it('lets use cards resources to pay for a card', () => {
     const PLAYER_INITIAL_TOKENS = {
-      [ETokenColor.Blue]: 1,
-      [ETokenColor.Black]: 0,
-      [ETokenColor.Green]: 1,
-      [ETokenColor.Gold]: 0,
-      [ETokenColor.Red]: 0,
-      [ETokenColor.White]: 0,
+      [EGemColor.Blue]: 1,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 1,
+      [EGemColor.Gold]: 0,
+      [EGemColor.Red]: 0,
+      [EGemColor.White]: 0,
     };
 
     const game = new Game({
@@ -241,11 +245,11 @@ describe('Game functionality', () => {
         {
           name: 'max',
           id: FIRST_PLAYER.id,
-          tokens: PLAYER_INITIAL_TOKENS,
+          gems: PLAYER_INITIAL_TOKENS,
           cardsBought: {
-            [ETokenColor.Black]: [
+            [EGemColor.Black]: [
               {
-                color: ETokenColor.Black,
+                color: EGemColor.Black,
                 cost: {},
                 id: 'SOME',
                 lvl: EDeckLevel.First,
@@ -262,8 +266,8 @@ describe('Game functionality', () => {
       EPlayerAction.BuyCard,
       game.table[EDeckLevel.First].cards[0].id
     );
-    expect(game.table.tokens[ETokenColor.Black]).toBe(
-      TABLE_CONFIG[ETokenColor.Black]
+    expect(game.table.gems[EGemColor.Black]).toBe(
+      TABLE_CONFIG[EGemColor.Black]
     );
   });
 
@@ -285,8 +289,8 @@ describe('Game functionality', () => {
     const game = new Game(GAME_CONFIG);
 
     expect(game.getPlayerAvailableActions(FIRST_PLAYER.id)).toEqual([
-      EPlayerAction.TakeTokens,
-      EPlayerAction.TakeTokensOverLimit,
+      EPlayerAction.TakeGems,
+      EPlayerAction.TakeGemsOverLimit,
       EPlayerAction.BuyCard,
       EPlayerAction.EndTurn,
     ]);

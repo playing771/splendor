@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { ICardShape } from '../../../../../interfaces/card';
-import { ETokenColor } from '../../../../../interfaces/token';
+import { EGemColor } from '../../../../../interfaces/gem';
 
 import './styles.css';
 
@@ -14,7 +14,7 @@ export const Card = memo(({ id, color, cost, score, onClick }: IProps) => {
   };
 
   const costs = Object.entries(cost).filter(([_, value]) => value > 0) as [
-    ETokenColor,
+    EGemColor,
     number
   ][];
 

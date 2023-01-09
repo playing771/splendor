@@ -1,10 +1,10 @@
 import { ICardShape, TCardCost } from '../../interfaces/card'
 import { EDeckLevel } from '../../interfaces/devDeck';
-import { ETokenColor } from '../../interfaces/token';
+import { EGemColor } from '../../interfaces/gem';
 
 export class Card implements ICardShape {
   id: string;
-  color: ETokenColor;
+  color: EGemColor;
   score: number;
   cost: TCardCost;
   lvl: EDeckLevel;

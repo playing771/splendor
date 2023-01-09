@@ -8,7 +8,7 @@ import {
   IGameShape,
 } from '../../../interfaces/game';
 import { IPlayerConfig } from '../../../interfaces/player';
-import { ETokenColor } from '../../../interfaces/token';
+import { EGemColor } from '../../../interfaces/gem';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
@@ -102,8 +102,8 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public showPlayerTokens(playerId: string) {
-    const { tokens, tokensCount } = this.getPlayer(playerId);
-    return { count: tokensCount, tokens };
+    const { gems, tokensCount } = this.getPlayer(playerId);
+    return { count: tokensCount, gems };
   }
 
   public dispatch(userId:string, action: EPlayerAction, data?: any) {
@@ -116,7 +116,7 @@ export class Game implements IGameShape<ICardShape> {
     }
 
     switch (action) {
-      case EPlayerAction.TakeTokens:
+      case EPlayerAction.TakeGems:
         this.giveTokensToPlayer(userId, data);
         break;
 
@@ -125,7 +125,7 @@ export class Game implements IGameShape<ICardShape> {
         break;
       }
       default:
-        // TODO: make same as TakeTokens for all actions
+        // TODO: make same as TakeGems for all actions
         this.dispatchPlayerAction(userId, action, data);
         break;
     }
@@ -157,22 +157,22 @@ export class Game implements IGameShape<ICardShape> {
 
   private giveTokensToPlayer(
     playerId: string,
-    tokens: { [key in ETokenColor]?: number }
+    gems: { [key in EGemColor]?: number }
   ) {
     const targetPlayer = this.getPlayer(playerId);
 
     this.dispatchPlayerAction(
       playerId,
       targetPlayer.tokensCount <= TOKENS_LIMIT
-        ? EPlayerAction.TakeTokens
-        : EPlayerAction.TakeTokensOverLimit
+        ? EPlayerAction.TakeGems
+        : EPlayerAction.TakeGemsOverLimit
     );
 
-    for (const color of getKeys(tokens)) {
-      if (typeof tokens[color] === 'number') {
+    for (const color of getKeys(gems)) {
+      if (typeof gems[color] === 'number') {
         const count = this.tableManager.removeTokens(
           color,
-          tokens[color] as number
+          gems[color] as number
         );
         targetPlayer.getTokens(color, count);
       }
@@ -190,7 +190,7 @@ export class Game implements IGameShape<ICardShape> {
 
     const tokensSpent = targetPlayer.buyCard(targetCard);
 
-    Object.values(ETokenColor).forEach((color) => {
+    Object.values(EGemColor).forEach((color) => {
       this.tableManager.addTokens(color, tokensSpent[color])
     })
 
@@ -241,8 +241,8 @@ export class Game implements IGameShape<ICardShape> {
   //     return true
   //   };
 
-  // private takeTokensPlayerActionCreator = (playerId: string) => (tokens: Partial<TPlayerTokens>)=> {
-  //   this.giveTokensToPlayer(playerId, tokens);
+  // private takeTokensPlayerActionCreator = (playerId: string) => (gems: Partial<TPlayerTokens>)=> {
+  //   this.giveTokensToPlayer(playerId, gems);
 
   //   return true
   // }

@@ -1,7 +1,7 @@
 import { DevDeck } from '../server/modules/DevDeck';
 import { EDeckLevel, IDevDeckShape } from './devDeck';
 import { TPlayerTokens } from './player';
-import { ETokenColor } from './token';
+import { EGemColor } from './gem';
 
 export type TGameTableRowShape<C> = {
   deck: IDevDeckShape<C>;
@@ -14,15 +14,15 @@ export type TGameTableRowSafeShape<C> = {
 }
 
 export type TGameTableSafeState<C> = {
-  tokens: TPlayerTokens;
+  gems: TPlayerTokens;
 } & { [key in EDeckLevel]: TGameTableRowSafeShape<C> }
 
 export type TGameTableShape<C> = {
   [EDeckLevel.First]: TGameTableRowShape<C>;
   [EDeckLevel.Second]: TGameTableRowShape<C>;
   [EDeckLevel.Third]: TGameTableRowShape<C>;
-  tokens: {
-    [key in ETokenColor]: number;
+  gems: {
+    [key in EGemColor]: number;
   }
 };
 
@@ -31,12 +31,12 @@ export type TGameTableConfig<C> = {
   [EDeckLevel.Second]: Array<C>;
   [EDeckLevel.Third]: Array<C>;
 
-  [ETokenColor.Blue]: number,
-  [ETokenColor.Black]: number,
-  [ETokenColor.Gold]: number,
-  [ETokenColor.Green]: number,
-  [ETokenColor.Red]: number,
-  [ETokenColor.White]: number,
+  [EGemColor.Blue]: number,
+  [EGemColor.Black]: number,
+  [EGemColor.Gold]: number,
+  [EGemColor.Green]: number,
+  [EGemColor.Red]: number,
+  [EGemColor.White]: number,
   initialCardsOnTableCount: number,
   willShuffleDecks?: boolean
 };
