@@ -122,7 +122,7 @@ export class Game implements IGameShape<ICardShape> {
 
     switch (action) {
       case EPlayerAction.TakeGems:
-        this.buyGemsByPlayer(userId, data);
+        this.takeGemsByPlayer(userId, data);
         break;
 
       case EPlayerAction.BuyCard: {
@@ -176,9 +176,9 @@ export class Game implements IGameShape<ICardShape> {
       : [];
   }
 
-  private buyGemsByPlayer(playerId: string, gems: TPlayerGems) {
+  private takeGemsByPlayer(playerId: string, gems: TPlayerGems) {
     if (gems[EGemColor.Gold] > 0) {
-      throw Error(`Cant buy ${EGemColor.Gold} tokens`);
+      throw Error(`Cant take ${EGemColor.Gold} tokens`);
     }
 
     const colors = Object.entries(gems) as [EGemColor, number][];
@@ -201,15 +201,18 @@ export class Game implements IGameShape<ICardShape> {
         );
       }
 
-      // cant take any other gems if already taken 2 of the same color
+      // can take only 2 same color gems or 3 gems of different colors 
       if (value === TAKE_GEM_LIMIT_SAME_COLOR) {
+        if (gemsToTakeLimitRemaining < TAKE_GEM_LIMIT) {
+          throw Error(`Cant take ${value} gems if any other gems are taken`);
+        }
         gemsToTakeLimitRemaining = 0;
       } else {
         gemsToTakeLimitRemaining -= value;
       }
 
       if (gemsToTakeLimitRemaining < 0) {
-        throw Error(`Cant take ${value} ${color} gems`);
+        throw Error(`Cant take gems any more`);
       }
     }
 
@@ -254,28 +257,33 @@ export class Game implements IGameShape<ICardShape> {
     return card;
   }
 
-  private holdCardFromTableByPlayer(playerId: string, cardId?: string): ICardShape {
+  private holdCardFromTableByPlayer(playerId: string, cardId: string): ICardShape {
     const targetPlayer = this.getPlayer(playerId);
-
-    if (!cardId) throw Error('cant hold a card without cardId provided');
 
     if (targetPlayer.cardsHoldedCount >= PLAYER_CARDS_HOLDED_MAX) {
       throw Error(`cant hold cards more than ${PLAYER_CARDS_HOLDED_MAX}`)
     }
     const card = this.tableManager.giveCardFromTable(cardId);
     targetPlayer.holdCard(card);
-    this.giveGemsToPlayer(playerId, {
-      [EGemColor.Gold]: GOLD_GEMS_FOR_CARD_HOLD,
-    });
+    
+    // can hold a card even if no Gold gems available
+    if (this.tableManager.table.gems[EGemColor.Gold] > 0) {
+      this.giveGemsToPlayer(playerId, {
+        [EGemColor.Gold]: GOLD_GEMS_FOR_CARD_HOLD,
+      });
+    }
 
     this.dispatchPlayerAction(
       playerId,
-      EPlayerAction.HoldCardFromTable,
+      targetPlayer.gemsCount <= PLAYER_GEMS_MAX
+          ? EPlayerAction.HoldCardFromTable
+          : EPlayerAction.TakeGemsOverLimit
     );
 
     return card;
   }
 
+  // TODO: move share logic between holdCard actions to one place
   private holdCardFromDeckByPlayer(playerId: string, lvl: EDeckLevel): ICardShape {
     const targetPlayer = this.getPlayer(playerId);
 
@@ -291,13 +299,18 @@ export class Game implements IGameShape<ICardShape> {
 
     targetPlayer.holdCard(card);
 
-    this.giveGemsToPlayer(playerId, {
-      [EGemColor.Gold]: GOLD_GEMS_FOR_CARD_HOLD,
-    });
+    // can hold a card even if no Gold gems available
+    if (this.tableManager.table.gems[EGemColor.Gold] > 0) {
+      this.giveGemsToPlayer(playerId, {
+        [EGemColor.Gold]: GOLD_GEMS_FOR_CARD_HOLD,
+      });
+    }
 
     this.dispatchPlayerAction(
       playerId,
-      EPlayerAction.HoldCardFromDeck
+      targetPlayer.gemsCount <= PLAYER_GEMS_MAX
+      ? EPlayerAction.HoldCardFromDeck
+      : EPlayerAction.TakeGemsOverLimit
     );
 
     return card
@@ -316,9 +329,6 @@ export class Game implements IGameShape<ICardShape> {
         EPLayerState.Idle,
         createPlayerSMDefinition({
           move: this.move,
-          // buyCard: this.buyCardPlayerActionCreator(player.id),
-          // takeGems: this.takeGemsPlayerActionCreator(player.id)
-          // activateNextPlayer: this.startTurnPlayerActionCreator()
         })
       );
 
@@ -335,19 +345,4 @@ export class Game implements IGameShape<ICardShape> {
   private endTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(playerId, EPlayerAction.EndTurn);
   };
-
-  // private buyCardPlayerActionCreator =
-  //   (playerId: string) => (cardId?: string) => {
-
-  //     this.buyCardByPlayer(playerId, cardId);
-  //     this.dispatchPlayerAction(playerId, EPlayerAction.BuyCard, cardId);
-
-  //     return true
-  //   };
-
-  // private takeGemsPlayerActionCreator = (playerId: string) => (gems: Partial<TPlayerGems>)=> {
-  //   this.giveGemsToPlayer(playerId, gems);
-
-  //   return true
-  // }
 }

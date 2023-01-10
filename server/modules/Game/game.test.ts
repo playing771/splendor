@@ -195,6 +195,12 @@ describe('Game functionality', () => {
         [EGemColor.Red]: 1,
       })
     ).toThrow();
+    expect(() =>
+      game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+        [EGemColor.Blue]: 1,
+        [EGemColor.Red]: 2,
+      })
+    ).toThrow();
   });
 
   it(`will throw if a player tries to buy any number of ${EGemColor.Gold}`, () => {
@@ -386,6 +392,29 @@ describe('Game functionality', () => {
       [EGemColor.White]: 0,
     });
   });
+
+  it(`will make player state ${EPLayerState.TooManyGems} if tokens exceeds limit after gold gems taken`, ()=>{
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          ...GAME_CONFIG.players[0],
+          gems: {
+            [EGemColor.Blue]: 8,
+            [EGemColor.Red]: 2,
+          }
+        },
+      ],
+    });
+
+    game.dispatch(
+      FIRST_PLAYER.id,
+      EPlayerAction.HoldCardFromTable,
+      game.table[EDeckLevel.First].cards[0].id
+    )
+
+    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.TooManyGems);
+  })
 
   it(`will throw an error if player tries to hold more than ${PLAYER_CARDS_HOLDED_MAX} cards`, () => {
     const game = new Game({
