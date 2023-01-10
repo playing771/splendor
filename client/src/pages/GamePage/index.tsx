@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../interfaces/api';
 import { EPlayerAction } from '../../../../interfaces/game';
-import { TPlayerTokens } from '../../../../interfaces/player';
+import { TPlayerGems } from '../../../../interfaces/player';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
@@ -30,7 +30,7 @@ export const GamePage = (props: IProps) => {
 
   const handleDispatchAction =
     (action: EPlayerAction) =>
-    async (data?: string | Partial<TPlayerTokens>) => {
+    async (data?: string | Partial<TPlayerGems>) => {
       console.log('action - data', action, data);
 
       await Api.post('game/dispatch', { action, data });

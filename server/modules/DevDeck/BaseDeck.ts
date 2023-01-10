@@ -1,4 +1,4 @@
-import { IBaseDeckShape, IBaseDeckConfig } from "../../../interfaces/baseDeck";
+import { IBaseDeckShape, IBaseDeckConfig } from '../../../interfaces/baseDeck';
 
 export class BaseDeck<C> implements IBaseDeckShape<C> {
   cards: Array<C>;
@@ -11,22 +11,29 @@ export class BaseDeck<C> implements IBaseDeckShape<C> {
 
   getTop() {
     if (this.cards.length === 0) {
-      throw Error("No more cards")
+      throw Error('No more cards');
     }
     const topCard = this.cards.pop();
     return topCard || null;
   }
 
+  lookTop() {
+    if (this.cards.length === 0) {
+      throw Error('No more cards');
+    }
+    const topCard = this.cards[this.cards.length - 1];
+    return topCard || null;
+  }
+
   getTopCards(count: number) {
-    const arr: C[] = []
+    const arr: C[] = [];
     for (let i = 0; i < count; i++) {
       const topCard = this.getTop();
       if (topCard !== null) {
-        arr.push(topCard)
+        arr.push(topCard);
       } else {
         break;
       }
-
     }
     return arr;
   }

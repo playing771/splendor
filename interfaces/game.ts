@@ -22,6 +22,8 @@ export enum EPLayerState {
 export enum EPlayerAction {
   StartTurn = 'START_TURN',
   BuyCard = 'BUY_CARD',
+  HoldCardFromTable = 'HOLD_CARD_FROM_TABLE',
+  HoldCardFromDeck = 'HOLD_CARD_FROM_DECK',
   TakeGems = 'TAKE_GEMS',
   TakeGemsOverLimit = 'TAKE_GEMS_OVER_LIMIT',
   ReturnGems = 'RETURN_GEMS',

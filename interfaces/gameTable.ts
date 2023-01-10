@@ -1,6 +1,6 @@
 import { DevDeck } from '../server/modules/DevDeck';
 import { EDeckLevel, IDevDeckShape } from './devDeck';
-import { TPlayerTokens } from './player';
+import { TPlayerGems } from './player';
 import { EGemColor } from './gem';
 
 export type TGameTableRowShape<C> = {
@@ -14,7 +14,7 @@ export type TGameTableRowSafeShape<C> = {
 }
 
 export type TGameTableSafeState<C> = {
-  gems: TPlayerTokens;
+  gems: TPlayerGems;
 } & { [key in EDeckLevel]: TGameTableRowSafeShape<C> }
 
 export type TGameTableShape<C> = {

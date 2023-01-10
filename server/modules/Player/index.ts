@@ -4,13 +4,14 @@ import {
   IPlayerConfig,
   IPlayerShape,
   TPlayerCardsBought,
-  TPlayerTokens,
+  TPlayerGems,
 } from '../../../interfaces/player';
 import { countTokens } from '../Game/countTokens';
 import { getKeys } from '../../../utils/typescript';
+import { PLAYER_CARDS_HOLDED_MAX } from '../Game/constants';
 
 export class Player implements IPlayerShape {
-  gems: TPlayerTokens;
+  gems: TPlayerGems;
   cardsBought: TPlayerCardsBought;
   cardsHolded: ICardShape[];
   name: string;
@@ -19,13 +20,13 @@ export class Player implements IPlayerShape {
   constructor({
     name,
     id,
-    gems: initialTokens = {} as TPlayerTokens,
+    gems: initialTokens = {} as TPlayerGems,
     cardsBought: initialCardsBought = {} as TPlayerCardsBought
   }: IPlayerConfig) {
     this.gems = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = initialTokens[color] || 0;
       return acc;
-    }, {} as TPlayerTokens);
+    }, {} as TPlayerGems);
 
     this.cardsBought = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = initialCardsBought[color] || [];
@@ -37,7 +38,7 @@ export class Player implements IPlayerShape {
     this.id = id;
   }
 
-  getTokens(color: EGemColor, count: number): void {
+  getGems(color: EGemColor, count: number): void {
     this.gems[color] += count;
   }
 
@@ -54,10 +55,10 @@ export class Player implements IPlayerShape {
     const extraTokens = this.tokensFromCardsBought;
 
     // tokensSpent = CardCost - TokensOfPlayerCards
-    const tokensSpent = Object.values(EGemColor).reduce((acc, color)=>{
+    const tokensSpent = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = 0;
       return acc;
-    }, {} as TPlayerTokens);
+    }, {} as TPlayerGems);
     for (const color of getKeys(cost)) {
       const tokensToSpend = Math.max(
         (cost[color] || 0) - (extraTokens[color] || 0),
@@ -79,6 +80,13 @@ export class Player implements IPlayerShape {
     return tokensSpent;
   }
 
+  holdCard(card: ICardShape) {
+    if (this.cardsHolded.length >= PLAYER_CARDS_HOLDED_MAX) {
+      throw Error(`Cant hold a card: ${this.cardsHolded.length} exceeds ${PLAYER_CARDS_HOLDED_MAX} of cards holded limit`);
+    }
+      this.cardsHolded.push(card);
+  }
+
   private calculateTokensFromBoughtCards(color: EGemColor) {
     return this.cardsBought[color].length;
   }
@@ -98,7 +106,7 @@ export class Player implements IPlayerShape {
     }, {} as TCardCost);
   }
 
-  get state(): IPlayerShape{
+  get state(): IPlayerShape {
     return {
       id: this.id,
       cardsBought: this.cardsBought,

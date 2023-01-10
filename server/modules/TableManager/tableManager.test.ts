@@ -58,12 +58,16 @@ describe('Table functional', () => {
 
   it('give card from table', () => {
     const table = new GameTable(TABLE_CONFIG);
-    const tableManager = new TableManager(table);
-  
-    expect(tableManager.giveCardFromTable('two_second').id).toBe(
-      'two_second'
+    const tableManager = new TableManager(table);    
+    
+    const cardToTake = table[EDeckLevel.Second].cards[0];
+    const newCardFromDeck = table[EDeckLevel.Second].deck.lookTop();
+    const cardTaken = tableManager.giveCardFromTable(cardToTake.id);
+    
+    expect(cardTaken.id).toBe(
+      cardToTake.id
     )
-    expect(tableManager.table[EDeckLevel.Second].cards[3].id).toBe('one_second');
+    expect(tableManager.table[EDeckLevel.Second].cards[0].id).toBe(newCardFromDeck?.id);
     expect(tableManager.table[EDeckLevel.Second].deck.cards).toHaveLength(0);
   });
   

@@ -8,7 +8,7 @@ import { EPlayerAction } from '../../../../../interfaces/game';
 import { ICardShape } from '../../../../../interfaces/card';
 import { TGameTableSafeState } from '../../../../../interfaces/gameTable';
 import { useState } from 'react';
-import { TPlayerTokens } from '../../../../../interfaces/player';
+import { TPlayerGems } from '../../../../../interfaces/player';
 
 const levels = Object.values(EDeckLevel).reverse();
 
@@ -21,7 +21,7 @@ export const GameTable = ({
   isPlayerActive: boolean;
   table: TGameTableSafeState<ICardShape>;
   onCardClick: (cardId:string)=>void
-  onTakeTokensSubmit: (gems: Partial<TPlayerTokens>) =>void;
+  onTakeTokensSubmit: (gems: Partial<TPlayerGems>) =>void;
 }) => {
   
   

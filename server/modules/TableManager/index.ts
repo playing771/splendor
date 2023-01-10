@@ -33,8 +33,8 @@ export class TableManager<C extends { id: string }>
 
   public giveCardFromTable(cardId: string): C {
     const [card, index, level] = this.findCardOnTable(cardId);
-    
     const topCardFromDeck = this.table[level].deck.getTop();
+    
     if (topCardFromDeck !== null) {
       this.table[level].cards[index] = topCardFromDeck;
     }

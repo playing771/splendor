@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../../interfaces/api';
-import { TPlayerTokens } from '../../../../../interfaces/player';
+import { TPlayerGems } from '../../../../../interfaces/player';
 import { EGemColor } from '../../../../../interfaces/gem';
 import { TableGemsList, GemsToTakeList } from '../GemsList';
 
@@ -20,12 +20,12 @@ export const GameTableTokens = ({
   gems,
   onTakeTokensSubmit,
 }: {
-  gems: TPlayerTokens;
-  onTakeTokensSubmit: (gems: Partial<TPlayerTokens>) => void;
+  gems: TPlayerGems;
+  onTakeTokensSubmit: (gems: Partial<TPlayerGems>) => void;
 }) => {
   const [canTakeTokens, setCanTakeTokens] = useState(false);
   const [tokensToTake, setTokensToTake] =
-    useState<Partial<TPlayerTokens>>(emptyTokensToTake);
+    useState<Partial<TPlayerGems>>(emptyTokensToTake);
 
   const tokensRemaining = Object.values(EGemColor).reduce(
     (acc, color) => {

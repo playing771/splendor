@@ -1,7 +1,7 @@
 import { ICardShape, TCardCost } from "./card";
 import { EGemColor } from "./gem";
 
-export type TPlayerTokens = {
+export type TPlayerGems = {
   [key in EGemColor]: number;
 }
 
@@ -12,7 +12,7 @@ export type TPlayerCardsBought = {
 export interface IPlayerShape {
   name: string;
   id: string;
-  gems: TPlayerTokens,
+  gems: TPlayerGems,
   cardsBought: { [key in EGemColor]: ICardShape[] };
   cardsHolded: ICardShape[];
   gemsCount:number;
@@ -21,6 +21,6 @@ export interface IPlayerShape {
 export interface IPlayerConfig {
   name: string;
   id: string;
-  gems?: Partial<TPlayerTokens>;
+  gems?: Partial<TPlayerGems>;
   cardsBought?: Partial<TPlayerCardsBought>;
 }

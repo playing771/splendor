@@ -1,19 +1,11 @@
 import { EPLayerState, EPlayerAction } from '../../../interfaces/game';
-import { TPlayerTokens } from '../../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
-
-export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
-  [EPLayerState.Idle]: false,
-  [EPLayerState.Active]: true,
-  [EPLayerState.OutOfAction]: true,
-  [EPLayerState.TooManyGems]: true,
-};
 
 export const createPlayerSMDefinition = (actions: {
   move: () => void;
   // buyCard: (cardId?: string) => void;
-  // takeTokens: (gems: Partial<TPlayerTokens>) => void;
+  // takeTokens: (gems: Partial<TPlayerGems>) => void;
   // activateNextPlayer: () => void;
 }) => {
   const playerSMDefinition: TStateMachineDefinition<
@@ -34,7 +26,6 @@ export const createPlayerSMDefinition = (actions: {
       transitions: {
         [EPlayerAction.TakeGems]: {
           target: EPLayerState.OutOfAction,
-          // action: (gems) => actions.takeTokens(gems as Partial<TPlayerTokens>),
         },
         [EPlayerAction.TakeGemsOverLimit]: {
           target: EPLayerState.TooManyGems,
@@ -42,9 +33,14 @@ export const createPlayerSMDefinition = (actions: {
         [EPlayerAction.BuyCard]: {
           target: EPLayerState.OutOfAction,
         },
+        [EPlayerAction.HoldCardFromTable]: {
+          target: EPLayerState.OutOfAction
+        },
+        [EPlayerAction.HoldCardFromDeck]: {
+          target: EPLayerState.OutOfAction
+        },
         [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle,
-          // action: actions.activateNextPlayer
         },
       },
     },

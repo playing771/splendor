@@ -1,16 +1,16 @@
 import React, { memo } from 'react';
-import { TPlayerTokens } from '../../../../../interfaces/player';
+import { TPlayerGems } from '../../../../../interfaces/player';
 import { EGemColor } from '../../../../../interfaces/gem';
 import { getKeys } from '../../../../../utils/typescript';
 
 import './styles.css';
 
 interface ITableTokensProps extends IBasicTokensList {
-  gems: TPlayerTokens;
+  gems: TPlayerGems;
 }
 
 interface ITokensToTakeProps extends IBasicTokensList {
-  gems: Partial<TPlayerTokens>;
+  gems: Partial<TPlayerGems>;
 }
 
 interface IBasicTokensList {
