@@ -7,14 +7,14 @@ import {
   IGameConfig,
   IGameShape,
 } from '../../../interfaces/game';
-import { IPlayerConfig } from '../../../interfaces/player';
+import { IPlayerConfig, TPlayerTokens } from '../../../interfaces/player';
 import { EGemColor } from '../../../interfaces/gem';
 import { GameTable } from '../GameTable';
 import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
 import { IStateMachine } from '../StateMachine/models';
 import { TableManager } from '../TableManager';
-import { TOKENS_LIMIT } from './constants';
+import { TAKE_GEM_LIMIT, PLAYER_MAX_GEMS_LIMIT, TAKE_GEM_LIMIT_SAME_COLOR, GEMS_IN_STOCK_LIMIT } from './constants';
 import {
   createGameSMDefinition,
   EGameBasicState,
@@ -44,7 +44,7 @@ export class Game implements IGameShape<ICardShape> {
     players,
     tableConfig,
   }: IGameConfig & { players: IPlayerConfig[] }) {
-    this.id =uuidv4();
+    this.id = uuidv4();
 
     this.table = new GameTable(tableConfig);
     this.tableManager = new TableManager(this.table);
@@ -67,12 +67,12 @@ export class Game implements IGameShape<ICardShape> {
 
   public start = () => {
     this.sm.dispatchTransition('start');
-    return true
+    return true;
   };
 
   public move = () => {
     this.sm.dispatchTransition('next');
-    return true
+    return true;
   };
 
   public getState() {
@@ -101,27 +101,28 @@ export class Game implements IGameShape<ICardShape> {
     return this.sm.value === playerId;
   }
 
-  public showPlayerTokens(playerId: string) {
-    const { gems, tokensCount } = this.getPlayer(playerId);
-    return { count: tokensCount, gems };
+  public showPlayerGems(playerId: string) {
+    const { gems, gemsCount } = this.getPlayer(playerId);
+    return { count: gemsCount, gems };
   }
 
-  public dispatch(userId:string, action: EPlayerAction, data?: any) {
-
+  public dispatch(userId: string, action: EPlayerAction, data?: any) {
     const actionIsAllowed = this.smPlayers[userId].checkTransition(action);
-    console.log('actionIsAllowed',actionIsAllowed);
-    
+    console.log('actionIsAllowed', actionIsAllowed);
+
     if (!actionIsAllowed) {
-      throw Error(`cant dispatch ${action} for ${userId} now (player state: ${this.smPlayers[userId].value})`)
+      throw Error(
+        `cant dispatch ${action} for ${userId} now (player state: ${this.smPlayers[userId].value})`
+      );
     }
 
     switch (action) {
       case EPlayerAction.TakeGems:
-        this.giveTokensToPlayer(userId, data);
+        this.buyTokensByPlayer(userId, data);
         break;
 
       case EPlayerAction.BuyCard: {
-        this.buyCardByPlayer(userId, data)
+        this.buyCardByPlayer(userId, data);
         break;
       }
       default:
@@ -150,49 +151,68 @@ export class Game implements IGameShape<ICardShape> {
 
     return stateHasActions
       ? getKeys(
-        playerStateMachine.definition[playerStateMachine.value].transitions
-      )
+          playerStateMachine.definition[playerStateMachine.value].transitions
+        )
       : [];
   }
 
-  private giveTokensToPlayer(
-    playerId: string,
-    gems: { [key in EGemColor]?: number }
-  ) {
+  private buyTokensByPlayer(playerId:string, gems: TPlayerTokens) {
+
+    if (gems[EGemColor.Gold] > 0) {
+      throw Error(`Cant buy ${EGemColor.Gold} tokens`);
+    }
+
+    const colors = Object.entries(gems) as [EGemColor, number][];
+
+    // check limit of 3 diff color or 2 of the same color
+    let gemsToTakeLimitRemaining = TAKE_GEM_LIMIT;
+
+    for (const [color, value] of colors) {
+      if (value > TAKE_GEM_LIMIT_SAME_COLOR){
+        throw Error(`${value} exceeds the limit ${TAKE_GEM_LIMIT_SAME_COLOR} of same color gems to take`)
+      }
+      if (this.tableManager.table.gems[color] < GEMS_IN_STOCK_LIMIT){
+        throw Error(`Cant take ${value} ${color} gems because the stock is less than ${GEMS_IN_STOCK_LIMIT}`)
+      }
+      gemsToTakeLimitRemaining -= value === 1? value: TAKE_GEM_LIMIT;
+
+      if (gemsToTakeLimitRemaining < 0) {
+        throw Error(`Cant take ${value} ${color} gems`)
+      }
+    }
+
+    this.giveTokensToPlayer(playerId, gems);
+  }
+
+  private giveTokensToPlayer(playerId: string, gems: TPlayerTokens) {
     const targetPlayer = this.getPlayer(playerId);
+    const colors = Object.entries(gems) as [EGemColor, number][];
 
     this.dispatchPlayerAction(
       playerId,
-      targetPlayer.tokensCount <= TOKENS_LIMIT
+      targetPlayer.gemsCount <= PLAYER_MAX_GEMS_LIMIT
         ? EPlayerAction.TakeGems
         : EPlayerAction.TakeGemsOverLimit
     );
 
-    for (const color of getKeys(gems)) {
-      if (typeof gems[color] === 'number') {
-        const count = this.tableManager.removeTokens(
-          color,
-          gems[color] as number
-        );
-        targetPlayer.getTokens(color, count);
-      }
+    for (const [color, value] of colors) {
+      const count = this.tableManager.removeGems(color, value);
+      targetPlayer.getTokens(color, count);
     }
-
-
   }
 
   private buyCardByPlayer(playerId: string, cardId?: string): ICardShape {
     const targetPlayer = this.getPlayer(playerId);
 
-    if (!cardId) throw Error('cant buy a card without cardId provided')
+    if (!cardId) throw Error('cant buy a card without cardId provided');
 
     const [targetCard] = this.tableManager.findCardOnTable(cardId);
 
     const tokensSpent = targetPlayer.buyCard(targetCard);
 
     Object.values(EGemColor).forEach((color) => {
-      this.tableManager.addTokens(color, tokensSpent[color])
-    })
+      this.tableManager.addGems(color, tokensSpent[color]);
+    });
 
     const card = this.tableManager.giveCardFromTable(cardId);
 

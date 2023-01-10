@@ -3,7 +3,10 @@ import { EGemColor } from "../../../interfaces/gem";
 import { getCardsFromCSV } from "../Card/getCardsFromCSV";
 import { populateCardsByLevelFromPool } from "../DevDeck/populateCardByLevelFromPool";
 
-export const TOKENS_LIMIT = 10;
+export const PLAYER_MAX_GEMS_LIMIT = 10;
+export const TAKE_GEM_LIMIT = 3;
+export const TAKE_GEM_LIMIT_SAME_COLOR = 2;
+export const GEMS_IN_STOCK_LIMIT = 4;
 
 const cardsPool = getCardsFromCSV();
 

@@ -7,6 +7,7 @@ import { IPlayerConfig } from '../../../interfaces/player';
 import { EGemColor } from '../../../interfaces/gem';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { MOCKED_CARDS_POOL } from './mockedCards';
+import { GEMS_IN_STOCK_LIMIT, TAKE_GEM_LIMIT, TAKE_GEM_LIMIT_SAME_COLOR } from './constants';
 
 const PLAYERS: IPlayerConfig[] = [
   {
@@ -48,7 +49,7 @@ describe('Game functionality', () => {
     (player) => {
       const game = new Game(GAME_CONFIG);
 
-      expect(game.showPlayerTokens(player.id)).toEqual({
+      expect(game.showPlayerGems(player.id)).toEqual({
         count: 0,
         gems: {
           [EGemColor.Blue]: 0,
@@ -74,10 +75,12 @@ describe('Game functionality', () => {
     expect(game.getState()).toBe(FIRST_PLAYER.id);
   });
 
-  it('will throw an Error if player cant change a state', ()=> {
+  it('will throw an Error if player cant change a state', () => {
     const game = new Game(GAME_CONFIG);
-    expect(()=>{game.dispatch(SECOND_PLAYER.id, EPlayerAction.EndTurn)}).toThrow()
-  })
+    expect(() => {
+      game.dispatch(SECOND_PLAYER.id, EPlayerAction.EndTurn);
+    }).toThrow();
+  });
 
   it('can change active players state', () => {
     const game = new Game(GAME_CONFIG);
@@ -109,34 +112,34 @@ describe('Game functionality', () => {
   it('can show player gems', () => {
     const game = new Game(GAME_CONFIG);
 
-    expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('count');
-    expect(game.showPlayerTokens(FIRST_PLAYER.id)).toHaveProperty('gems');
+    expect(game.showPlayerGems(FIRST_PLAYER.id)).toHaveProperty('count');
+    expect(game.showPlayerGems(FIRST_PLAYER.id)).toHaveProperty('gems');
   });
 
   it('can give gems to player', () => {
     const game = new Game(GAME_CONFIG);
 
-    expect(game.getPlayer(FIRST_PLAYER.id).tokensCount).toBe(0);
+    expect(game.getPlayer(FIRST_PLAYER.id).gemsCount).toBe(0);
 
-    const TOKENS_TO_TAKE = {
+    const GEMS_TO_TAKE = {
       [EGemColor.Blue]: 1,
       [EGemColor.Red]: 1,
       [EGemColor.Black]: 1,
     };
 
-    game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, TOKENS_TO_TAKE);
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, GEMS_TO_TAKE);
 
     expect(game.table.gems[EGemColor.Blue]).toBe(
-      TABLE_CONFIG[EGemColor.Blue] - TOKENS_TO_TAKE[EGemColor.Blue]
+      TABLE_CONFIG[EGemColor.Blue] - GEMS_TO_TAKE[EGemColor.Blue]
     );
     expect(game.table.gems[EGemColor.Red]).toBe(
-      TABLE_CONFIG[EGemColor.Red] - TOKENS_TO_TAKE[EGemColor.Red]
+      TABLE_CONFIG[EGemColor.Red] - GEMS_TO_TAKE[EGemColor.Red]
     );
     expect(game.table.gems[EGemColor.Black]).toBe(
-      TABLE_CONFIG[EGemColor.Black] - TOKENS_TO_TAKE[EGemColor.Black]
+      TABLE_CONFIG[EGemColor.Black] - GEMS_TO_TAKE[EGemColor.Black]
     );
 
-    expect(game.getPlayer(FIRST_PLAYER.id).tokensCount).toBe(3);
+    expect(game.getPlayer(FIRST_PLAYER.id).gemsCount).toBe(3);
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Blue]: 1,
       [EGemColor.Red]: 1,
@@ -148,12 +151,73 @@ describe('Game functionality', () => {
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
   });
 
-  it('can take 3 different gems', ()=> {
-    
+  it(`will throw an error if player takes more than ${TAKE_GEM_LIMIT} limit`, () => {
+    const game = new Game(GAME_CONFIG);
+
+    expect(() =>
+      game.dispatch(
+        FIRST_PLAYER.id,
+        EPlayerAction.TakeGems,
+        {
+          [EGemColor.Blue]: 1,
+          [EGemColor.Red]: 1,
+          [EGemColor.Black]: 1,
+          [EGemColor.Green]: 1,
+        }
+      )
+    ).toThrow();
+  });
+
+  it(`will throw an error if player takes ${TAKE_GEM_LIMIT_SAME_COLOR} of gems if stock is less than ${GEMS_IN_STOCK_LIMIT}`, () => {
+    const game = new Game({
+      ...GAME_CONFIG, tableConfig: {
+        ...GAME_CONFIG.tableConfig,
+        [EGemColor.Blue]: 3
+      }
+    });
+
+    expect(() =>
+      game.dispatch(
+        FIRST_PLAYER.id,
+        EPlayerAction.TakeGems,
+        {
+          [EGemColor.Blue]: TAKE_GEM_LIMIT_SAME_COLOR,
+        }
+      )
+    ).toThrow();
+  });
+
+  it(`will throw an error if a player takes 2 same color gems and any number of other gems`, () => {
+    const game = new Game(GAME_CONFIG);
+
+    expect(() =>
+      game.dispatch(
+        FIRST_PLAYER.id,
+        EPlayerAction.TakeGems,
+        {
+          [EGemColor.Blue]: 2,
+          [EGemColor.Red]: 1,
+        }
+      )
+    ).toThrow();
+  });
+
+  it(`will throw if a player tries to buy any number of ${EGemColor.Gold}`, ()=>{
+    const game = new Game(GAME_CONFIG);
+
+    expect(() =>
+      game.dispatch(
+        FIRST_PLAYER.id,
+        EPlayerAction.TakeGems,
+        {
+          [EGemColor.Gold]: 1,
+        }
+      )
+    ).toThrow();
   })
 
   it('let player buy a card', () => {
-    const PLAYER_INITIAL_TOKENS = {
+    const PLAYER_INITIAL_GEMS = {
       [EGemColor.Blue]: 5,
       [EGemColor.Black]: 3,
       [EGemColor.Green]: 3,
@@ -168,7 +232,7 @@ describe('Game functionality', () => {
         {
           name: 'max',
           id: FIRST_PLAYER.id,
-          gems: PLAYER_INITIAL_TOKENS,
+          gems: PLAYER_INITIAL_GEMS,
         },
       ],
     });
@@ -188,22 +252,22 @@ describe('Game functionality', () => {
     expect(game.table.First.cards.length === 4);
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Black]:
-        PLAYER_INITIAL_TOKENS[EGemColor.Black] -
+        PLAYER_INITIAL_GEMS[EGemColor.Black] -
         (CARD_TO_TAKE.cost[EGemColor.Black] || 0),
       [EGemColor.Blue]:
-        PLAYER_INITIAL_TOKENS[EGemColor.Blue] -
+        PLAYER_INITIAL_GEMS[EGemColor.Blue] -
         (CARD_TO_TAKE.cost[EGemColor.Blue] || 0),
       [EGemColor.Gold]:
-        PLAYER_INITIAL_TOKENS[EGemColor.Gold] -
+        PLAYER_INITIAL_GEMS[EGemColor.Gold] -
         (CARD_TO_TAKE.cost[EGemColor.Gold] || 0),
       [EGemColor.Green]:
-        PLAYER_INITIAL_TOKENS[EGemColor.Green] -
+        PLAYER_INITIAL_GEMS[EGemColor.Green] -
         (CARD_TO_TAKE.cost[EGemColor.Green] || 0),
       [EGemColor.Red]:
-        PLAYER_INITIAL_TOKENS[EGemColor.Red] -
+        PLAYER_INITIAL_GEMS[EGemColor.Red] -
         (CARD_TO_TAKE.cost[EGemColor.Red] || 0),
       [EGemColor.White]:
-        PLAYER_INITIAL_TOKENS[EGemColor.White] -
+        PLAYER_INITIAL_GEMS[EGemColor.White] -
         (CARD_TO_TAKE.cost[EGemColor.White] || 0),
     });
     expect(game.table.gems).toEqual({
@@ -230,7 +294,7 @@ describe('Game functionality', () => {
   });
 
   it('lets use cards resources to pay for a card', () => {
-    const PLAYER_INITIAL_TOKENS = {
+    const PLAYER_INITIAL_GEMS = {
       [EGemColor.Blue]: 1,
       [EGemColor.Black]: 0,
       [EGemColor.Green]: 1,
@@ -245,7 +309,7 @@ describe('Game functionality', () => {
         {
           name: 'max',
           id: FIRST_PLAYER.id,
-          gems: PLAYER_INITIAL_TOKENS,
+          gems: PLAYER_INITIAL_GEMS,
           cardsBought: {
             [EGemColor.Black]: [
               {

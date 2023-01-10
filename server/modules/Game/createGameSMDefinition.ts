@@ -87,7 +87,7 @@ export const createGameSMDefinition = (
     },
   };
 
-  addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
+  // addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
 
   return finalGameSMDefinition;
 };

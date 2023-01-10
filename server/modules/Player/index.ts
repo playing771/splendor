@@ -83,7 +83,7 @@ export class Player implements IPlayerShape {
     return this.cardsBought[color].length;
   }
 
-  get tokensCount() {
+  get gemsCount() {
     return countTokens(this.gems);
   }
 
@@ -105,7 +105,7 @@ export class Player implements IPlayerShape {
       cardsHolded: this.cardsHolded,
       name: this.name,
       gems: this.gems,
-      tokensCount: this.tokensCount
+      gemsCount: this.gemsCount
     }
   }
 }

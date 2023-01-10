@@ -13,11 +13,11 @@ export class TableManager<C extends { id: string }>
     this.table = table;
   }
 
-  addTokens(color: EGemColor, count: number) {
+  addGems(color: EGemColor, count: number) {
     this.table.gems[color] += count;
   }
 
-  removeTokens(color: EGemColor, count: number) {
+  removeGems(color: EGemColor, count: number) {
     const targetTokenCount = this.table.gems[color];
     if (count > targetTokenCount) {
       throw Error('No more gem');

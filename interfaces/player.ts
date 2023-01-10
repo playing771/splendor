@@ -15,7 +15,7 @@ export interface IPlayerShape {
   gems: TPlayerTokens,
   cardsBought: { [key in EGemColor]: ICardShape[] };
   cardsHolded: ICardShape[];
-  tokensCount:number;
+  gemsCount:number;
 }
 
 export interface IPlayerConfig {
