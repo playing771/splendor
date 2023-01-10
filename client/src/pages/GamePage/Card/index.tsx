@@ -1,25 +1,23 @@
-import React, { memo } from 'react';
+import React, { memo, ReactNode } from 'react';
 import { ICardShape } from '../../../../../interfaces/card';
 import { EGemColor } from '../../../../../interfaces/gem';
+import { concatClassNames } from '../../../utils/concatClassNames';
 
 import './styles.css';
 
-interface IProps extends ICardShape {
-  onClick?: (cardId: string) => void;
+export interface ICardProps extends ICardShape {
+  className?:string;
+  children?: ReactNode;
 }
 
-export const Card = memo(({ id, color, cost, score, onClick }: IProps) => {
-  const handleCardClick = (cardId: string) => () => {
-    onClick && onClick(cardId);
-  };
-
+export const Card = memo(({ id, color, cost, score, className, children }: ICardProps) => {
   const costs = Object.entries(cost).filter(([_, value]) => value > 0) as [
     EGemColor,
     number
   ][];
 
   return (
-    <div key={id} className="Card" onClick={handleCardClick(id)}>
+    <div key={id} className={concatClassNames("Card", className)}>
       <div className="Card_header">
         <span className="Card_headerScore">{score}</span>
         <span className="Card_headerColor">{color}</span>
@@ -36,6 +34,7 @@ export const Card = memo(({ id, color, cost, score, onClick }: IProps) => {
           );
         })}
       </div>
+      {children}
     </div>
   );
 });

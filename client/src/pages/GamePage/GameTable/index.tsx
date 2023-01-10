@@ -15,12 +15,14 @@ const levels = Object.values(EDeckLevel).reverse();
 export const GameTable = ({
   isPlayerActive,
   table,
-  onCardClick,
+  onBuyCard,
+  onHoldCard,
   onTakeTokensSubmit
 }: {
   isPlayerActive: boolean;
   table: TGameTableSafeState<ICardShape>;
-  onCardClick: (cardId:string)=>void
+  onBuyCard: (cardId:string)=>void;
+  onHoldCard: (cardId:string)=>void;
   onTakeTokensSubmit: (gems: Partial<TPlayerGems>) =>void;
 }) => {
   
@@ -38,7 +40,8 @@ export const GameTable = ({
               cardsCountInDeck={cardsCountInDeck}
               cards={cards}
               lvl={lvl}
-              onCardClick={onCardClick}
+              onBuyCard={onBuyCard}
+              onHoldCard={onHoldCard}
             />
           );
         })}

@@ -12,7 +12,7 @@ import { Card } from './Card';
 
 import './styles.css';
 
-interface IProps {}
+interface IProps { }
 
 export const GamePage = (props: IProps) => {
   const [gameState, setGameState] = useState<IGameStateDTO>();
@@ -29,8 +29,7 @@ export const GamePage = (props: IProps) => {
   }, []);
 
   const handleDispatchAction =
-    (action: EPlayerAction) =>
-    async (data?: string | Partial<TPlayerGems>) => {
+    (action: EPlayerAction) => async (data?: string | Partial<TPlayerGems>) => {
       console.log('action - data', action, data);
 
       await Api.post('game/dispatch', { action, data });
@@ -40,8 +39,12 @@ export const GamePage = (props: IProps) => {
     handleDispatchAction(EPlayerAction.EndTurn)();
   };
 
-  const handleCardClick = (cardId: string) => {
+  const handleBuyCard = (cardId: string) => {
     handleDispatchAction(EPlayerAction.BuyCard)(cardId);
+  };
+
+  const handleHoldCard = (cardId: string) => {
+    handleDispatchAction(EPlayerAction.HoldCardFromTable)(cardId);
   };
 
   useWebsockets(onMessage, onError);
@@ -64,44 +67,79 @@ export const GamePage = (props: IProps) => {
       <GameTable
         table={table}
         isPlayerActive={isPlayerActive}
-        onCardClick={handleCardClick}
+        onBuyCard={handleBuyCard}
+        onHoldCard={handleHoldCard}
         onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
       />
 
       <TableGemsList gems={playerState.gems} orientaion="horizontal" />
 
-      <div style={{ display: 'flex', columnGap: 12 }}>
-        {Object.values(EGemColor).map((color) => {
-          return (
-            <ul
-              key={color}
-              style={{
-                flexBasis: 100,
-                flexGrow: 0,
-                flexShrink: 1,
-                position: 'relative',
-              }}
-            >
-              {playerState.cardsBought[color].map((card, index) => {
-                return (
-                  <li
-                    key={card.id}
-                    style={{
-                      position: 'absolute',
-                      top: 0 + index * 30,
-                      left: 0,
-                      right: 0,
-                      height: 180,
-                      display: 'flex  ',
-                    }}
-                  >
-                    <Card {...card} />
-                  </li>
-                );
-              })}
-            </ul>
-          );
-        })}
+      <div style={{ display: 'flex' }}>
+
+        <div style={{ display: 'flex', columnGap: 12, position: 'relative', flex: 1 }}>
+          Cards bought
+          {Object.values(EGemColor).map((color) => {
+            return (
+              <ul
+                key={color}
+                style={{
+                  flexBasis: 100,
+                  flexGrow: 0,
+                  flexShrink: 1,
+                  position: 'relative',
+                }}
+              >
+                {playerState.cardsBought[color].map((card, index) => {
+                  return (
+                    <li
+                      key={card.id}
+                      style={{
+                        position: 'absolute',
+                        top: 0 + index * 30,
+                        left: 0,
+                        right: 0,
+                        height: 180,
+                        display: 'flex  ',
+                      }}
+                    >
+                      <Card {...card} />
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })}
+        </div>
+        Cards holded
+        <div style={{ display: 'flex', columnGap: 12, position: 'relative', flex: 1 }}>
+          
+          <ul
+            style={{
+              flexBasis: 100,
+              flexGrow: 0,
+              flexShrink: 1,
+              position: 'relative',
+            }}
+          >
+            {playerState.cardsHolded.map((card, index) => {
+              return (
+                <li
+                  key={card.id}
+                  style={{
+                    position: 'absolute',
+                    top: 0 + index * 30,
+                    left: 0,
+                    right: 0,
+                    height: 180,
+                    display: 'flex  ',
+                  }}
+                >
+                  <Card {...card} />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
       <button disabled={!isPlayerActive} onClick={handleEndTurnClick}>
