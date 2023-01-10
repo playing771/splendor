@@ -7,7 +7,12 @@ import { IPlayerConfig } from '../../../interfaces/player';
 import { EGemColor } from '../../../interfaces/gem';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { MOCKED_CARDS_POOL } from './mockedCards';
-import { GEMS_IN_STOCK_LIMIT, TAKE_GEM_LIMIT, TAKE_GEM_LIMIT_SAME_COLOR } from './constants';
+import {
+  GEMS_IN_STOCK_LIMIT,
+  PLAYER_MAX_GEMS_LIMIT,
+  TAKE_GEM_LIMIT,
+  TAKE_GEM_LIMIT_SAME_COLOR,
+} from './constants';
 
 const PLAYERS: IPlayerConfig[] = [
   {
@@ -155,35 +160,28 @@ describe('Game functionality', () => {
     const game = new Game(GAME_CONFIG);
 
     expect(() =>
-      game.dispatch(
-        FIRST_PLAYER.id,
-        EPlayerAction.TakeGems,
-        {
-          [EGemColor.Blue]: 1,
-          [EGemColor.Red]: 1,
-          [EGemColor.Black]: 1,
-          [EGemColor.Green]: 1,
-        }
-      )
+      game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+        [EGemColor.Blue]: 1,
+        [EGemColor.Red]: 1,
+        [EGemColor.Black]: 1,
+        [EGemColor.Green]: 1,
+      })
     ).toThrow();
   });
 
   it(`will throw an error if player takes ${TAKE_GEM_LIMIT_SAME_COLOR} of gems if stock is less than ${GEMS_IN_STOCK_LIMIT}`, () => {
     const game = new Game({
-      ...GAME_CONFIG, tableConfig: {
+      ...GAME_CONFIG,
+      tableConfig: {
         ...GAME_CONFIG.tableConfig,
-        [EGemColor.Blue]: 3
-      }
+        [EGemColor.Blue]: 3,
+      },
     });
 
     expect(() =>
-      game.dispatch(
-        FIRST_PLAYER.id,
-        EPlayerAction.TakeGems,
-        {
-          [EGemColor.Blue]: TAKE_GEM_LIMIT_SAME_COLOR,
-        }
-      )
+      game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+        [EGemColor.Blue]: TAKE_GEM_LIMIT_SAME_COLOR,
+      })
     ).toThrow();
   });
 
@@ -191,30 +189,44 @@ describe('Game functionality', () => {
     const game = new Game(GAME_CONFIG);
 
     expect(() =>
-      game.dispatch(
-        FIRST_PLAYER.id,
-        EPlayerAction.TakeGems,
-        {
-          [EGemColor.Blue]: 2,
-          [EGemColor.Red]: 1,
-        }
-      )
+      game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+        [EGemColor.Blue]: 2,
+        [EGemColor.Red]: 1,
+      })
     ).toThrow();
   });
 
-  it(`will throw if a player tries to buy any number of ${EGemColor.Gold}`, ()=>{
+  it(`will throw if a player tries to buy any number of ${EGemColor.Gold}`, () => {
     const game = new Game(GAME_CONFIG);
 
     expect(() =>
-      game.dispatch(
-        FIRST_PLAYER.id,
-        EPlayerAction.TakeGems,
-        {
-          [EGemColor.Gold]: 1,
-        }
-      )
+      game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+        [EGemColor.Gold]: 1,
+      })
     ).toThrow();
-  })
+  });
+
+  it.only(`will make player state ${EPLayerState.TooManyGems} if gems exceeds ${PLAYER_MAX_GEMS_LIMIT} limit in the end of turn`, () => {
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          ...FIRST_PLAYER,
+          gems: {
+            [EGemColor.Red]: 9,
+          },
+        },
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+      [EGemColor.Blue]: 2,
+    });
+
+    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(
+      EPLayerState.TooManyGems
+    );
+  });
 
   it('let player buy a card', () => {
     const PLAYER_INITIAL_GEMS = {

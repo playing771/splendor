@@ -107,8 +107,8 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public dispatch(userId: string, action: EPlayerAction, data?: any) {
+    
     const actionIsAllowed = this.smPlayers[userId].checkTransition(action);
-    console.log('actionIsAllowed', actionIsAllowed);
 
     if (!actionIsAllowed) {
       throw Error(
@@ -130,6 +130,8 @@ export class Game implements IGameShape<ICardShape> {
         this.dispatchPlayerAction(userId, action, data);
         break;
     }
+
+    return this;
   }
 
   private dispatchPlayerAction(
@@ -188,18 +190,19 @@ export class Game implements IGameShape<ICardShape> {
     }
 
     this.giveTokensToPlayer(playerId, gems);
-  }
 
-  private giveTokensToPlayer(playerId: string, gems: TPlayerTokens) {
     const targetPlayer = this.getPlayer(playerId);
-    const colors = Object.entries(gems) as [EGemColor, number][];
-
     this.dispatchPlayerAction(
       playerId,
       targetPlayer.gemsCount <= PLAYER_MAX_GEMS_LIMIT
         ? EPlayerAction.TakeGems
         : EPlayerAction.TakeGemsOverLimit
     );
+  }
+
+  private giveTokensToPlayer(playerId: string, gems: TPlayerTokens) {
+    const targetPlayer = this.getPlayer(playerId);
+    const colors = Object.entries(gems) as [EGemColor, number][];
 
     for (const [color, value] of colors) {
       const count = this.tableManager.removeGems(color, value);
