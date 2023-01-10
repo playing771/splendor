@@ -10,17 +10,11 @@ export class BaseDeck<C> implements IBaseDeckShape<C> {
   }
 
   getTop() {
-    if (this.cards.length === 0) {
-      throw Error('No more cards');
-    }
     const topCard = this.cards.pop();
     return topCard || null;
   }
 
   lookTop() {
-    if (this.cards.length === 0) {
-      throw Error('No more cards');
-    }
     const topCard = this.cards[this.cards.length - 1];
     return topCard || null;
   }

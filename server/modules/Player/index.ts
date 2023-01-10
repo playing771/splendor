@@ -21,7 +21,8 @@ export class Player implements IPlayerShape {
     name,
     id,
     gems: initialTokens = {} as TPlayerGems,
-    cardsBought: initialCardsBought = {} as TPlayerCardsBought
+    cardsBought: initialCardsBought = {} as TPlayerCardsBought,
+    cardsHolded = []
   }: IPlayerConfig) {
     this.gems = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = initialTokens[color] || 0;
@@ -33,7 +34,7 @@ export class Player implements IPlayerShape {
       return acc;
     }, {} as TPlayerCardsBought);
 
-    this.cardsHolded = [];
+    this.cardsHolded = cardsHolded;
     this.name = name;
     this.id = id;
   }

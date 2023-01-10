@@ -9,6 +9,7 @@ import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFrom
 import { MOCKED_CARDS_POOL } from './mockedCards';
 import {
   GEMS_IN_STOCK_LIMIT,
+  PLAYER_CARDS_HOLDED_MAX,
   PLAYER_GEMS_MAX,
   TAKE_GEM_LIMIT,
   TAKE_GEM_LIMIT_SAME_COLOR,
@@ -223,9 +224,7 @@ describe('Game functionality', () => {
       [EGemColor.Blue]: 2,
     });
 
-    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(
-      EPLayerState.TooManyGems
-    );
+    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.TooManyGems);
   });
 
   it('let player buy a card', () => {
@@ -361,7 +360,7 @@ describe('Game functionality', () => {
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.Active);
   });
 
-  it.only('let player hold a card from table', ()=> {
+  it('let player hold a card from table', () => {
     const game = new Game(GAME_CONFIG);
     const cardToHold = game.table[EDeckLevel.First].cards[0];
     const newCardFromDeck = game.table[EDeckLevel.First].deck.lookTop();
@@ -371,11 +370,12 @@ describe('Game functionality', () => {
       EPlayerAction.HoldCardFromTable,
       cardToHold.id
     );
-      
 
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
 
-    expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded[0].id).toBe(cardToHold.id);
+    expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded[0].id).toBe(
+      cardToHold.id
+    );
     expect(game.table[EDeckLevel.First].cards[0].id).toBe(newCardFromDeck?.id);
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Blue]: 0,
@@ -384,20 +384,81 @@ describe('Game functionality', () => {
       [EGemColor.Gold]: 1,
       [EGemColor.Red]: 0,
       [EGemColor.White]: 0,
-    })
+    });
+  });
+
+  it(`will throw an error if player tries to hold more than ${PLAYER_CARDS_HOLDED_MAX} cards`, () => {
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          ...GAME_CONFIG.players[0],
+          cardsHolded: [...MOCKED_CARDS_POOL.slice(0, 3)],
+        },
+      ],
+    });
+
+    expect(() =>
+      game.dispatch(
+        FIRST_PLAYER.id,
+        EPlayerAction.HoldCardFromTable,
+        game.table[EDeckLevel.First].cards[0].id
+      )
+    ).toThrow();
+  });
+
+  it('let player to hold top card from deck', () => {
+    const game = new Game(GAME_CONFIG);
+
+    const cardToHold = game.table[EDeckLevel.First].deck.lookTop();
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.HoldCardFromDeck, EDeckLevel.First)
+    
+    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
+    expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded[0].id).toBe(cardToHold?.id);
+    expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
+      [EGemColor.Blue]: 0,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.Gold]: 1,
+      [EGemColor.Red]: 0,
+      [EGemColor.White]: 0,
+    });
   })
+
+  it(`will throw an error if player tries to hold more than ${PLAYER_CARDS_HOLDED_MAX} cards from deck`, () => {
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          ...GAME_CONFIG.players[0],
+          cardsHolded: [...MOCKED_CARDS_POOL.slice(0, 3)],
+        },
+      ],
+    });
+
+    expect(() =>
+      game.dispatch(
+        FIRST_PLAYER.id,
+        EPlayerAction.HoldCardFromDeck,
+        EDeckLevel.First
+      )
+    ).toThrow();
+  });
 
   it('can show available actions for player', () => {
     const game = new Game(GAME_CONFIG);
 
-    expect(game.getPlayerAvailableActions(FIRST_PLAYER.id)).toEqual(expect.arrayContaining([
-      EPlayerAction.TakeGems,
-      EPlayerAction.TakeGemsOverLimit,
-      EPlayerAction.BuyCard,
-      EPlayerAction.EndTurn,
-      EPlayerAction.HoldCardFromTable,
-      EPlayerAction.HoldCardFromDeck,
-    ]));
+    expect(game.getPlayerAvailableActions(FIRST_PLAYER.id)).toEqual(
+      expect.arrayContaining([
+        EPlayerAction.TakeGems,
+        EPlayerAction.TakeGemsOverLimit,
+        EPlayerAction.BuyCard,
+        EPlayerAction.EndTurn,
+        EPlayerAction.HoldCardFromTable,
+        EPlayerAction.HoldCardFromDeck,
+      ])
+    );
     expect(game.getPlayerAvailableActions(SECOND_PLAYER.id)).toHaveLength(0);
   });
 });

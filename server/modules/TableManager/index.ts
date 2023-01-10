@@ -65,11 +65,4 @@ export class TableManager<C extends { id: string }>
     
     return [card, cardIndex, deckLvl] as const;
   }
-
-  buyCard(): C {
-    throw new Error('Method not implemented.');
-  }
-  holdCard(): C {
-    throw new Error('Method not implemented.');
-  }
 }

@@ -21,6 +21,7 @@ import {
   GEMS_IN_STOCK_LIMIT,
   STATES_AVAILABLE_FOR_ACTION,
   GOLD_GEMS_FOR_CARD_HOLD,
+  PLAYER_CARDS_HOLDED_MAX,
 } from './constants';
 import {
   createGameSMDefinition,
@@ -28,6 +29,7 @@ import {
   TGameEvent,
 } from './createGameSMDefinition';
 import { createPlayerSMDefinition } from './createPlayerSMDefinition';
+import { EDeckLevel } from '../../../interfaces/devDeck';
 
 type PlayerId = string;
 type TGameState = PlayerId | EGameBasicState;
@@ -129,7 +131,12 @@ export class Game implements IGameShape<ICardShape> {
       }
 
       case EPlayerAction.HoldCardFromTable: {
-        this.holdCardByPlayer(userId, data);
+        this.holdCardFromTableByPlayer(userId, data);
+        break;
+      }
+
+      case EPlayerAction.HoldCardFromDeck: {
+        this.holdCardFromDeckByPlayer(userId, data);
         break;
       }
 
@@ -164,8 +171,8 @@ export class Game implements IGameShape<ICardShape> {
 
     return stateHasActions
       ? getKeys(
-          playerStateMachine.definition[playerStateMachine.value].transitions
-        )
+        playerStateMachine.definition[playerStateMachine.value].transitions
+      )
       : [];
   }
 
@@ -247,11 +254,14 @@ export class Game implements IGameShape<ICardShape> {
     return card;
   }
 
-  private holdCardByPlayer(playerId: string, cardId?: string): ICardShape {
+  private holdCardFromTableByPlayer(playerId: string, cardId?: string): ICardShape {
     const targetPlayer = this.getPlayer(playerId);
 
     if (!cardId) throw Error('cant hold a card without cardId provided');
 
+    if (targetPlayer.cardsHoldedCount >= PLAYER_CARDS_HOLDED_MAX) {
+      throw Error(`cant hold cards more than ${PLAYER_CARDS_HOLDED_MAX}`)
+    }
     const card = this.tableManager.giveCardFromTable(cardId);
     targetPlayer.holdCard(card);
     this.giveGemsToPlayer(playerId, {
@@ -261,9 +271,36 @@ export class Game implements IGameShape<ICardShape> {
     this.dispatchPlayerAction(
       playerId,
       EPlayerAction.HoldCardFromTable,
-      cardId
     );
+
     return card;
+  }
+
+  private holdCardFromDeckByPlayer(playerId: string, lvl: EDeckLevel): ICardShape {
+    const targetPlayer = this.getPlayer(playerId);
+
+    if (targetPlayer.cardsHoldedCount >= PLAYER_CARDS_HOLDED_MAX) {
+      throw Error(`cant hold cards more than ${PLAYER_CARDS_HOLDED_MAX}`)
+    }
+
+    const card = this.tableManager.table[lvl].deck.getTop();
+
+    if (!card) {
+      throw Error(`No cards in deck ${lvl}`);
+    }
+
+    targetPlayer.holdCard(card);
+
+    this.giveGemsToPlayer(playerId, {
+      [EGemColor.Gold]: GOLD_GEMS_FOR_CARD_HOLD,
+    });
+
+    this.dispatchPlayerAction(
+      playerId,
+      EPlayerAction.HoldCardFromDeck
+    );
+
+    return card
   }
 
   public endTurnByPlayer(playerId: string) {

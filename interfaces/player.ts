@@ -23,4 +23,5 @@ export interface IPlayerConfig {
   id: string;
   gems?: Partial<TPlayerGems>;
   cardsBought?: Partial<TPlayerCardsBought>;
+  cardsHolded?: ICardShape[]
 }
