@@ -36,7 +36,14 @@ describe('Player functionality', () => {
       },
     });
 
-    player.buyCard(CARD_MOCKED_ONE);
+    expect(player.buyCard(CARD_MOCKED_ONE)).toEqual({
+      [EGemColor.Gold]: 0,
+      [EGemColor.Red]: 1,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.White]: 0,
+      [EGemColor.Blue]: 1,
+    });
 
     expect(player.cardsBought[CARD_MOCKED_ONE.color][0].id).toBe(
       CARD_MOCKED_ONE.id
@@ -56,7 +63,14 @@ describe('Player functionality', () => {
       cardsBought: { [EGemColor.Blue]: [CARD_MOCKED_ONE] },
     });
 
-    player.buyCard(CARD_MOCKED_TWO);
+    expect(player.buyCard(CARD_MOCKED_TWO)).toEqual({
+      [EGemColor.Gold]: 0,
+      [EGemColor.Red]: 1,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.White]: 0,
+      [EGemColor.Blue]: 0,
+    });
 
     expect(player.cardsBought[CARD_MOCKED_TWO.color][1].id).toBe(
       CARD_MOCKED_TWO.id
@@ -64,4 +78,27 @@ describe('Player functionality', () => {
     expect(player.gems[EGemColor.Blue]).toBe(2);
     expect(player.gems[EGemColor.Red]).toBe(1);
   });
+
+  it('can buy a card for gold', ()=> {
+    const player = new Player({
+      name: 'max',
+      id: 'ID_1',
+      gems: {
+        [EGemColor.Gold]: 2,
+      },
+    });
+
+    expect(player.buyCard(CARD_MOCKED_TWO)).toEqual({
+      [EGemColor.Gold]: 2,
+      [EGemColor.Red]: 0,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.White]: 0,
+      [EGemColor.Blue]: 0,
+    });
+    expect(player.cardsBought[CARD_MOCKED_TWO.color][0].id).toBe(
+      CARD_MOCKED_TWO.id
+    );
+    expect(player.gems[EGemColor.Gold]).toBe(0);
+  })
 });

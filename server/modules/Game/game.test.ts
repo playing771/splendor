@@ -352,6 +352,42 @@ describe('Game functionality', () => {
     );
   });
 
+  it.only('let player to pay gold for cards cost', () => {
+    const PLAYER_INITIAL_GEMS = {
+      [EGemColor.Blue]: 1,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.Gold]: 2,
+      [EGemColor.Red]: 0,
+      [EGemColor.White]: 0,
+    };
+
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          name: 'max',
+          id: FIRST_PLAYER.id,
+          gems: PLAYER_INITIAL_GEMS,
+        },
+      ],
+    });
+    console.log(game.table.First.cards);
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.BuyCard, 'first_five');
+    expect(game.getPlayer(FIRST_PLAYER.id).cardsBought[EGemColor.Red][0].id).toBe('first_five');
+    expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
+      [EGemColor.Blue]: 0,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.Gold]: 0,
+      [EGemColor.Red]: 0,
+      [EGemColor.White]: 0,
+    })
+    expect(game.table.gems[EGemColor.Gold]).toBe(7);
+    expect(game.table.gems[EGemColor.Blue]).toBe(6);
+  })
+
   it('wont change state if a player didnt manage to buy a card', () => {
     const game = new Game(GAME_CONFIG);
 
@@ -393,7 +429,7 @@ describe('Game functionality', () => {
     });
   });
 
-  it(`will make player state ${EPLayerState.TooManyGems} if tokens exceeds limit after gold gems taken`, ()=>{
+  it(`will make player state ${EPLayerState.TooManyGems} if tokens exceeds limit after gold gems taken`, () => {
     const game = new Game({
       ...GAME_CONFIG,
       players: [
@@ -442,7 +478,7 @@ describe('Game functionality', () => {
     const cardToHold = game.table[EDeckLevel.First].deck.lookTop();
 
     game.dispatch(FIRST_PLAYER.id, EPlayerAction.HoldCardFromDeck, EDeckLevel.First)
-    
+
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
     expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded[0].id).toBe(cardToHold?.id);
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({

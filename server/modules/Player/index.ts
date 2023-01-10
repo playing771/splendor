@@ -44,11 +44,6 @@ export class Player implements IPlayerShape {
   }
 
   spendTokens(color: EGemColor, count: number): void {
-    if (count > this.gems[color]) {
-      throw Error(
-        `Player (id=${this.id}) doesn't have ${count} ${color} gems `
-      );
-    }
     this.gems[color] -= count;
   }
 
@@ -60,16 +55,33 @@ export class Player implements IPlayerShape {
       acc[color] = 0;
       return acc;
     }, {} as TPlayerGems);
+
     for (const color of getKeys(cost)) {
-      const tokensToSpend = Math.max(
+      let nonGoldTokensToSpend = Math.max(
         (cost[color] || 0) - (extraTokens[color] || 0),
         0
       );
+        
+      if (nonGoldTokensToSpend > this.gems[color]) {
 
-      this.spendTokens(color, tokensToSpend);
-      tokensSpent[color] += tokensToSpend;
+        const goldTokensToSpend = nonGoldTokensToSpend - this.gems[color];
+
+        if (goldTokensToSpend > this.gems[EGemColor.Gold]) {
+          throw Error(
+            `Player (id=${this.id}) doesn't have ${nonGoldTokensToSpend} ${color} gems or enough ${EGemColor.Gold} tokens`
+          );
+        }
+
+        this.spendTokens(EGemColor.Gold,goldTokensToSpend);
+        tokensSpent[EGemColor.Gold] += goldTokensToSpend;
+
+        nonGoldTokensToSpend -= goldTokensToSpend;
+      }
+
+      this.spendTokens(color, nonGoldTokensToSpend);
+      tokensSpent[color] = nonGoldTokensToSpend;
     }
-
+    
     return tokensSpent;
   }
 
@@ -85,7 +97,7 @@ export class Player implements IPlayerShape {
     if (this.cardsHolded.length >= PLAYER_CARDS_HOLDED_MAX) {
       throw Error(`Cant hold a card: ${this.cardsHolded.length} exceeds ${PLAYER_CARDS_HOLDED_MAX} of cards holded limit`);
     }
-      this.cardsHolded.push(card);
+    this.cardsHolded.push(card);
   }
 
   private calculateTokensFromBoughtCards(color: EGemColor) {
