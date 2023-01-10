@@ -151,12 +151,12 @@ export class Game implements IGameShape<ICardShape> {
 
     return stateHasActions
       ? getKeys(
-          playerStateMachine.definition[playerStateMachine.value].transitions
-        )
+        playerStateMachine.definition[playerStateMachine.value].transitions
+      )
       : [];
   }
 
-  private buyTokensByPlayer(playerId:string, gems: TPlayerTokens) {
+  private buyTokensByPlayer(playerId: string, gems: TPlayerTokens) {
 
     if (gems[EGemColor.Gold] > 0) {
       throw Error(`Cant buy ${EGemColor.Gold} tokens`);
@@ -168,13 +168,19 @@ export class Game implements IGameShape<ICardShape> {
     let gemsToTakeLimitRemaining = TAKE_GEM_LIMIT;
 
     for (const [color, value] of colors) {
-      if (value > TAKE_GEM_LIMIT_SAME_COLOR){
+      if (value > TAKE_GEM_LIMIT_SAME_COLOR) {
         throw Error(`${value} exceeds the limit ${TAKE_GEM_LIMIT_SAME_COLOR} of same color gems to take`)
       }
-      if (this.tableManager.table.gems[color] < GEMS_IN_STOCK_LIMIT){
+      if (value === TAKE_GEM_LIMIT_SAME_COLOR && this.tableManager.table.gems[color] < GEMS_IN_STOCK_LIMIT) {
         throw Error(`Cant take ${value} ${color} gems because the stock is less than ${GEMS_IN_STOCK_LIMIT}`)
       }
-      gemsToTakeLimitRemaining -= value === 1? value: TAKE_GEM_LIMIT;
+
+      // cant take any other gems if already taken 2 of the same color
+      if (value === TAKE_GEM_LIMIT_SAME_COLOR) {
+        gemsToTakeLimitRemaining = 0
+      } else {
+        gemsToTakeLimitRemaining -= value
+      }
 
       if (gemsToTakeLimitRemaining < 0) {
         throw Error(`Cant take ${value} ${color} gems`)
