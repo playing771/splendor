@@ -15,18 +15,18 @@ interface ITokensToTakeProps extends IBasicTokensList {
 
 interface IBasicTokensList {
   isActive?: boolean;
-  onClick?: (onClick: EGemColor) => void;
+  onClick?: (color: EGemColor) => void;
   orientaion?: 'horizontal' | 'vertical';
 }
 
-const BasicGemsList = memo(
+export const BasicGemsList = memo(
   ({
-    tokensList,
+    gemsList,
     isActive,
     onClick,
     orientaion = 'vertical',
   }: IBasicTokensList & {
-    tokensList: Array<{ color: EGemColor; value: number }>;
+    gemsList: Array<{ color: EGemColor; value: number }>;
   }) => {
     const handleClick = (color: EGemColor) => () => {
       onClick && onClick(color);
@@ -34,7 +34,7 @@ const BasicGemsList = memo(
 
     return (
       <ul className={`TokensList TokensList__${orientaion}`}>
-        {tokensList.map(({ color, value }) => {
+        {gemsList.map(({ color, value }) => {
           return (
             <div
               key={color}
@@ -54,21 +54,21 @@ const BasicGemsList = memo(
   }
 );
 
-export const TableGemsList = memo(
+export const PlayerGemsList = memo(
   ({ gems, ...rest }: ITableTokensProps) => {
-    const tokensList = getKeys(gems).reduce((acc, color) => {
+    const gemsList = getKeys(gems).reduce((acc, color) => {
       const value = gems[color];
       acc.push({ color, value });
       return acc;
     }, [] as Array<{ color: EGemColor; value: number }>);
 
-    return <BasicGemsList tokensList={tokensList} {...rest} />;
+    return <BasicGemsList gemsList={gemsList} {...rest} />;
   }
 );
 
 export const GemsToTakeList = memo(
   ({ gems, ...rest }: ITokensToTakeProps) => {
-    const tokensList = getKeys(gems).reduce((acc, color) => {
+    const gemsList = getKeys(gems).reduce((acc, color) => {
       const value = gems[color];
       if (!!value) {
         acc.push({ color, value });
@@ -76,6 +76,6 @@ export const GemsToTakeList = memo(
       return acc;
     }, [] as Array<{ color: EGemColor; value: number }>);
 
-    return <BasicGemsList tokensList={tokensList} {...rest} />;
+    return <BasicGemsList gemsList={gemsList} {...rest} />;
   }
 );

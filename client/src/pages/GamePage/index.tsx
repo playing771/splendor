@@ -1,22 +1,47 @@
 import React, { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../interfaces/api';
-import { EPlayerAction } from '../../../../interfaces/game';
+import { EPlayerAction, EPLayerState } from '../../../../interfaces/game';
 import { TPlayerGems } from '../../../../interfaces/player';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
-import { TableGemsList } from './GemsList';
+import { BasicGemsList, GemsToTakeList, PlayerGemsList } from './GemsList';
 import { EGemColor } from '../../../../interfaces/gem';
 import { Card } from './Card';
 
 import './styles.css';
+import { GameTableTokens } from './GameTable/GameTableTokens';
 
-interface IProps { }
+interface IProps {}
+
+const emptyTokensToTake = {
+  [EGemColor.Black]: 0,
+  [EGemColor.Red]: 0,
+  [EGemColor.Green]: 0,
+  [EGemColor.Blue]: 0,
+  [EGemColor.Gold]: 0,
+  [EGemColor.White]: 0,
+};
 
 export const GamePage = (props: IProps) => {
   const [gameState, setGameState] = useState<IGameStateDTO>();
+  const [gemsToReturn, setGemsToReturn] =
+    useState<Partial<TPlayerGems>>(emptyTokensToTake);
   const [error, setError] = useState<Nullable<string>>(null);
+
+  const gemsRemaining = Object.values(EGemColor).reduce(
+    (acc, color) => {
+      acc[color] = acc[color] - (gemsToReturn[color] || 0);
+      return acc;
+    },
+    { ...(gameState ? gameState.playerState.gems : emptyTokensToTake) }
+  );
+
+  const gemsToReturnCount = Object.values(gemsToReturn).reduce(
+    (acc, count) => (acc += count),
+    0
+  );
 
   const onMessage = useCallback((message: string) => {
     const gameStateDTO: IGameStateDTO = JSON.parse(message);
@@ -47,9 +72,38 @@ export const GamePage = (props: IProps) => {
     handleDispatchAction(EPlayerAction.HoldCardFromTable)(cardId);
   };
 
-  const handleBuyHoldedCard = (cardId: string) => ()=> {
+  const handleBuyHoldedCard = (cardId: string) => () => {
     handleDispatchAction(EPlayerAction.BuyHoldedCard)(cardId);
-  }
+  };
+
+  const handleReturnGems = () => {
+    setGemsToReturn(emptyTokensToTake);
+    handleDispatchAction(EPlayerAction.ReturnGems)(gemsToReturn);
+  };
+
+  const handleReturnGemClick = (color: EGemColor) => {
+    if (gemsRemaining[color] > 0) {
+      setGemsToReturn((prev) => {
+        const obj = prev || {};
+        const targetCount = obj[color];
+        return {
+          ...obj,
+          [color]: targetCount !== undefined ? targetCount + 1 : 1,
+        };
+      });
+    }
+  };
+
+  const handleRevertReturnGemClick = (color: EGemColor) => {
+    setGemsToReturn((prev) => {
+      const obj = prev || {};
+      const targetCount = obj[color];
+      return {
+        ...obj,
+        [color]: targetCount !== undefined ? targetCount - 1 : 0,
+      };
+    });
+  };
 
   useWebsockets(onMessage, onError);
 
@@ -76,11 +130,41 @@ export const GamePage = (props: IProps) => {
         onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
       />
 
-      <TableGemsList gems={playerState.gems} orientaion="horizontal" />
+      <PlayerGemsList
+        gems={gemsRemaining}
+        orientaion="horizontal"
+        isActive={gameState.availableActions[0] === EPlayerAction.ReturnGems}
+        onClick={handleReturnGemClick}
+      />
+
+      {gemsToReturnCount > 0 && (
+        <div>
+          <button
+            // disabled={!tokensToTakeCount}
+            style={{ width: 130 }}
+            onClick={handleReturnGems}
+          >
+            Submit
+          </button>
+
+          <GemsToTakeList
+            gems={gemsToReturn}
+            isActive={true}
+            onClick={handleRevertReturnGemClick}
+            orientaion="horizontal"
+          />
+        </div>
+      )}
 
       <div style={{ display: 'flex' }}>
-
-        <div style={{ display: 'flex', columnGap: 12, position: 'relative', flex: 1 }}>
+        <div
+          style={{
+            display: 'flex',
+            columnGap: 12,
+            position: 'relative',
+            flex: 1,
+          }}
+        >
           Cards bought
           {Object.values(EGemColor).map((color) => {
             return (
@@ -115,8 +199,14 @@ export const GamePage = (props: IProps) => {
           })}
         </div>
         Cards holded
-        <div style={{ display: 'flex', columnGap: 12, position: 'relative', flex: 1 }}>
-
+        <div
+          style={{
+            display: 'flex',
+            columnGap: 12,
+            position: 'relative',
+            flex: 1,
+          }}
+        >
           <ul
             style={{
               flexBasis: 100,

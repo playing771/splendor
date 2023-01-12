@@ -189,7 +189,7 @@ export class Game implements IGameShape<ICardShape> {
     return stateHasActions
       ? getKeys(
         playerStateMachine.definition[playerStateMachine.value].transitions
-      )
+      ).filter((action) => action !== EPlayerAction.TakeGemsOverLimit)
       : [];
   }
 

@@ -1,10 +1,7 @@
 import { useCallback, useState } from 'react';
-import { IGameStateDTO } from '../../../../../interfaces/api';
 import { TPlayerGems } from '../../../../../interfaces/player';
 import { EGemColor } from '../../../../../interfaces/gem';
-import { TableGemsList, GemsToTakeList } from '../GemsList';
-
-const tokensList = Object.values(EGemColor);
+import { PlayerGemsList, GemsToTakeList } from '../GemsList';
 
 const emptyTokensToTake = {
   [EGemColor.Black]: 0,
@@ -77,7 +74,7 @@ export const GameTableTokens = ({
             {canTakeTokens ? 'Cancel' : 'Take gems'}
           </button>
 
-          <TableGemsList
+          <PlayerGemsList
             gems={tokensRemaining}
             isActive={canTakeTokens}
             onClick={handleTokenTakeClick}
@@ -98,23 +95,6 @@ export const GameTableTokens = ({
             isActive={true}
             onClick={handleTokenReturnClick}
           />
-          {/* {tokensList
-            .filter((color) => tokensToTake[color] > 0)
-            .map((color) => {
-              return (
-                <div className="GameTableTokens_itemContainer">
-                  <div
-                    key={color}
-                    onClick={handleTokenReturnClick(color)}
-                    className={`GameTableTokens_item GameTableTokens_item__${color} ${
-                      canTakeTokens && 'GameTableTokens_item__active'
-                    }`}
-                  >
-                    {tokensToTake[color]}
-                  </div>
-                </div>
-              );
-            })} */}
         </div>
       </div>
     </div>

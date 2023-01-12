@@ -22,7 +22,7 @@ export const DeckLevelRow = ({
     <div className="DeckLevelRow">
       <div className={`Deck Deck__${lvl}`}>{cardsCountInDeck}</div>
       {cards.map((cardData) => {
-        return <CardWithActions {...cardData} onBuyClick={onBuyCard} onHoldClick={onHoldCard}/>
+        return <CardWithActions key={cardData.id} {...cardData} onBuyClick={onBuyCard} onHoldClick={onHoldCard}/>
       })}
     </div>
   );

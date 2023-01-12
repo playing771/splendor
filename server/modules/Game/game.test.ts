@@ -599,9 +599,10 @@ describe('Game functionality', () => {
     expect(game.getPlayerAvailableActions(FIRST_PLAYER.id)).toEqual(
       expect.arrayContaining([
         EPlayerAction.TakeGems,
-        EPlayerAction.TakeGemsOverLimit,
+        // EPlayerAction.TakeGemsOverLimit,
         EPlayerAction.BuyCard,
         EPlayerAction.EndTurn,
+        EPlayerAction.BuyHoldedCard,
         EPlayerAction.HoldCardFromTable,
         EPlayerAction.HoldCardFromDeck,
       ])
