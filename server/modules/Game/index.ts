@@ -178,7 +178,7 @@ export class Game implements IGameShape<ICardShape> {
 
   private takeGemsByPlayer(playerId: string, gems: TPlayerGems) {
     if (gems[EGemColor.Gold] > 0) {
-      throw Error(`Cant take ${EGemColor.Gold} tokens`);
+      throw Error(`Cant take ${EGemColor.Gold} gems`);
     }
 
     const colors = Object.entries(gems) as [EGemColor, number][];
@@ -244,10 +244,11 @@ export class Game implements IGameShape<ICardShape> {
 
     const [targetCard] = this.tableManager.findCardOnTable(cardId);
 
-    const tokensSpent = targetPlayer.buyCard(targetCard);
+    const gemsToSpend = targetPlayer.buyCard(targetCard);
 
-    Object.values(EGemColor).forEach((color) => {
-      this.tableManager.addGems(color, tokensSpent[color]);
+    Object.entries(gemsToSpend).forEach(([color, count]) => {
+      
+      this.tableManager.addGems(color as EGemColor, count);
     });
 
     const card = this.tableManager.giveCardFromTable(cardId);

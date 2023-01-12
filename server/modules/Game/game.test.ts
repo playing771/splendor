@@ -352,7 +352,7 @@ describe('Game functionality', () => {
     );
   });
 
-  it.only('let player to pay gold for cards cost', () => {
+  it('let player to pay gold for cards cost', () => {
     const PLAYER_INITIAL_GEMS = {
       [EGemColor.Blue]: 1,
       [EGemColor.Black]: 0,
@@ -372,10 +372,10 @@ describe('Game functionality', () => {
         },
       ],
     });
-    console.log(game.table.First.cards);
 
     game.dispatch(FIRST_PLAYER.id, EPlayerAction.BuyCard, 'first_five');
-    expect(game.getPlayer(FIRST_PLAYER.id).cardsBought[EGemColor.Red][0].id).toBe('first_five');
+
+    expect(game.getPlayer(FIRST_PLAYER.id).cardsBought[EGemColor.White][0].id).toBe('first_five');
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Blue]: 0,
       [EGemColor.Black]: 0,
@@ -383,10 +383,10 @@ describe('Game functionality', () => {
       [EGemColor.Gold]: 0,
       [EGemColor.Red]: 0,
       [EGemColor.White]: 0,
-    })
+    });
     expect(game.table.gems[EGemColor.Gold]).toBe(7);
     expect(game.table.gems[EGemColor.Blue]).toBe(6);
-  })
+  });
 
   it('wont change state if a player didnt manage to buy a card', () => {
     const game = new Game(GAME_CONFIG);
@@ -438,7 +438,7 @@ describe('Game functionality', () => {
           gems: {
             [EGemColor.Blue]: 8,
             [EGemColor.Red]: 2,
-          }
+          },
         },
       ],
     });
@@ -447,10 +447,10 @@ describe('Game functionality', () => {
       FIRST_PLAYER.id,
       EPlayerAction.HoldCardFromTable,
       game.table[EDeckLevel.First].cards[0].id
-    )
+    );
 
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.TooManyGems);
-  })
+  });
 
   it(`will throw an error if player tries to hold more than ${PLAYER_CARDS_HOLDED_MAX} cards`, () => {
     const game = new Game({
@@ -477,10 +477,16 @@ describe('Game functionality', () => {
 
     const cardToHold = game.table[EDeckLevel.First].deck.lookTop();
 
-    game.dispatch(FIRST_PLAYER.id, EPlayerAction.HoldCardFromDeck, EDeckLevel.First)
+    game.dispatch(
+      FIRST_PLAYER.id,
+      EPlayerAction.HoldCardFromDeck,
+      EDeckLevel.First
+    );
 
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
-    expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded[0].id).toBe(cardToHold?.id);
+    expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded[0].id).toBe(
+      cardToHold?.id
+    );
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Blue]: 0,
       [EGemColor.Black]: 0,
@@ -489,7 +495,7 @@ describe('Game functionality', () => {
       [EGemColor.Red]: 0,
       [EGemColor.White]: 0,
     });
-  })
+  });
 
   it(`will throw an error if player tries to hold more than ${PLAYER_CARDS_HOLDED_MAX} cards from deck`, () => {
     const game = new Game({

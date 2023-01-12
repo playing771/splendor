@@ -48,17 +48,17 @@ export class Player implements IPlayerShape {
   }
 
   payCost(cost: TCardCost) {
-    const extraTokens = this.tokensFromCardsBought;
+    const extraGems = this.gemsFromCardsBought;
 
-    // tokensSpent = CardCost - TokensOfPlayerCards
-    const tokensSpent = Object.values(EGemColor).reduce((acc, color) => {
+    const gemsSpent = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = 0;
       return acc;
     }, {} as TPlayerGems);
 
     for (const color of getKeys(cost)) {
+
       let nonGoldTokensToSpend = Math.max(
-        (cost[color] || 0) - (extraTokens[color] || 0),
+        (cost[color] || 0) - (extraGems[color] || 0),
         0
       );
         
@@ -68,29 +68,29 @@ export class Player implements IPlayerShape {
 
         if (goldTokensToSpend > this.gems[EGemColor.Gold]) {
           throw Error(
-            `Player (id=${this.id}) doesn't have ${nonGoldTokensToSpend} ${color} gems or enough ${EGemColor.Gold} tokens`
+            `Player (id=${this.id}) doesn't have ${nonGoldTokensToSpend} ${color} gems or enough ${EGemColor.Gold} gems`
           );
         }
-
+        
         this.spendTokens(EGemColor.Gold,goldTokensToSpend);
-        tokensSpent[EGemColor.Gold] += goldTokensToSpend;
+        gemsSpent[EGemColor.Gold] += goldTokensToSpend;
 
         nonGoldTokensToSpend -= goldTokensToSpend;
       }
 
       this.spendTokens(color, nonGoldTokensToSpend);
-      tokensSpent[color] = nonGoldTokensToSpend;
+      gemsSpent[color] += nonGoldTokensToSpend;
     }
     
-    return tokensSpent;
+    return gemsSpent;
   }
 
   buyCard(card: ICardShape) {
     const { cost, color } = card;
-    const tokensSpent = this.payCost(cost);
+    const gemsSpent = this.payCost(cost);
     this.cardsBought[color].push(card);
 
-    return tokensSpent;
+    return gemsSpent;
   }
 
   holdCard(card: ICardShape) {
@@ -112,7 +112,7 @@ export class Player implements IPlayerShape {
     return this.cardsHolded.length;
   }
 
-  get tokensFromCardsBought() {
+  get gemsFromCardsBought() {
     return getKeys(this.cardsBought).reduce((acc, color) => {
       acc[color] = this.calculateTokensFromBoughtCards(color);
       return acc;

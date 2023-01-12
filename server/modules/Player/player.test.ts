@@ -85,12 +85,13 @@ describe('Player functionality', () => {
       id: 'ID_1',
       gems: {
         [EGemColor.Gold]: 2,
+        [EGemColor.Red]: 1,
       },
     });
 
     expect(player.buyCard(CARD_MOCKED_TWO)).toEqual({
-      [EGemColor.Gold]: 2,
-      [EGemColor.Red]: 0,
+      [EGemColor.Gold]: 1,
+      [EGemColor.Red]: 1,
       [EGemColor.Black]: 0,
       [EGemColor.Green]: 0,
       [EGemColor.White]: 0,
@@ -99,6 +100,6 @@ describe('Player functionality', () => {
     expect(player.cardsBought[CARD_MOCKED_TWO.color][0].id).toBe(
       CARD_MOCKED_TWO.id
     );
-    expect(player.gems[EGemColor.Gold]).toBe(0);
+    expect(player.gems[EGemColor.Gold]).toBe(1);
   })
 });
