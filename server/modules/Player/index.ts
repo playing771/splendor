@@ -43,7 +43,7 @@ export class Player implements IPlayerShape {
     this.gems[color] += count;
   }
 
-  spendTokens(color: EGemColor, count: number): void {
+  spendGems(color: EGemColor, count: number): void {
     this.gems[color] -= count;
   }
 
@@ -72,13 +72,13 @@ export class Player implements IPlayerShape {
           );
         }
         
-        this.spendTokens(EGemColor.Gold,goldTokensToSpend);
+        this.spendGems(EGemColor.Gold,goldTokensToSpend);
         gemsSpent[EGemColor.Gold] += goldTokensToSpend;
 
         nonGoldTokensToSpend -= goldTokensToSpend;
       }
 
-      this.spendTokens(color, nonGoldTokensToSpend);
+      this.spendGems(color, nonGoldTokensToSpend);
       gemsSpent[color] += nonGoldTokensToSpend;
     }
     
@@ -89,6 +89,13 @@ export class Player implements IPlayerShape {
     const { cost, color } = card;
     const gemsSpent = this.payCost(cost);
     this.cardsBought[color].push(card);
+
+    return gemsSpent;
+  }
+
+  buyHoldedCard(card: ICardShape) {
+    const gemsSpent = this.buyCard(card);
+    this.cardsHolded = this.cardsHolded.filter((holdedCard)=>holdedCard.id !== card.id)
 
     return gemsSpent;
   }

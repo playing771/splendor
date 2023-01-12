@@ -47,6 +47,10 @@ export const GamePage = (props: IProps) => {
     handleDispatchAction(EPlayerAction.HoldCardFromTable)(cardId);
   };
 
+  const handleBuyHoldedCard = (cardId: string) => ()=> {
+    handleDispatchAction(EPlayerAction.BuyHoldedCard)(cardId);
+  }
+
   useWebsockets(onMessage, onError);
 
   if (!gameState) return <h1>...loading</h1>;
@@ -112,7 +116,7 @@ export const GamePage = (props: IProps) => {
         </div>
         Cards holded
         <div style={{ display: 'flex', columnGap: 12, position: 'relative', flex: 1 }}>
-          
+
           <ul
             style={{
               flexBasis: 100,
@@ -134,7 +138,9 @@ export const GamePage = (props: IProps) => {
                     display: 'flex  ',
                   }}
                 >
-                  <Card {...card} />
+                  <Card {...card}>
+                    <button onClick={handleBuyHoldedCard(card.id)}>Buy</button>
+                  </Card>
                 </li>
               );
             })}

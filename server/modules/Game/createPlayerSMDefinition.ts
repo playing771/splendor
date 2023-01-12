@@ -33,6 +33,9 @@ export const createPlayerSMDefinition = (actions: {
         [EPlayerAction.BuyCard]: {
           target: EPLayerState.OutOfAction,
         },
+        [EPlayerAction.BuyHoldedCard]: {
+          target: EPLayerState.OutOfAction,
+        },
         [EPlayerAction.HoldCardFromTable]: {
           target: EPLayerState.OutOfAction
         },
@@ -49,6 +52,9 @@ export const createPlayerSMDefinition = (actions: {
         [EPlayerAction.ReturnGems]: {
           target: EPLayerState.OutOfAction,
         },
+        [EPlayerAction.TakeGemsOverLimit]: {
+          target: EPLayerState.TooManyGems
+        }
       },
     },
     [EPLayerState.OutOfAction]: {

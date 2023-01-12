@@ -3,6 +3,17 @@ import { ICardShape } from '../../../interfaces/card';
 import { EDeckLevel } from '../../../interfaces/devDeck';
 import { EGemColor } from '../../../interfaces/gem';
 
+const HOLDED_CARD: ICardShape = {
+  color: EGemColor.Red,
+  cost: {
+    [EGemColor.Blue]: 1,
+    [EGemColor.Red]: 1,
+  },
+  id: 'HOLDED_CARD',
+  lvl: EDeckLevel.First,
+  score: 0,
+}
+
 const CARD_MOCKED_ONE: ICardShape = {
   color: EGemColor.Blue,
   cost: {
@@ -11,7 +22,7 @@ const CARD_MOCKED_ONE: ICardShape = {
   },
   id: 'CARD_ID_1',
   score: 0,
-  lvl: EDeckLevel.First
+  lvl: EDeckLevel.First,
 };
 
 const CARD_MOCKED_TWO: ICardShape = {
@@ -22,7 +33,7 @@ const CARD_MOCKED_TWO: ICardShape = {
   },
   id: 'CARD_ID_2',
   score: 0,
-  lvl: EDeckLevel.First
+  lvl: EDeckLevel.First,
 };
 
 describe('Player functionality', () => {
@@ -47,6 +58,35 @@ describe('Player functionality', () => {
 
     expect(player.cardsBought[CARD_MOCKED_ONE.color][0].id).toBe(
       CARD_MOCKED_ONE.id
+    );
+    expect(player.gems[EGemColor.Blue]).toBe(1);
+    expect(player.gems[EGemColor.Red]).toBe(1);
+  });
+
+  it('can buy a holded card', () => {
+    const player = new Player({
+      name: 'max',
+      id: 'ID_1',
+      gems: {
+        [EGemColor.Blue]: 2,
+        [EGemColor.Red]: 2,
+      },
+      cardsHolded: [
+        HOLDED_CARD
+      ],
+    });
+
+    expect(player.buyHoldedCard(HOLDED_CARD)).toEqual({
+      [EGemColor.Red]: 1,
+      [EGemColor.Blue]: 1,
+      [EGemColor.Gold]: 0,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.White]: 0,
+    });
+
+    expect(player.cardsBought[HOLDED_CARD.color][0].id).toBe(
+      HOLDED_CARD.id
     );
     expect(player.gems[EGemColor.Blue]).toBe(1);
     expect(player.gems[EGemColor.Red]).toBe(1);
@@ -79,7 +119,7 @@ describe('Player functionality', () => {
     expect(player.gems[EGemColor.Red]).toBe(1);
   });
 
-  it('can buy a card for gold', ()=> {
+  it('can buy a card for gold', () => {
     const player = new Player({
       name: 'max',
       id: 'ID_1',
@@ -101,5 +141,5 @@ describe('Player functionality', () => {
       CARD_MOCKED_TWO.id
     );
     expect(player.gems[EGemColor.Gold]).toBe(1);
-  })
+  });
 });

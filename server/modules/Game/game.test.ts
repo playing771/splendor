@@ -230,10 +230,41 @@ describe('Game functionality', () => {
       [EGemColor.Blue]: 2,
     });
 
-    expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.TooManyGems);
+    expect(game.getActivePlayerState()).toBe(EPLayerState.TooManyGems);
   });
 
-  it('let player buy a card', () => {
+  it('can let player to return gems', () => {
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          ...FIRST_PLAYER,
+          gems: {
+            [EGemColor.Red]: 10,
+          },
+        },
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, {
+      [EGemColor.Black]: 2,
+    });
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.ReturnGems, {
+      [EGemColor.Red]: 1,
+    });
+
+    expect(game.getActivePlayerState()).toBe(EPLayerState.TooManyGems);
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.ReturnGems, {
+      [EGemColor.Black]: 1,
+    });
+    expect(game.getActivePlayerState()).toBe(EPLayerState.OutOfAction);
+    expect(game.table.gems[EGemColor.Red]).toBe(6);
+    expect(game.table.gems[EGemColor.Black]).toBe(4);
+    expect(game.getActivePlayer().gems[EGemColor.Red]).toBe(9);
+    expect(game.getActivePlayer().gems[EGemColor.Black]).toBe(1);
+  });
+
+  it('let player to buy a card', () => {
     const PLAYER_INITIAL_GEMS = {
       [EGemColor.Blue]: 5,
       [EGemColor.Black]: 3,
@@ -353,29 +384,29 @@ describe('Game functionality', () => {
   });
 
   it('let player to pay gold for cards cost', () => {
-    const PLAYER_INITIAL_GEMS = {
-      [EGemColor.Blue]: 1,
-      [EGemColor.Black]: 0,
-      [EGemColor.Green]: 0,
-      [EGemColor.Gold]: 2,
-      [EGemColor.Red]: 0,
-      [EGemColor.White]: 0,
-    };
-
     const game = new Game({
       ...GAME_CONFIG,
       players: [
         {
           name: 'max',
           id: FIRST_PLAYER.id,
-          gems: PLAYER_INITIAL_GEMS,
+          gems: {
+            [EGemColor.Blue]: 1,
+            [EGemColor.Black]: 0,
+            [EGemColor.Green]: 0,
+            [EGemColor.Gold]: 2,
+            [EGemColor.Red]: 0,
+            [EGemColor.White]: 0,
+          },
         },
       ],
     });
 
     game.dispatch(FIRST_PLAYER.id, EPlayerAction.BuyCard, 'first_five');
 
-    expect(game.getPlayer(FIRST_PLAYER.id).cardsBought[EGemColor.White][0].id).toBe('first_five');
+    expect(
+      game.getPlayer(FIRST_PLAYER.id).cardsBought[EGemColor.White][0].id
+    ).toBe('first_five');
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Blue]: 0,
       [EGemColor.Black]: 0,
@@ -386,6 +417,51 @@ describe('Game functionality', () => {
     });
     expect(game.table.gems[EGemColor.Gold]).toBe(7);
     expect(game.table.gems[EGemColor.Blue]).toBe(6);
+  });
+
+  it('let to buy holded card', () => {
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          name: 'max',
+          id: FIRST_PLAYER.id,
+          cardsHolded: [
+            {
+              id: 'HOLDED_CARD',
+              color: EGemColor.Black,
+              lvl: EDeckLevel.First,
+              score: 0,
+              cost: {
+                [EGemColor.Blue]: 1,
+                [EGemColor.Black]: 1,
+              },
+            },
+          ],
+          gems: {
+            [EGemColor.Blue]: 1,
+            [EGemColor.Black]: 1,
+          },
+        },
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.BuyHoldedCard, 'HOLDED_CARD');
+
+    expect(
+      game.getPlayer(FIRST_PLAYER.id).cardsBought[EGemColor.Black][0].id
+    ).toBe('HOLDED_CARD');
+    expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
+      [EGemColor.Blue]: 0,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+      [EGemColor.Gold]: 0,
+      [EGemColor.Red]: 0,
+      [EGemColor.White]: 0,
+    });
+    expect(game.table.gems[EGemColor.Blue]).toBe(6);
+    expect(game.table.gems[EGemColor.Black]).toBe(6);
+    expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded).toHaveLength(0);
   });
 
   it('wont change state if a player didnt manage to buy a card', () => {
