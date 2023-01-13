@@ -22,6 +22,7 @@ import {
   STATES_AVAILABLE_FOR_ACTION,
   GOLD_GEMS_FOR_CARD_HOLD,
   PLAYER_CARDS_HOLDED_MAX,
+  SCORE_TO_END_GAME,
 } from './constants';
 import {
   createGameSMDefinition,
@@ -45,6 +46,8 @@ export class Game implements IGameShape<ICardShape> {
     [playerId: PlayerId]: IStateMachine<EPLayerState, EPlayerAction>;
   };
 
+  private isLastRound: boolean;
+
   constructor({
     players,
     tableConfig,
@@ -67,6 +70,8 @@ export class Game implements IGameShape<ICardShape> {
       EGameBasicState.Initialization,
       gameSMDefinition
     );
+
+    this.isLastRound = false;
     this.start();
   }
 
@@ -76,6 +81,10 @@ export class Game implements IGameShape<ICardShape> {
   };
 
   public move = () => {
+    if (this.isLastRound) {
+      this.findWinner();
+      this.sm.dispatchTransition('end');
+    }
     this.sm.dispatchTransition('next');
     return true;
   };
@@ -301,6 +310,8 @@ export class Game implements IGameShape<ICardShape> {
       this.tableManager.addGems(color as EGemColor, count);
     });
 
+    this.dispatchPlayerAction(EPlayerAction.BuyHoldedCard, cardId);
+
     return targetCard;
   }
 
@@ -378,6 +389,7 @@ export class Game implements IGameShape<ICardShape> {
         EPLayerState.Idle,
         createPlayerSMDefinition({
           move: this.move,
+          checkWinConditions: this.checkWinConditions
         })
       );
 
@@ -385,6 +397,33 @@ export class Game implements IGameShape<ICardShape> {
 
       return acc;
     }, {} as { [key: string]: IStateMachine<EPLayerState, EPlayerAction> });
+  }
+
+  private checkWinConditions = () => {
+    // no need to check anymore if winConditions are met
+    if (this.isLastRound) {
+      return
+    }
+    const playerIsEndingGame = this.players.find((player) => {
+      console.log('player.score', player.score);
+
+      return player.score >= SCORE_TO_END_GAME
+    })
+
+    if (playerIsEndingGame) {
+      console.log('playerIsEndingGame', playerIsEndingGame.name);
+      this.isLastRound = true;
+      // this.sm.dispatchTransition('end')
+    }
+  }
+
+  private findWinner = () => {
+    const playersWithResults = this.players.map((player) => ({ score: player.score, id: player.id }));
+
+    const winners = playersWithResults.sort((a,b)=>b.score - a.score);
+
+    console.log('WINNERS', winners);
+    
   }
 
   private startTurnPlayerActionCreator = (playerId: string) => () => {

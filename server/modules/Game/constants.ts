@@ -12,6 +12,8 @@ export const GEMS_IN_STOCK_LIMIT = 4;
 
 export const GOLD_GEMS_FOR_CARD_HOLD = 1;
 
+export const SCORE_TO_END_GAME = 1;
+
 export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
   [EPLayerState.Idle]: false,
   [EPLayerState.Active]: true,

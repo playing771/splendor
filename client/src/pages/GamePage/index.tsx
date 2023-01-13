@@ -1,17 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IGameStateDTO } from '../../../../interfaces/api';
-import { EPlayerAction, EPLayerState } from '../../../../interfaces/game';
+import { EPlayerAction } from '../../../../interfaces/game';
 import { TPlayerGems } from '../../../../interfaces/player';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
-import { BasicGemsList, GemsToTakeList, PlayerGemsList } from './GemsList';
+import { GemsToTakeList, PlayerGemsList } from './GemsList';
 import { EGemColor } from '../../../../interfaces/gem';
 import { Card } from './Card';
 
 import './styles.css';
-import { GameTableTokens } from './GameTable/GameTableTokens';
+import { EDeckLevel } from '../../../../interfaces/devDeck';
 
 interface IProps {}
 
@@ -72,6 +72,10 @@ export const GamePage = (props: IProps) => {
     handleDispatchAction(EPlayerAction.HoldCardFromTable)(cardId);
   };
 
+  const handleHoldCardFromDeck = (deckLvl: EDeckLevel) => {
+    handleDispatchAction(EPlayerAction.HoldCardFromDeck)(deckLvl);
+  };
+
   const handleBuyHoldedCard = (cardId: string) => () => {
     handleDispatchAction(EPlayerAction.BuyHoldedCard)(cardId);
   };
@@ -127,6 +131,7 @@ export const GamePage = (props: IProps) => {
         isPlayerActive={isPlayerActive}
         onBuyCard={handleBuyCard}
         onHoldCard={handleHoldCard}
+        onHoldCardFromDeck={handleHoldCardFromDeck}
         onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
       />
 

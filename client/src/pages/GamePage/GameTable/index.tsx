@@ -17,12 +17,14 @@ export const GameTable = ({
   table,
   onBuyCard,
   onHoldCard,
+  onHoldCardFromDeck,
   onTakeTokensSubmit
 }: {
   isPlayerActive: boolean;
   table: TGameTableSafeState<ICardShape>;
   onBuyCard: (cardId:string)=>void;
   onHoldCard: (cardId:string)=>void;
+  onHoldCardFromDeck: (deckLvl:EDeckLevel)=>void;
   onTakeTokensSubmit: (gems: Partial<TPlayerGems>) =>void;
 }) => {
   
@@ -42,6 +44,7 @@ export const GameTable = ({
               lvl={lvl}
               onBuyCard={onBuyCard}
               onHoldCard={onHoldCard}
+              onHoldCardFromDeck={onHoldCardFromDeck}
             />
           );
         })}

@@ -462,6 +462,7 @@ describe('Game functionality', () => {
     expect(game.table.gems[EGemColor.Blue]).toBe(6);
     expect(game.table.gems[EGemColor.Black]).toBe(6);
     expect(game.getPlayer(FIRST_PLAYER.id).cardsHolded).toHaveLength(0);
+    expect(game.getActivePlayerState()).toBe(EPLayerState.OutOfAction);
   });
 
   it('wont change state if a player didnt manage to buy a card', () => {

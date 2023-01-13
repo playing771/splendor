@@ -61,7 +61,7 @@ export class Player implements IPlayerShape {
         (cost[color] || 0) - (extraGems[color] || 0),
         0
       );
-        
+
       if (nonGoldTokensToSpend > this.gems[color]) {
 
         const goldTokensToSpend = nonGoldTokensToSpend - this.gems[color];
@@ -71,8 +71,8 @@ export class Player implements IPlayerShape {
             `Player (id=${this.id}) doesn't have ${nonGoldTokensToSpend} ${color} gems or enough ${EGemColor.Gold} gems`
           );
         }
-        
-        this.spendGems(EGemColor.Gold,goldTokensToSpend);
+
+        this.spendGems(EGemColor.Gold, goldTokensToSpend);
         gemsSpent[EGemColor.Gold] += goldTokensToSpend;
 
         nonGoldTokensToSpend -= goldTokensToSpend;
@@ -81,7 +81,7 @@ export class Player implements IPlayerShape {
       this.spendGems(color, nonGoldTokensToSpend);
       gemsSpent[color] += nonGoldTokensToSpend;
     }
-    
+
     return gemsSpent;
   }
 
@@ -95,7 +95,7 @@ export class Player implements IPlayerShape {
 
   buyHoldedCard(card: ICardShape) {
     const gemsSpent = this.buyCard(card);
-    this.cardsHolded = this.cardsHolded.filter((holdedCard)=>holdedCard.id !== card.id)
+    this.cardsHolded = this.cardsHolded.filter((holdedCard) => holdedCard.id !== card.id)
 
     return gemsSpent;
   }
@@ -107,8 +107,12 @@ export class Player implements IPlayerShape {
     this.cardsHolded.push(card);
   }
 
-  private calculateTokensFromBoughtCards(color: EGemColor) {
+  private calculateGemsFromBoughtCards(color: EGemColor) {
     return this.cardsBought[color].length;
+  }
+
+  private calculateScoreFromBoughtCards(color: EGemColor) {
+    return this.cardsBought[color].reduce((total, card) => total += card.score, 0);
   }
 
   get gemsCount() {
@@ -121,9 +125,15 @@ export class Player implements IPlayerShape {
 
   get gemsFromCardsBought() {
     return getKeys(this.cardsBought).reduce((acc, color) => {
-      acc[color] = this.calculateTokensFromBoughtCards(color);
+      acc[color] = this.calculateGemsFromBoughtCards(color);
       return acc;
     }, {} as TCardCost);
+  }
+
+  get score() {
+    return getKeys(this.cardsBought).reduce((total, color) => {
+      return total += this.calculateScoreFromBoughtCards(color)
+    }, 0);
   }
 
   get state(): IPlayerShape {

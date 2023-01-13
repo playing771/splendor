@@ -4,6 +4,7 @@ import { TStateMachineDefinition } from '../StateMachine/models';
 
 export const createPlayerSMDefinition = (actions: {
   move: () => void;
+  checkWinConditions: ()=> void;
   // buyCard: (cardId?: string) => void;
   // takeTokens: (gems: Partial<TPlayerGems>) => void;
   // activateNextPlayer: () => void;
@@ -58,6 +59,9 @@ export const createPlayerSMDefinition = (actions: {
       },
     },
     [EPLayerState.OutOfAction]: {
+      actions: {
+        onExit: actions.checkWinConditions
+      },
       transitions: {
         [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle,

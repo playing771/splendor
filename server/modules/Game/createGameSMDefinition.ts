@@ -80,9 +80,6 @@ export const createGameSMDefinition = (
     },
     [EGameBasicState.GameEnded]: {
       transitions: {
-        end: {
-          target: EGameBasicState.Initialization,
-        },
       },
     },
   };
