@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { IGameMessage } from '../../../interfaces/game';
 import { Nullable } from '../../../utils/typescript';
+import { WEBSOCKETS_URL } from '../Api';
 
-const WEBSOCKETS_URL = 'ws://localhost:8080';
+
 
 export const useWebsockets = (onMessage: (message: string)=> void, onError: (err: Error)=> void) => {
   const wsRef = useRef<Nullable<WebSocket>>(null);

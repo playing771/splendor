@@ -18,7 +18,7 @@ export class GameService {
       players: users,
       ...DEFAULT_GAME_SETUP,
     });
-    this.games.push(game);
+    this.games = [game]; // TODO:
     return this.games[this.games.length - 1];
   }
 
