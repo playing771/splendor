@@ -31,8 +31,10 @@ const sessionMiddleware = session({
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-
+  
   cookie: {
+    // sameSite: 'none',
+    // secure: false,
     // secure: false,
     // httpOnly: false
     // secure: true,
@@ -42,7 +44,8 @@ const sessionMiddleware = session({
 
 const corsMiddleware = cors({
   credentials: true,
-  origin: 'http://localhost:5173',
+  origin: 'http://178.250.157.172',
+  
 });
 
 export const Api = () => {

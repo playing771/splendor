@@ -12,14 +12,9 @@ export const getCardsFromCSV = () => {
 
   const cardsDTO: Array<{
     Level: string;
-    Color: string;
+    Color: EGemColor;
     Score: string;
-    Black: string;
-    Blue: string;
-    Green: string;
-    Red: string;
-    White: string;
-  }> = parse(cardsCSV, {
+  } & Record<EGemColor,string>> = parse(cardsCSV, {
     columns: true,
     skip_empty_lines: true,
   });
