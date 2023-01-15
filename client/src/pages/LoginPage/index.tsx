@@ -6,6 +6,10 @@ import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useGlobalState } from '../../context';
 
+import cn from 'classnames';
+
+import styles from './style.module.css';
+
 export function LoginPage() {
   const [username, setUsername] = useState('');
   const [error, setError] = useState<Nullable<string>>(null);
@@ -36,6 +40,7 @@ export function LoginPage() {
 
   return (
     <div
+    className={cn(styles.Container)}
       style={{
         maxWidth: 800,
         margin: 'auto',

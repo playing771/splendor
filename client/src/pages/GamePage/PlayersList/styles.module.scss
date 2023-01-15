@@ -1,0 +1,35 @@
+.PlayerInfo {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  padding: 12px;
+  &_header {
+    padding: 12px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .PlayerScore {
+    color: red;
+  }
+
+  .PlayerName {
+    color: green;
+  }
+
+  .ColorList {
+    display: flex;
+    &_column {
+      flex: 1;
+    }
+  }
+
+  .CardsList {
+    display: flex;
+    &_column {
+      flex: 1;
+    }
+  }
+}
+
+

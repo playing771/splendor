@@ -1,0 +1,17 @@
+.Game {
+  &_info {
+    display: flex;
+  }
+
+  &_infoPlayers {
+    flex: 2;
+  }
+
+  &_infoTable {
+    flex: 3;
+  }
+
+  &_infoGems {
+    flex: 1;
+  }
+}

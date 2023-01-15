@@ -73,7 +73,13 @@ export const GameTableTokens = ({
           <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
             {canTakeTokens ? 'Cancel' : 'Take gems'}
           </button>
-
+          <button
+            disabled={!tokensToTakeCount}
+            style={{ width: 130 }}
+            onClick={handleSubmitTakeTokens}
+          >
+            Submit
+          </button>
           <PlayerGemsList
             gems={tokensRemaining}
             isActive={canTakeTokens}
@@ -82,13 +88,7 @@ export const GameTableTokens = ({
 
         </div>
         <div>
-          <button
-            disabled={!tokensToTakeCount}
-            style={{ width: 130 }}
-            onClick={handleSubmitTakeTokens}
-          >
-            Submit
-          </button>
+
 
           <GemsToTakeList
             gems={tokensToTake}

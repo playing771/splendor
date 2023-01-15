@@ -10,10 +10,14 @@ import { GemsToTakeList, PlayerGemsList } from './GemsList';
 import { EGemColor } from '../../../../interfaces/gem';
 import { Card } from './Card';
 
-import './styles.css';
 import { EDeckLevel } from '../../../../interfaces/devDeck';
+import { PlayersList } from './PlayersList';
 
-interface IProps {}
+import './styles.css';
+import styles from './styles.module.scss';
+import { GameTableTokens } from './GameTable/GameTableTokens';
+
+interface IProps { }
 
 const emptyTokensToTake = {
   [EGemColor.Black]: 0,
@@ -117,7 +121,7 @@ export const GamePage = (props: IProps) => {
     gameState;
 
   return (
-    <div>
+    <div className={styles.Game}>
       <div className="StatusBar">
         {error && <h3>Error: {error}</h3>}
         {isPlayerActive && <h3 className="StatusBar_yourTurn">Your turn</h3>}
@@ -125,23 +129,30 @@ export const GamePage = (props: IProps) => {
           Available actions: {availableActions.join('; ')}
         </h3>
       </div>
-
-      <GameTable
-        table={table}
-        isPlayerActive={isPlayerActive}
-        onBuyCard={handleBuyCard}
-        onHoldCard={handleHoldCard}
-        onHoldCardFromDeck={handleHoldCardFromDeck}
-        onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
-      />
-
+      <div className={styles.Game_info}>
+        <div className={styles.Game_infoPlayers}>
+          <PlayersList players={players} />
+        </div>
+        <div className={styles.Game_infoTable}>
+          <GameTable
+            table={table}
+            isPlayerActive={isPlayerActive}
+            onBuyCard={handleBuyCard}
+            onHoldCard={handleHoldCard}
+            onHoldCardFromDeck={handleHoldCardFromDeck}
+            onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
+          />
+        </div>
+        <div className={styles.Game_infoGems}>
+          <GameTableTokens gems={table.gems} onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)} />
+        </div>
+      </div>
       <PlayerGemsList
         gems={gemsRemaining}
         orientaion="horizontal"
         isActive={gameState.availableActions[0] === EPlayerAction.ReturnGems}
         onClick={handleReturnGemClick}
       />
-
       {gemsToReturnCount > 0 && (
         <div>
           <button

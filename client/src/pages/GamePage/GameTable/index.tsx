@@ -51,7 +51,7 @@ export const GameTable = ({
 
       </div>
       <div className="GameTable_sideColumn">
-        <GameTableTokens gems={table.gems} onTakeTokensSubmit={onTakeTokensSubmit}  />
+        {/* <GameTableTokens gems={table.gems} onTakeTokensSubmit={onTakeTokensSubmit}  /> */}
       </div>
     </div>
   );

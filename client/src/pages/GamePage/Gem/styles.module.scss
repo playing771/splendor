@@ -1,0 +1,116 @@
+$red_gem: #c12e35;
+$black_gem: #14150c;
+$blue_gem: #224173;
+$white_gem: #dfd4ca;
+$green_gem: #166735;
+$gold_gem: #f5ea42;
+
+.Gem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  padding: 4px;
+  border-width: 3px;
+  border-style: double;
+  font-size: 24px;
+
+  background-color: #b7b7b7;
+
+  &__Red {
+    color: $red_gem;
+    border-color: $red_gem;
+  }
+  &__Black {
+    color: $black_gem;
+    border-color: $black_gem;
+  }
+  &__Blue {
+    color: $blue_gem;
+    border-color: $blue_gem;
+  }
+  &__White {
+    color: $white_gem;
+    border-color: $white_gem;
+  }
+  &__Green {
+    color: $green_gem;
+    border-color: $green_gem;
+  }
+  &__Gold {
+    color: $gold_gem;
+    border-color: $gold_gem;
+  }
+
+  &__xs {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  &__sm {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  &__lg {
+    width: 64px;
+    height: 64px;
+    font-size: 24px;
+  }
+}
+
+.GemIcon {
+  &__Red {
+    color: $red_gem;
+  }
+  &__Black {
+    color: $black_gem;
+  }
+  &__Blue {
+    color: $blue_gem;
+  }
+  &__White {
+    color: $white_gem;
+  }
+  &__Green {
+    color: $green_gem;
+  }
+  &__Gold {
+    color: $gold_gem;
+  }
+}
+
+
+.GemStack {
+  position: relative;
+  height: 40px;
+  &_gem {
+    position: absolute;
+    // top: 0;
+    left: 0;
+  }
+
+  &_counter {
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    left: -4px;
+    top:-4px;
+    background-color: #e91e63;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  &__empty {
+    opacity: 0.3;
+  }
+}

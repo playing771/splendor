@@ -1,0 +1,68 @@
+$red_gem_light: #762B2E;
+$black_gem_light: #1D1D19;
+$blue_gem_light: #22395D;
+$white_gem_light: #A49C95;
+$green_gem_light: #21482E;
+$gold_gem_light: #A49B3B;
+
+$red_gem: #c12e35;
+$black_gem: #14150c;
+$blue_gem: #224173;
+$white_gem: #dfd4ca;
+$green_gem: #166735;
+$gold_gem: #f5ea42;
+
+
+.CardShort {
+  height: 60px;
+  width: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+
+  &__Red {
+    background-color: $red_gem_light;
+    border-color: $red_gem;
+  }
+  &__Black {
+    background-color: $black_gem_light;
+    border-color: $black_gem;
+  }
+  &__Blue {
+    background-color: $blue_gem_light;
+    border-color: $blue_gem;
+  }
+  &__White {
+    background-color: $white_gem_light;
+    border-color: $white_gem;
+  }
+  &__Green {
+    background-color: $green_gem_light;
+    border-color: $green_gem;
+  }
+  &__Gold {
+    background-color: $gold_gem_light;
+    border-color: $gold_gem;
+  }
+
+  &_score {
+    color: red;
+  }
+
+  &_gemIcon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+.CardStack {
+  position: relative;
+  &_card {
+    position: absolute;
+  }
+}
