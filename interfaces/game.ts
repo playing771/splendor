@@ -38,6 +38,7 @@ export interface IGameMessage {
   players: IPlayerShape[];
   playerState: IPlayerShape;
   isPlayerActive: boolean;
+  gameResults: IGameResult;
 }
 export type IGameResult = {
   winner: Nullable<string>,

@@ -4,7 +4,7 @@ import { EPlayerAction } from '../../../../interfaces/game';
 import { TPlayerGems } from '../../../../interfaces/player';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
-import { useWebsockets } from '../../utils/useWebsockets';
+import { useWebsocket } from '../../utils/useWebsocket';
 import { GameTable } from './GameTable';
 import { GemsToTakeList, PlayerGemsList } from './GemsList';
 import { EGemColor } from '../../../../interfaces/gem';
@@ -109,7 +109,7 @@ export const GamePage = (props: IProps) => {
     });
   };
 
-  useWebsockets(onMessage, onError);
+  useWebsocket(onMessage, onError);
 
   if (!gameState) return <h1>...loading</h1>;
 

@@ -5,7 +5,7 @@ import { WEBSOCKETS_URL } from '../Api';
 
 
 
-export const useWebsockets = (onMessage: (message: string)=> void, onError: (err: Error)=> void) => {
+export const useWebsocket = (onMessage: (message: string)=> void, onError: (err: Error)=> void) => {
   const wsRef = useRef<Nullable<WebSocket>>(null);
   useEffect(() => {
     wsRef.current = new WebSocket(WEBSOCKETS_URL);

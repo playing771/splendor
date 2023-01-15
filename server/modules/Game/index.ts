@@ -429,7 +429,7 @@ export class Game implements IGameShape<ICardShape> {
     }
   };
 
-  private getGameResults = (): IGameResult => {
+  public getGameResults = (): IGameResult => {
     const playersWithResults = this.players.map((player) => ({
       score: player.score,
       cardsBoughtCount: player.cardsBoughtCount,

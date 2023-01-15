@@ -45,6 +45,7 @@ export class GameService {
       table,
       playerState,
       isPlayerActive: currentGame.checkPlayerIsActive(userId),
+      gameResults: currentGame.getGameResults()
     };
 
     return state;
