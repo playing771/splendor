@@ -1,4 +1,5 @@
 import { Player } from "../server/modules/Player";
+import { Nullable } from "../utils/typescript";
 import { ICardShape } from "./card";
 import { TGameTableConfig, TGameTableSafeState, TGameTableShape } from "./gameTable";
 import { IPlayerShape } from "./player";
@@ -37,4 +38,12 @@ export interface IGameMessage {
   players: IPlayerShape[];
   playerState: IPlayerShape;
   isPlayerActive: boolean;
+}
+export type IGameResult = {
+  winner: Nullable<string>,
+  players: Array<{
+    score: number,
+    cardsBoughtCount: number,
+    id: string
+  }>
 }

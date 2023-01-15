@@ -24,6 +24,9 @@ export const createPlayerSMDefinition = (actions: {
       },
     },
     [EPLayerState.Active]: {
+      actions: {
+        onExit: actions.checkWinConditions
+      },
       transitions: {
         [EPlayerAction.TakeGems]: {
           target: EPLayerState.OutOfAction,
@@ -59,9 +62,6 @@ export const createPlayerSMDefinition = (actions: {
       },
     },
     [EPLayerState.OutOfAction]: {
-      actions: {
-        onExit: actions.checkWinConditions
-      },
       transitions: {
         [EPlayerAction.EndTurn]: {
           target: EPLayerState.Idle,

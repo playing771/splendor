@@ -123,6 +123,10 @@ export class Player implements IPlayerShape {
     return this.cardsHolded.length;
   }
 
+  get cardsBoughtCount() {
+    return Object.values(this.cardsBought).reduce((count, arr)=> count += arr.length, 0);
+  }
+
   get gemsFromCardsBought() {
     return getKeys(this.cardsBought).reduce((acc, color) => {
       acc[color] = this.calculateGemsFromBoughtCards(color);

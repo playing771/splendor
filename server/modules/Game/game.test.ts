@@ -14,6 +14,7 @@ import {
   TAKE_GEM_LIMIT,
   TAKE_GEM_LIMIT_SAME_COLOR,
 } from './constants';
+import { EGameBasicState } from './createGameSMDefinition';
 
 const PLAYERS: IPlayerConfig[] = [
   {
@@ -609,5 +610,213 @@ describe('Game functionality', () => {
       ])
     );
     expect(game.getPlayerAvailableActions(SECOND_PLAYER.id)).toHaveLength(0);
+  });
+
+  it('can find a winner - player with the biggerst score', () => {
+    const onGameEndMocked = jest.fn();
+    const game = new Game({
+      ...GAME_CONFIG,
+      onGameEnd: onGameEndMocked,
+      players: [
+        {
+          ...PLAYERS[0],
+        },
+        {
+          ...PLAYERS[1],
+          gems: {
+            [EGemColor.Gold]: 10,
+          },
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_1',
+                score: 14,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+        {
+          id: 'PL_3',
+          name: 'Player3',
+        },
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.EndTurn);
+    game.dispatch(
+      PLAYERS[1].id,
+      EPlayerAction.BuyCard,
+      game.table[EDeckLevel.Second].cards[0].id
+    );
+    game.dispatch(PLAYERS[1].id, EPlayerAction.EndTurn);
+    game.dispatch('PL_3', EPlayerAction.EndTurn);
+
+    expect(game.getState()).toBe(EGameBasicState.GameEnded);
+    expect(onGameEndMocked).toBeCalledWith({
+      winner: PLAYERS[1].id,
+      players: [
+        { score: 16, id: 'player_2', cardsBoughtCount: 2 },
+        { score: 0, id: 'player_1', cardsBoughtCount: 0 },
+        { score: 0, id: 'PL_3', cardsBoughtCount: 0 },
+      ],
+    });
+  });
+
+  it('can find a winner between players with equal score by smallest count of bought cards', () => {
+    const onGameEndMocked = jest.fn();
+    const game = new Game({
+      ...GAME_CONFIG,
+      onGameEnd: onGameEndMocked,
+      players: [
+        {
+          ...PLAYERS[0],
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_1',
+                score: 10,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+              {
+                color: EGemColor.Black,
+                id: 'CARD_2',
+                score: 2,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+              {
+                color: EGemColor.Black,
+                id: 'CARD_3',
+                score: 3,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+        {
+          ...PLAYERS[1],
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_4',
+                score: 15,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+        {
+          id: 'PL_3',
+          name: 'Player3',
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_5',
+                score: 14,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+              {
+                color: EGemColor.Black,
+                id: 'CARD_6',
+                score: 1,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.EndTurn);
+    game.dispatch(PLAYERS[1].id, EPlayerAction.EndTurn);
+    game.dispatch('PL_3', EPlayerAction.EndTurn);
+
+    expect(game.getState()).toBe(EGameBasicState.GameEnded);
+    expect(onGameEndMocked).toBeCalledWith({
+      winner: PLAYERS[1].id,
+      players: [
+        { score: 15, id: 'player_2', cardsBoughtCount: 1 },
+        { score: 15, id: 'PL_3', cardsBoughtCount: 2 },
+        { score: 15, id: 'player_1', cardsBoughtCount: 3 },
+      ],
+    });
+  });
+
+  it('has NULL winner if score and cards bought count are equal among winning players', () => {
+    const onGameEndMocked = jest.fn();
+    const game = new Game({
+      ...GAME_CONFIG,
+      onGameEnd: onGameEndMocked,
+      players: [
+        {
+          ...PLAYERS[0],
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_1',
+                score: 16,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+        {
+          ...PLAYERS[1],
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_2',
+                score: 16,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+        {
+          id: 'PL_3',
+          name: 'Player3',
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                id: 'CARD_5',
+                score: 16,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.EndTurn);
+    game.dispatch(PLAYERS[1].id, EPlayerAction.EndTurn);
+    game.dispatch('PL_3', EPlayerAction.EndTurn);
+
+    expect(game.getState()).toBe(EGameBasicState.GameEnded);
+    expect(onGameEndMocked).toBeCalledWith({
+      winner: null,
+      players: expect.arrayContaining([
+        { score: 16, id: 'player_2', cardsBoughtCount: 1 },
+        { score: 16, id: 'player_1', cardsBoughtCount: 1 },
+        { score: 16, id: 'PL_3', cardsBoughtCount: 1 },
+      ]),
+    });
   });
 });

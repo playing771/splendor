@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getKeys } from '../../../utils/typescript';
+import { getKeys, Nullable } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
 import {
   EPlayerAction,
   EPLayerState,
   IGameConfig,
+  IGameResult,
   IGameShape,
 } from '../../../interfaces/game';
 import { IPlayerConfig, TPlayerGems } from '../../../interfaces/player';
@@ -47,11 +48,18 @@ export class Game implements IGameShape<ICardShape> {
   };
 
   private isLastRound: boolean;
+  private onGameEnd: ((result: IGameResult) => void) | undefined;
 
   constructor({
     players,
     tableConfig,
-  }: IGameConfig & { players: IPlayerConfig[] }) {
+    onGameEnd
+  }: IGameConfig & {
+    players: IPlayerConfig[];
+    onGameEnd?: (
+      result: IGameResult
+    ) => void;
+  }) {
     this.id = uuidv4();
 
     this.table = new GameTable(tableConfig);
@@ -66,6 +74,8 @@ export class Game implements IGameShape<ICardShape> {
       move: this.move,
     });
 
+    this.onGameEnd = onGameEnd;
+
     this.sm = createStateMachine(
       EGameBasicState.Initialization,
       gameSMDefinition
@@ -77,16 +87,19 @@ export class Game implements IGameShape<ICardShape> {
 
   public start = () => {
     this.sm.dispatchTransition('start');
-    return true;
   };
 
   public move = () => {
-    if (this.isLastRound) {
-      this.findWinner();
+    if (this.isLastRound && this.isLastPlayerActive) {
+      this.getGameResults();
       this.sm.dispatchTransition('end');
+      if (this.onGameEnd) {
+        
+        this.onGameEnd(this.getGameResults())
+      }
+    } else {
+      this.sm.dispatchTransition('next');
     }
-    this.sm.dispatchTransition('next');
-    return true;
   };
 
   public getState() {
@@ -107,6 +120,13 @@ export class Game implements IGameShape<ICardShape> {
 
   public getActivePlayer() {
     return this.getPlayer(this.sm.value);
+  }
+
+  get isLastPlayerActive() {
+    const result =
+      this.getActivePlayer().id === this.players[this.players.length - 1].id;
+
+    return result;
   }
 
   public getPlayer(playerId: string) {
@@ -184,7 +204,7 @@ export class Game implements IGameShape<ICardShape> {
     data?: string,
     playerId?: string
   ) {
-    const targetPlayerId = playerId || this.getActivePlayer().id
+    const targetPlayerId = playerId || this.getActivePlayer().id;
     this.smPlayers[targetPlayerId].dispatchTransition(action, data);
   }
 
@@ -315,9 +335,7 @@ export class Game implements IGameShape<ICardShape> {
     return targetCard;
   }
 
-  private holdCardFromTableByPlayer(
-    cardId: string
-  ): ICardShape {
+  private holdCardFromTableByPlayer(cardId: string): ICardShape {
     const targetPlayer = this.getActivePlayer();
 
     if (targetPlayer.cardsHoldedCount >= PLAYER_CARDS_HOLDED_MAX) {
@@ -343,9 +361,7 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   // TODO: move share logic between holdCard actions to one place
-  private holdCardFromDeckByPlayer(
-    lvl: EDeckLevel
-  ): ICardShape {
+  private holdCardFromDeckByPlayer(lvl: EDeckLevel): ICardShape {
     const targetPlayer = this.getActivePlayer();
 
     if (targetPlayer.cardsHoldedCount >= PLAYER_CARDS_HOLDED_MAX) {
@@ -389,7 +405,7 @@ export class Game implements IGameShape<ICardShape> {
         EPLayerState.Idle,
         createPlayerSMDefinition({
           move: this.move,
-          checkWinConditions: this.checkWinConditions
+          checkWinConditions: this.checkWinConditions,
         })
       );
 
@@ -402,29 +418,38 @@ export class Game implements IGameShape<ICardShape> {
   private checkWinConditions = () => {
     // no need to check anymore if winConditions are met
     if (this.isLastRound) {
-      return
+      return;
     }
     const playerIsEndingGame = this.players.find((player) => {
-      console.log('player.score', player.score);
-
-      return player.score >= SCORE_TO_END_GAME
-    })
+      return player.score >= SCORE_TO_END_GAME;
+    });
 
     if (playerIsEndingGame) {
-      console.log('playerIsEndingGame', playerIsEndingGame.name);
       this.isLastRound = true;
-      // this.sm.dispatchTransition('end')
     }
-  }
+  };
 
-  private findWinner = () => {
-    const playersWithResults = this.players.map((player) => ({ score: player.score, id: player.id }));
+  private getGameResults = (): IGameResult => {
+    const playersWithResults = this.players.map((player) => ({
+      score: player.score,
+      cardsBoughtCount: player.cardsBoughtCount,
+      id: player.id,
+    }));
 
-    const winners = playersWithResults.sort((a,b)=>b.score - a.score);
+    playersWithResults.sort((a, b) => b.score - a.score || a.cardsBoughtCount - b.cardsBoughtCount);
 
-    console.log('WINNERS', winners);
-    
-  }
+    const maxScore = playersWithResults[0].score;
+
+    const playersWithMaxScore = playersWithResults.filter(player => player.score === maxScore);
+    if (playersWithMaxScore.length > 1) {
+      const minBoughtCards = playersWithMaxScore[0].cardsBoughtCount;
+      const playersWithMinCardsBought = playersWithMaxScore.filter(player => player.cardsBoughtCount === minBoughtCards);
+
+      return playersWithMinCardsBought.length > 1 ? { winner: null, players: playersWithResults } : { winner: playersWithMinCardsBought[0].id, players: playersWithResults }
+    }
+
+    return { winner: playersWithMaxScore[0].id, players: playersWithResults }
+  };
 
   private startTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(EPlayerAction.StartTurn, undefined, playerId);
