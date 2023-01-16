@@ -21,3 +21,24 @@
     flex: 2;
   }
 }
+
+.DeckCards {
+  transform: scale(2);
+  border-color: grey;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  transition: color 0.3s;
+  &:hover {
+    border-color: #e91e63;
+    color: #e91e63;
+  }
+  &__First {
+    background-color: #204127;
+  }
+  &__Second {
+    background-color: #987138;
+  }
+  &__Third {
+    background-color: #136f9a;
+  }
+}

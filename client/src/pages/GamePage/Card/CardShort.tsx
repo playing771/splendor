@@ -7,15 +7,16 @@ import cn from 'classnames';
 import styles from './styles.module.scss';
 
 interface IProps {
-  color: EGemColor;
-  counter?: number;
+  color?: EGemColor;
+  counter: number;
+  className?:string;
 }
 
-export const CardShort = ({ color, counter }: IProps) => {
+export const CardShort = ({ color, counter, className }: IProps) => {
   console.log('color',color,counter);
   
   return (
-    <div className={cn(styles.CardShort, styles[`CardShort__${color}`])}>
+    <div className={cn(styles.CardShort, styles[`CardShort__${color}`], className)}>
       {counter && <span className={styles.CardShort_counter}>{counter}</span>}
       {/* <div className={styles.CardShort_gemIcon}>
         <GemIcon color={color} />

@@ -22,31 +22,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
-  color: #e5db67;
   flex-grow: 1;
   flex-shrink: 0;
-  /* flex-basis: 100px; */
   margin-right: 24px;
   border-radius: 12px;
 }
 
-
-
-.Deck__First {
-  background-color: #136f9a;
-}
-
-.Deck__Second {
-  background-color: #987138;
-}
-.Deck__Third {
-  background-color: #204127;
-}
-
-.GameTable_sideColumn {
-  padding: 24px;
-}
 
 .GameTableTokens {
   display: flex;

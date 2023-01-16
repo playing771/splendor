@@ -9,16 +9,20 @@ import { CardShort } from './CardShort';
 
 interface IProps {
   count: number;
-  color: EGemColor;
+  color?: EGemColor;
+  cardClassName?: string;
+  maxCountVisible?: number;
 }
 
-export const CardStack = ({ count, color }: IProps) => {
-  
-  const countList = [...Array(count).keys()];
+export const CardStack = ({ count, color, cardClassName, maxCountVisible = 6 }: IProps) => {
+
+  const countCorrected = Math.min(count, maxCountVisible);
+
+  const countList = [...Array(countCorrected).keys()];
   return <ul className={cn(styles.CardStack)}>
     {countList.map((index) => (
-      <li key={index} className={styles.CardStack_card} style={{ top: index * 2, left: index }}>
-        <CardShort color={color} counter={count}/>
+      <li key={index} className={styles.CardStack_card} style={{ bottom: index, left: Math.max(0, index / 2) }}>
+        <CardShort color={color} counter={count} className={cardClassName}/>
       </li>
 
     ))}

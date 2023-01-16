@@ -5,12 +5,6 @@ import { PlayerGemsList, GemsToTakeList } from '../GemsList';
 import { Modal } from '../../../components/Modal';
 
 const emptyTokensToTake = {
-  [EGemColor.Black]: 0,
-  [EGemColor.Red]: 0,
-  [EGemColor.Green]: 0,
-  [EGemColor.Blue]: 0,
-  [EGemColor.Gold]: 0,
-  [EGemColor.White]: 0,
 };
 
 
@@ -67,6 +61,10 @@ export const GameTableTokens = ({
     setCanTakeTokens(false);
   };
 
+  const handleClearClick = () => {
+    setTokensToTake(emptyTokensToTake);
+  }
+
   return (
     <div className="GameTableTokens">
       <div style={{ display: 'flex', columnGap: 8 }}>
@@ -74,49 +72,43 @@ export const GameTableTokens = ({
           <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
             Take gems
           </button>
-          {/* <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
-            {canTakeTokens ? 'Cancel' : 'Take gems'}
-          </button> */}
 
           <PlayerGemsList
-            gems={tokensRemaining}
+            gems={gems}
             isActive={canTakeTokens}
             onClick={handleTokenTakeClick}
           />
 
         </div>
-        {/* <div>
-          <GemsToTakeList
-            gems={tokensToTake}
-            isActive={true}
-            onClick={handleTokenReturnClick}
-          />
-        </div> */}
+
       </div>
 
       <Modal isOpen={canTakeTokens} onRequestClose={handleToggleTakeTokens}>
         <div style={{ maxWidth: 500, display: 'flex' }}>
-          <div style={{ flex: 1, display:'flex',justifyContent:'center' }}>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <PlayerGemsList
               gems={tokensRemaining}
               isActive={canTakeTokens}
               onClick={handleTokenTakeClick}
             />
           </div>
-          <div style={{ flex: 1, display:'flex',justifyContent:'center' }}>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <GemsToTakeList
               gems={tokensToTake}
               isActive={true}
               onClick={handleTokenReturnClick}
             />
           </div>
-          <button
-            disabled={!tokensToTakeCount}
-            style={{ width: 130 }}
-            onClick={handleSubmitTakeTokens}
-          >
-            Submit
-          </button>
+          <div>
+            <button onClick={handleClearClick}>Clear</button>
+            <button
+              disabled={!tokensToTakeCount}
+              style={{ width: 130 }}
+              onClick={handleSubmitTakeTokens}
+            >
+              Submit
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
