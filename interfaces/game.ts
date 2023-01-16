@@ -36,7 +36,7 @@ export interface IGameMessage {
   availableActions: EPlayerAction[];
   table: TGameTableSafeState<ICardShape>;
   players: IPlayerShape[];
-  playerState: IPlayerShape;
+  playerState: Nullable<IPlayerShape>;
   isPlayerActive: boolean;
   gameResults: IGameResult;
 }

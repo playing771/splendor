@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { IRoomUsersDTO } from '../../../../interfaces/api';
 import { Nullable } from '../../../../utils/typescript';
@@ -7,9 +8,8 @@ import { Api } from '../../Api';
 import { useRequest } from '../../utils/useRequest';
 
 export function RoomPage() {
-  const [error, setError] = useState<Nullable<string>>(null);
   const navigate = useNavigate()
-  const {data: usersData} = useRequest<IRoomUsersDTO>('room/users');
+  const { data: usersData } = useRequest<IRoomUsersDTO>('room/users');
 
   const handleStart = (e: any) => {
     (async function request() {
@@ -19,15 +19,27 @@ export function RoomPage() {
 
 
       } catch (error: unknown) {
-        const axiosError = error as AxiosError;
-        setError(axiosError.message);
+        const axiosError = error as AxiosError<string>;
+        const text = axiosError.response?.data ? axiosError.response?.data : axiosError.message;
+        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 3000 });
       }
     })();
   };
 
 
-  const handleResumeGame = ()=> {
+  const handleResumeGame = () => {
     navigate('/game');
+  }
+
+  const handleSpectateGame = async () => {
+    try {
+      await Api.get('game/spectate');
+      navigate('/game');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<string>;
+      const text = axiosError.response?.data ? axiosError.response?.data : axiosError.message;
+      toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 3000 });
+    }
   }
 
   return (
@@ -42,9 +54,6 @@ export function RoomPage() {
       }}
     >
 
-      <button onClick={handleStart}>Start</button>
-      <button onClick={handleResumeGame}>Resume game</button>
-      {error && <h3>{error}</h3>}
       <ul>
         {usersData?.users.map(({ id, name }) => <li key={id}>
           <p>
@@ -55,6 +64,11 @@ export function RoomPage() {
           </p>
         </li>)}
       </ul>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <button onClick={handleStart}>Start</button>
+        <button onClick={handleResumeGame}>Resume game</button>
+        <button onClick={handleSpectateGame}>Spectate game</button>
+      </div>
     </div>
   );
 }

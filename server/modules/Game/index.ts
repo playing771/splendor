@@ -41,6 +41,7 @@ export class Game implements IGameShape<ICardShape> {
   public table: GameTable<ICardShape>;
 
   public players: Player[];
+  public spectators: string[];
   private tableManager: TableManager<ICardShape>;
   private sm: IStateMachine<TGameState, TGameEvent>;
   private smPlayers: {
@@ -66,6 +67,7 @@ export class Game implements IGameShape<ICardShape> {
     this.tableManager = new TableManager(this.table);
 
     this.players = players.map((playerConfig) => new Player(playerConfig));
+    this.spectators = [];
     this.smPlayers = this.initializePlayersSM();
 
     const gameSMDefinition = createGameSMDefinition(this.players, {

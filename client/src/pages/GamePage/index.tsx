@@ -41,7 +41,7 @@ export const GamePage = (props: IProps) => {
       acc[color] = acc[color] - (gemsToReturn[color] || 0);
       return acc;
     },
-    { ...(gameState ? gameState.playerState.gems : emptyTokensToTake) }
+    { ...(gameState && gameState.playerState ? gameState.playerState.gems : emptyTokensToTake) }
   );
 
   const gemsToReturnCount = Object.values(gemsToReturn).reduce(
@@ -71,7 +71,7 @@ export const GamePage = (props: IProps) => {
         const text = axiosError.response?.data ? axiosError.response?.data : axiosError.message;
         console.log('axiosError', axiosError);
 
-        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 3000});
+        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 3000 });
 
       }
 
@@ -206,7 +206,7 @@ export const GamePage = (props: IProps) => {
                   position: 'relative',
                 }}
               >
-                {playerState.cardsBought[color].map((card, index) => {
+                {playerState && playerState.cardsBought[color].map((card, index) => {
                   return (
                     <li
                       key={card.id}
@@ -244,7 +244,7 @@ export const GamePage = (props: IProps) => {
               position: 'relative',
             }}
           >
-            {playerState.cardsHolded.map((card, index) => {
+            {playerState && playerState.cardsHolded.map((card, index) => {
               return (
                 <li
                   key={card.id}

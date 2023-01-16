@@ -22,6 +22,13 @@ export class GameService {
     return this.games[this.games.length - 1];
   }
 
+  spectate(userId:string){
+    const game = this.games[0];
+    if (!game.spectators.includes(userId)){
+      game.spectators.push(userId);
+    }
+  }
+
   remove(id: string) {
     this.games = this.games.filter((game) => game.id !== id);
   }
@@ -35,9 +42,10 @@ export class GameService {
   getGameState(userId: string) {
     const currentGame = this.games[0]; // TODO:
     const { players, table } = currentGame.getSafeState();
-    const availableActions = currentGame.getPlayerAvailableActions(userId);
+    const isPlayer = currentGame.players.some((player)=>player.id === userId);
+    const availableActions = isPlayer? currentGame.getPlayerAvailableActions(userId): [];
 
-    const playerState = currentGame.getPlayer(userId).state;
+    const playerState = isPlayer? currentGame.getPlayer(userId).state: null;
 
     const state: IGameStateDTO = {
       availableActions,
@@ -60,7 +68,9 @@ export class GameService {
 
     currentGame.dispatch(userId, action, data);
 
-    for (const { id } of currentGame.players) {
+    const observers = currentGame.players.map((player)=>player.id).concat(currentGame.spectators);
+
+    for (const id of observers) {
       const connection = connectionService.get(id);
 
       const gameState = this.getGameState(id);
