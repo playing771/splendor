@@ -71,7 +71,7 @@ export const GamePage = (props: IProps) => {
         const text = axiosError.response?.data ? axiosError.response?.data : axiosError.message;
         console.log('axiosError', axiosError);
 
-        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 5000});
+        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 3000});
 
       }
 
