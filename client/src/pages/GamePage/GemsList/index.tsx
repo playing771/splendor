@@ -4,6 +4,7 @@ import { EGemColor } from '../../../../../interfaces/gem';
 import { getKeys } from '../../../../../utils/typescript';
 
 import './styles.css';
+import { GemStack } from '../Gem/GemStack';
 
 interface ITableTokensProps extends IBasicTokensList {
   gems: TPlayerGems;
@@ -28,25 +29,11 @@ export const BasicGemsList = memo(
   }: IBasicTokensList & {
     gemsList: Array<{ color: EGemColor; value: number }>;
   }) => {
-    const handleClick = (color: EGemColor) => () => {
-      onClick && onClick(color);
-    };
-
     return (
       <ul className={`TokensList TokensList__${orientaion}`}>
         {gemsList.map(({ color, value }) => {
           return (
-            <div
-              key={color}
-              onClick={handleClick(color)}
-              className={`TokensList_item TokensList_item__${color} ${
-                isActive &&
-                color !== EGemColor.Gold &&
-                'TokensList_item__active'
-              }`}
-            >
-              {value}
-            </div>
+            <GemStack key={color} count={value} gemSize='lg' color={color} onClick={onClick}/>
           );
         })}
       </ul>

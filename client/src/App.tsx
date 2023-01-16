@@ -5,12 +5,16 @@ import { GlobalStateProvider } from './context';
 import { GamePage } from './pages/GamePage';
 import { LoginPage } from './pages/LoginPage';
 import { RoomPage } from './pages/RoomPage';
+import Modal from 'react-modal';
+import { Toaster } from 'react-hot-toast';
 
+Modal.setAppElement('#root');
 
 function App() {
   return (
     <GlobalStateProvider>
       <BrowserRouter>
+        <Toaster />
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginPage />} />

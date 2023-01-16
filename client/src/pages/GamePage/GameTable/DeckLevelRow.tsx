@@ -8,15 +8,13 @@ export const DeckLevelRow = ({
   cardsCountInDeck,
   cards,
   lvl,
-  onBuyCard,
-  onHoldCard,
+  onClick,
   onHoldCardFromDeck
 }: {
   cardsCountInDeck: number;
   cards: ICardShape[];
   lvl: EDeckLevel;
-  onBuyCard: (cardId: string) => void;
-  onHoldCard: (cardId: string) => void;
+  onClick: (cardId:string, cardInfo: ICardShape)=>void;
   onHoldCardFromDeck: (deckLvl: EDeckLevel)=> void;
 }) => {
 
@@ -24,7 +22,7 @@ export const DeckLevelRow = ({
     <div className="DeckLevelRow">
       <div className={`Deck Deck__${lvl}`} onClick={()=>onHoldCardFromDeck(lvl)}>{cardsCountInDeck}</div>
       {cards.map((cardData) => {
-        return <CardWithActions key={cardData.id} {...cardData} onBuyClick={onBuyCard} onHoldClick={onHoldCard}/>
+        return <Card key={cardData.id} onClick={onClick} {...cardData}/>
       })}
     </div>
   );

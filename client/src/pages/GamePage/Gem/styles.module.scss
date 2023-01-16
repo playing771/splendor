@@ -6,9 +6,10 @@ $green_gem: #166735;
 $gold_gem: #f5ea42;
 
 $red_gem_light: #762b2e;
-$black_gem_light: #1d1d19;
-$blue_gem_light: #22395d;
-$white_gem_light: #a49c95;
+$black_gem_light: #404040;
+// $black_gem_light: #1d1d19;
+$blue_gem_light: #223656;
+$white_gem_light: #7d8386;
 $green_gem_light: #21482e;
 $gold_gem_light: #a49b3b;
 
@@ -19,12 +20,26 @@ $gold_gem_light: #a49b3b;
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  padding: 4px;
   border-width: 2px;
   border-style: double;
   font-size: 24px;
 
+  position: relative;
+
   // background-color: #b7b7b7;
+
+  &_value {
+    color: #dfd4ca;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &_miniature {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    font-size: 14px;
+  }
 
   &__Red {
     color: $red_gem;
@@ -56,22 +71,22 @@ $gold_gem_light: #a49b3b;
     border-color: $gold_gem;
     background-color: $gold_gem_light;
   }
-  
+
   &__xxs {
-    width: 12px;
-    height: 12px;
+    width: 24px;
+    height: 24px;
     font-size: 12px;
   }
 
   &__xs {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     font-size: 22px;
   }
 
   &__sm {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     font-size: 24px;
   }
 
@@ -105,17 +120,21 @@ $gold_gem_light: #a49b3b;
 
 .GemStack {
   position: relative;
+
+
+  &__empty {
+    opacity: 0.3;
+  }
   &_gem {
     &:not(:first-child) {
       position: absolute;
     }
 
-    
   }
 
   &_counter {
-    height: 8px;
-    width: 8px;
+    height: 16px;
+    width: 16px;
     position: absolute;
     left: -4px;
     top: -4px;
@@ -125,11 +144,6 @@ $gold_gem_light: #a49b3b;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
     font-size: 12px;
-  }
-
-  &__empty {
-    opacity: 0.3;
   }
 }

@@ -1,0 +1,21 @@
+.Modal {
+  position: absolute;
+  inset: 40px;
+  width: 100%;
+  max-width: 800px;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  padding: 40px 24px;
+  background-color: #2c2827;
+  border-radius: 12px;
+
+  &_overlay {
+    position: fixed;
+    inset: 0px;
+    background-color: #454545bf;
+  }
+}

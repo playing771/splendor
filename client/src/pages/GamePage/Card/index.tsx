@@ -1,40 +1,56 @@
-import React, { memo, ReactNode } from 'react';
+import { memo, ReactNode } from 'react';
 import { ICardShape } from '../../../../../interfaces/card';
 import { EGemColor } from '../../../../../interfaces/gem';
-import { concatClassNames } from '../../../utils/concatClassNames';
+import { Gem } from '../Gem';
 
-import './styles.css';
+import cn from 'classnames';
+
+import styles from './styles.module.scss';
 
 export interface ICardProps extends ICardShape {
-  className?:string;
+  size?: 'sm' | 'lg'
+  className?: string;
   children?: ReactNode;
+  onClick?: (cardId: string, cardInfo: ICardShape) => void
 }
 
-export const Card = memo(({ id, color, cost, score, className, children }: ICardProps) => {
-  const costs = Object.entries(cost).filter(([_, value]) => value > 0) as [
-    EGemColor,
-    number
-  ][];
+export const Card = memo(
+  ({ size = 'sm',className, children, onClick, ...cardInfo }: ICardProps) => {
+    const { color, cost, id, score } = cardInfo;
+    const costs = Object.entries(cost).filter(([_, value]) => value > 0) as [
+      EGemColor,
+      number
+    ][];
 
-  return (
-    <div key={id} className={concatClassNames("Card", className)}>
-      <div className="Card_header">
-        <span className="Card_headerScore">{score}</span>
-        <span className="Card_headerColor">{color}</span>
+    const handleCardClick = () => {
+      onClick && onClick(id, cardInfo);
+    }
+
+    return (
+      <div key={id} className={cn(styles.Card, styles[`Card__${color}`], styles[`Card__${size}`], className)} onClick={handleCardClick}>
+        <div className={cn(styles.Card_header)}>
+          <span>{score}</span>
+
+          <Gem color={color} size={size}/>
+
+        </div>
+        <div className={styles.Card_cost}>
+          {costs.map(([color, value]) => {
+            return (
+              <div className={styles.GemCost} key={color}>
+                <Gem
+                  key={color}
+                  color={color}
+                  size={size === 'lg'? 'sm': 'xxs'}
+                  value={value}
+                />
+                {/* <span className={styles.GemCost_value}>{value}</span> */}
+              </div>
+            );
+          })}
+        </div>
+        {children}
       </div>
-      <div className="Card_cost">
-        {costs.map(([color, value]) => {
-          return (
-            <div
-              key={color}
-              className={`Card_costItem Card_costItem__${color}`}
-            >
-              {value}
-            </div>
-          );
-        })}
-      </div>
-      {children}
-    </div>
-  );
-});
+    );
+  }
+);

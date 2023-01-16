@@ -1,0 +1,23 @@
+.CardModal {
+  &_content {
+    display: flex;
+    max-width: 800px;
+  }
+
+  &_cardColumn {
+    flex: 1;
+  }
+
+  &_controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding-left: 24px;
+    width: 50%;
+  }
+
+  &_controlsColumn {
+    flex: 2;
+  }
+}

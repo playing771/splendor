@@ -10,14 +10,19 @@ interface IProps {
   color: EGemColor;
   count: number;
   gemSize: IGemProps['size'];
+  onClick?: (color: EGemColor) => void;
 }
 
-export const GemStack = ({ color, count, gemSize }: IProps) => {
+export const GemStack = ({ color, count, gemSize, onClick }: IProps) => {
   const countList = [...Array(Math.max(count, 1)).keys()];
+
+  const handleClick = () => {
+    onClick && onClick(color)
+  }
   return (
-    <ul className={cn(styles.GemStack, { [styles.GemStack__empty]: count === 0 })}>
-      {countList.map((count) => (
-        <li key={count} className={styles.GemStack_gem} style={{ top: count * 2, left: count }}>
+    <ul className={cn(styles.GemStack, { [styles.GemStack__empty]: count === 0 })} onClick={handleClick}>
+      {countList.map((index) => (
+        <li key={index} className={styles.GemStack_gem} style={{ bottom: index, left: index }}>
           <Gem color={color} size={gemSize} />
         </li>
 

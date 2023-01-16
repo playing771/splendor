@@ -16,6 +16,8 @@ import { PlayersList } from './PlayersList';
 import './styles.css';
 import styles from './styles.module.scss';
 import { GameTableTokens } from './GameTable/GameTableTokens';
+import { toast } from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 interface IProps { }
 
@@ -60,8 +62,19 @@ export const GamePage = (props: IProps) => {
   const handleDispatchAction =
     (action: EPlayerAction) => async (data?: string | Partial<TPlayerGems>) => {
       console.log('action - data', action, data);
+      console.log('toast', toast);
 
-      await Api.post('game/dispatch', { action, data });
+      try {
+        await Api.post('game/dispatch', { action, data });
+      } catch (error) {
+        const axiosError = error as AxiosError<string>;
+        const text = axiosError.response?.data ? axiosError.response?.data : axiosError.message;
+        console.log('axiosError', axiosError);
+
+        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 5000});
+
+      }
+
     };
 
   const handleEndTurnClick = () => {

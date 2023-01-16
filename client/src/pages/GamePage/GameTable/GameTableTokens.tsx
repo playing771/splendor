@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { TPlayerGems } from '../../../../../interfaces/player';
 import { EGemColor } from '../../../../../interfaces/gem';
 import { PlayerGemsList, GemsToTakeList } from '../GemsList';
+import { Modal } from '../../../components/Modal';
 
 const emptyTokensToTake = {
   [EGemColor.Black]: 0,
@@ -71,15 +72,12 @@ export const GameTableTokens = ({
       <div style={{ display: 'flex', columnGap: 8 }}>
         <div>
           <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
+            Take gems
+          </button>
+          {/* <button onClick={handleToggleTakeTokens} style={{ width: 130 }}>
             {canTakeTokens ? 'Cancel' : 'Take gems'}
-          </button>
-          <button
-            disabled={!tokensToTakeCount}
-            style={{ width: 130 }}
-            onClick={handleSubmitTakeTokens}
-          >
-            Submit
-          </button>
+          </button> */}
+
           <PlayerGemsList
             gems={tokensRemaining}
             isActive={canTakeTokens}
@@ -87,16 +85,40 @@ export const GameTableTokens = ({
           />
 
         </div>
-        <div>
-
-
+        {/* <div>
           <GemsToTakeList
             gems={tokensToTake}
             isActive={true}
             onClick={handleTokenReturnClick}
           />
-        </div>
+        </div> */}
       </div>
+
+      <Modal isOpen={canTakeTokens} onRequestClose={handleToggleTakeTokens}>
+        <div style={{ maxWidth: 500, display: 'flex' }}>
+          <div style={{ flex: 1, display:'flex',justifyContent:'center' }}>
+            <PlayerGemsList
+              gems={tokensRemaining}
+              isActive={canTakeTokens}
+              onClick={handleTokenTakeClick}
+            />
+          </div>
+          <div style={{ flex: 1, display:'flex',justifyContent:'center' }}>
+            <GemsToTakeList
+              gems={tokensToTake}
+              isActive={true}
+              onClick={handleTokenReturnClick}
+            />
+          </div>
+          <button
+            disabled={!tokensToTakeCount}
+            style={{ width: 130 }}
+            onClick={handleSubmitTakeTokens}
+          >
+            Submit
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
