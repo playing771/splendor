@@ -1,9 +1,9 @@
-$red_gem_light: #762B2E;
-$black_gem_light: #1D1D19;
-$blue_gem_light: #22395D;
-$white_gem_light: #A49C95;
-$green_gem_light: #21482E;
-$gold_gem_light: #A49B3B;
+$red_gem_light: #762b2e;
+$black_gem_light: #3e3e3e;
+$blue_gem_light: #22395d;
+$white_gem_light: #a49c95;
+$green_gem_light: #21482e;
+$gold_gem_light: #a49b3b;
 
 $red_gem: #c12e35;
 $black_gem: #14150c;
@@ -12,6 +12,36 @@ $white_gem: #dfd4ca;
 $green_gem: #166735;
 $gold_gem: #f5ea42;
 
+.Card {
+  &__Red {
+    background-color:$red_gem;
+    border-color: $red_gem_light;
+  }
+  &__Black {
+    background-color:$black_gem;
+    border-color: $black_gem_light;
+  }
+  &__Blue {
+    background-color:$blue_gem;
+    border-color: $blue_gem_light;
+  }
+  &__White {
+    background-color:$white_gem;
+    border-color: $white_gem_light;
+  }
+  &__Green {
+    background-color:$green_gem;
+    border-color: $green_gem_light;
+  }
+  &__Gold {
+    background-color:$gold_gem;
+    border-color: $gold_gem_light;
+  }
+
+  &_header {
+    font-size: 24px;
+  }
+}
 
 .CardShort {
   height: 60px;
@@ -63,6 +93,8 @@ $gold_gem: #f5ea42;
 .CardStack {
   position: relative;
   &_card {
-    position: absolute;
+    &:not(:first-child) {
+      position: absolute;
+    }
   }
 }

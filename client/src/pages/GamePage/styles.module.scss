@@ -1,6 +1,7 @@
 .Game {
   &_info {
     display: flex;
+    flex-wrap: wrap;
   }
 
   &_infoPlayers {

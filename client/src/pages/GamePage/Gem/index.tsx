@@ -10,7 +10,7 @@ import { GemIcon } from './GemIcon';
 
 export interface IGemProps {
   color: EGemColor;
-  size?: 'xs' | 'sm' | 'lg'
+  size?: 'xxs' | 'xs' | 'sm' | 'lg'
 }
 
 
