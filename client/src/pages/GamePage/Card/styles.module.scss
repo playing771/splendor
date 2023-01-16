@@ -25,6 +25,7 @@ $gold_gem: #f5ea42;
   border-width: 2px;
   border-style: solid;
   transition: background-color 0.5s;
+  transition: border-color 0.3s;
   // border: 1px solid #6d6d6d;
   &__md {
     height: 154px;
@@ -36,7 +37,7 @@ $gold_gem: #f5ea42;
 
   &:hover {
     cursor: pointer;
-    background-color: #bdbdbd;
+    border-color: #e91e63;
     z-index: 999;
   }
 

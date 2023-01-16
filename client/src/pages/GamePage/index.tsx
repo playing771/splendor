@@ -146,6 +146,9 @@ export const GamePage = (props: IProps) => {
         <div className={styles.Game_infoPlayers}>
           <PlayersList players={players} />
         </div>
+        <div className={styles.Game_infoGems}>
+          <GameTableTokens gems={table.gems} onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)} />
+        </div>
         <div className={styles.Game_infoTable}>
           <GameTable
             table={table}
@@ -155,9 +158,6 @@ export const GamePage = (props: IProps) => {
             onHoldCardFromDeck={handleHoldCardFromDeck}
             onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
           />
-        </div>
-        <div className={styles.Game_infoGems}>
-          <GameTableTokens gems={table.gems} onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)} />
         </div>
       </div>
       <PlayerGemsList
