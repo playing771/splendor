@@ -41,6 +41,9 @@ export class GameService {
 
   getGameState(userId: string) {
     const currentGame = this.games[0]; // TODO:
+    if (!currentGame) {
+      throw Error('Game doesnt exists')
+    }
     const { players, table } = currentGame.getSafeState();
     const isPlayer = currentGame.players.some((player)=>player.id === userId);
     const availableActions = isPlayer? currentGame.getPlayerAvailableActions(userId): [];
