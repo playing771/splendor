@@ -160,14 +160,20 @@ export const Api = () => {
   });
 
   wss.on('connection', function connection(ws, request) {
-    console.log('request.session', request.session);
     const userId = request.session.userId;
-    connectionService.add(userId, ws);
+    try {
+      console.log('request.session', request.session);
+      connectionService.add(userId, ws);
+  
+      const gameState = gameService.getGameState(userId);
+      const message = JSON.stringify(gameState);
+  
+      ws.send(message);
+    } catch (error) {
+      console.log(error);
+      
+    }
 
-    const gameState = gameService.getGameState(userId);
-    const message = JSON.stringify(gameState);
-
-    ws.send(message);
 
     // ws.on('message', function (message) {
     //   //
