@@ -1,5 +1,5 @@
 export interface IBaseDeckConfig<C> {
-  name: string;
+  name?: string;
   cards: Array<C>;
 }
 

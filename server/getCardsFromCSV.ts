@@ -1,9 +1,9 @@
 import { parse } from 'csv-parse/sync';
 import fs from 'fs';
 import path from 'path';
-import { ICardShape, TCardCost } from '../../../interfaces/card';
-import { EDeckLevel } from '../../../interfaces/devDeck';
-import { EGemColor } from '../../../interfaces/gem';
+import { ICardShape, TCardCost } from '../interfaces/card';
+import { EDeckLevel } from '../interfaces/devDeck';
+import { EGemColor } from '../interfaces/gem';
 
 const pathToCSV = path.join('server', 'cards.csv');
 

@@ -9,6 +9,7 @@ import {
 import { countTokens } from '../Game/countTokens';
 import { getKeys } from '../../../utils/typescript';
 import { PLAYER_CARDS_HOLDED_MAX } from '../Game/constants';
+import { INobleShape } from '../../../interfaces/noble';
 
 export class Player implements IPlayerShape {
   gems: TPlayerGems;
@@ -16,13 +17,15 @@ export class Player implements IPlayerShape {
   cardsHolded: ICardShape[];
   name: string;
   id: string;
+  nobles: INobleShape[];
 
   constructor({
     name,
     id,
     gems: initialTokens = {} as TPlayerGems,
     cardsBought: initialCardsBought = {} as TPlayerCardsBought,
-    cardsHolded = []
+    cardsHolded = [],
+    nobles = [] as INobleShape[]
   }: IPlayerConfig) {
     this.gems = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = initialTokens[color] || 0;
@@ -37,17 +40,19 @@ export class Player implements IPlayerShape {
     this.cardsHolded = cardsHolded;
     this.name = name;
     this.id = id;
+    this.nobles = nobles;
   }
 
-  getGems(color: EGemColor, count: number): void {
+
+  public getGems(color: EGemColor, count: number): void {
     this.gems[color] += count;
   }
 
-  spendGems(color: EGemColor, count: number): void {
+  public spendGems(color: EGemColor, count: number): void {
     this.gems[color] -= count;
   }
 
-  payCost(cost: TCardCost) {
+  public payCost(cost: TCardCost) {
     const extraGems = this.gemsFromCardsBought;
 
     const gemsSpent = Object.values(EGemColor).reduce((acc, color) => {
@@ -85,7 +90,7 @@ export class Player implements IPlayerShape {
     return gemsSpent;
   }
 
-  buyCard(card: ICardShape) {
+  public buyCard(card: ICardShape) {
     const { cost, color } = card;
     const gemsSpent = this.payCost(cost);
     this.cardsBought[color].push(card);
@@ -93,19 +98,24 @@ export class Player implements IPlayerShape {
     return gemsSpent;
   }
 
-  buyHoldedCard(card: ICardShape) {
+  public buyHoldedCard(card: ICardShape) {
     const gemsSpent = this.buyCard(card);
     this.cardsHolded = this.cardsHolded.filter((holdedCard) => holdedCard.id !== card.id)
 
     return gemsSpent;
   }
 
-  holdCard(card: ICardShape) {
+  public holdCard(card: ICardShape) {
     if (this.cardsHolded.length >= PLAYER_CARDS_HOLDED_MAX) {
       throw Error(`Cant hold a card: ${this.cardsHolded.length} exceeds ${PLAYER_CARDS_HOLDED_MAX} of cards holded limit`);
     }
     this.cardsHolded.push(card);
   }
+
+  public earnNoble(noble: INobleShape) {
+    this.nobles.push(noble);
+  }
+
 
   private calculateGemsFromBoughtCards(color: EGemColor) {
     return this.cardsBought[color].length;
@@ -124,7 +134,7 @@ export class Player implements IPlayerShape {
   }
 
   get cardsBoughtCount() {
-    return Object.values(this.cardsBought).reduce((count, arr)=> count += arr.length, 0);
+    return Object.values(this.cardsBought).reduce((count, arr) => count += arr.length, 0);
   }
 
   get gemsFromCardsBought() {
@@ -135,9 +145,12 @@ export class Player implements IPlayerShape {
   }
 
   get score() {
-    return getKeys(this.cardsBought).reduce((total, color) => {
+    const cardsScore = getKeys(this.cardsBought).reduce((total, color) => {
       return total += this.calculateScoreFromBoughtCards(color)
     }, 0);
+
+    const noblesScore = this.nobles.reduce((total, noble) => total += noble.score, 0)
+    return cardsScore + noblesScore
   }
 
   get state(): IPlayerShape {
@@ -147,7 +160,8 @@ export class Player implements IPlayerShape {
       cardsHolded: this.cardsHolded,
       name: this.name,
       gems: this.gems,
-      gemsCount: this.gemsCount
+      gemsCount: this.gemsCount,
+      nobles: this.nobles
     }
   }
 }

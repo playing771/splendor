@@ -142,4 +142,15 @@ describe('Player functionality', () => {
     );
     expect(player.gems[EGemColor.Gold]).toBe(1);
   });
+
+  it('has score calculated by cards and nobles owned', () => {
+    const player = new Player({
+      name: 'max',
+      id: 'ID_1',
+      cardsBought: { [EGemColor.Black]: [{ color: EGemColor.Black, score: 4, cost: {}, id: 'SOME', lvl: EDeckLevel.First }] },
+      nobles: [{ requirements: { [EGemColor.Black]: 1 }, score: 2 }]
+    });
+
+    expect(player.score).toBe(6);
+  })
 });

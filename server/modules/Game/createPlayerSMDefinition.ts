@@ -71,7 +71,7 @@ export const createPlayerSMDefinition = (actions: {
     },
   };
 
-  addStateLogger(playerSMDefinition, 'PLAYER_STATE:');
+  // addStateLogger(playerSMDefinition, 'PLAYER_STATE:');
 
   return playerSMDefinition;
 };

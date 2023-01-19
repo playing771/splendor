@@ -2,6 +2,7 @@ import { Player } from "../server/modules/Player";
 import { Nullable } from "../utils/typescript";
 import { ICardShape } from "./card";
 import { TGameTableConfig, TGameTableSafeState, TGameTableShape } from "./gameTable";
+import { INobleShape } from "./noble";
 import { IPlayerShape } from "./player";
 
 export interface IGameShape<C> {

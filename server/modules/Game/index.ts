@@ -96,7 +96,7 @@ export class Game implements IGameShape<ICardShape> {
       this.getGameResults();
       this.sm.dispatchTransition('end');
       if (this.onGameEnd) {
-        
+
         this.onGameEnd(this.getGameResults())
       }
     } else {
@@ -201,15 +201,6 @@ export class Game implements IGameShape<ICardShape> {
     return this;
   }
 
-  private dispatchPlayerAction(
-    action: EPlayerAction,
-    data?: string,
-    playerId?: string
-  ) {
-    const targetPlayerId = playerId || this.getActivePlayer().id;
-    this.smPlayers[targetPlayerId].dispatchTransition(action, data);
-  }
-
   public getPlayerAvailableActions(playerId: string) {
     const playerStateMachine = this.smPlayers[playerId];
     if (!playerStateMachine)
@@ -223,6 +214,52 @@ export class Game implements IGameShape<ICardShape> {
       ).filter((action) => action !== EPlayerAction.TakeGemsOverLimit)
       : [];
   }
+
+
+  public checkAndGetNobles = () => {
+   const nobleToGetIndex = this.tableManager.table.nobles.findIndex((noble) => Object.entries(noble.requirements).every(([color, value])=>{
+      return this.getActivePlayer().cardsBought[color as EGemColor].length >= value;
+    }));
+
+    if (~nobleToGetIndex) {
+      const noble = this.tableManager.giveNoble(nobleToGetIndex);
+      this.getActivePlayer().earnNoble(noble);
+    }
+    
+  };
+
+  private dispatchPlayerAction(
+    action: EPlayerAction,
+    data?: string,
+    playerId?: string
+  ) {
+    const targetPlayerId = playerId || this.getActivePlayer().id;
+    this.smPlayers[targetPlayerId].dispatchTransition(action, data);
+  };
+
+  public getGameResults = (): IGameResult => {
+    const playersWithResults = this.players.map((player) => ({
+      score: player.score,
+      cardsBoughtCount: player.cardsBoughtCount,
+      id: player.id,
+    }));
+
+    playersWithResults.sort((a, b) => b.score - a.score || a.cardsBoughtCount - b.cardsBoughtCount);
+
+    const maxScore = playersWithResults[0].score;
+
+    const playersWithMaxScore = playersWithResults.filter(player => player.score === maxScore);
+    if (playersWithMaxScore.length > 1) {
+      const minBoughtCards = playersWithMaxScore[0].cardsBoughtCount;
+      const playersWithMinCardsBought = playersWithMaxScore.filter(player => player.cardsBoughtCount === minBoughtCards);
+
+      return playersWithMinCardsBought.length > 1 ? { winner: null, players: playersWithResults } : { winner: playersWithMinCardsBought[0].id, players: playersWithResults }
+    }
+
+    return { winner: playersWithMaxScore[0].id, players: playersWithResults }
+  };
+
+
 
   private takeGemsByPlayer(gems: TPlayerGems) {
     if (gems[EGemColor.Gold] > 0) {
@@ -310,6 +347,8 @@ export class Game implements IGameShape<ICardShape> {
 
     const card = this.tableManager.giveCardFromTable(cardId);
 
+    this.checkAndGetNobles();
+
     this.dispatchPlayerAction(EPlayerAction.BuyCard, cardId);
 
     return card;
@@ -331,6 +370,8 @@ export class Game implements IGameShape<ICardShape> {
     Object.entries(gemsToSpend).forEach(([color, count]) => {
       this.tableManager.addGems(color as EGemColor, count);
     });
+
+    this.checkAndGetNobles();
 
     this.dispatchPlayerAction(EPlayerAction.BuyHoldedCard, cardId);
 
@@ -431,27 +472,6 @@ export class Game implements IGameShape<ICardShape> {
     }
   };
 
-  public getGameResults = (): IGameResult => {
-    const playersWithResults = this.players.map((player) => ({
-      score: player.score,
-      cardsBoughtCount: player.cardsBoughtCount,
-      id: player.id,
-    }));
-
-    playersWithResults.sort((a, b) => b.score - a.score || a.cardsBoughtCount - b.cardsBoughtCount);
-
-    const maxScore = playersWithResults[0].score;
-
-    const playersWithMaxScore = playersWithResults.filter(player => player.score === maxScore);
-    if (playersWithMaxScore.length > 1) {
-      const minBoughtCards = playersWithMaxScore[0].cardsBoughtCount;
-      const playersWithMinCardsBought = playersWithMaxScore.filter(player => player.cardsBoughtCount === minBoughtCards);
-
-      return playersWithMinCardsBought.length > 1 ? { winner: null, players: playersWithResults } : { winner: playersWithMinCardsBought[0].id, players: playersWithResults }
-    }
-
-    return { winner: playersWithMaxScore[0].id, players: playersWithResults }
-  };
 
   private startTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(EPlayerAction.StartTurn, undefined, playerId);

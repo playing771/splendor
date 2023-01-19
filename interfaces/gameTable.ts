@@ -2,6 +2,7 @@ import { DevDeck } from '../server/modules/DevDeck';
 import { EDeckLevel, IDevDeckShape } from './devDeck';
 import { TPlayerGems } from './player';
 import { EGemColor } from './gem';
+import { INobleShape } from './noble';
 
 export type TGameTableRowShape<C> = {
   deck: IDevDeckShape<C>;
@@ -24,6 +25,7 @@ export type TGameTableShape<C> = {
   gems: {
     [key in EGemColor]: number;
   }
+  nobles: INobleShape[]
 };
 
 export type TGameTableConfig<C> = {
@@ -38,5 +40,7 @@ export type TGameTableConfig<C> = {
   [EGemColor.Red]: number,
   [EGemColor.White]: number,
   initialCardsOnTableCount: number,
-  willShuffleDecks?: boolean
+  noblesInPlay: number,
+  willShuffleDecks?: boolean,
+  nobles: INobleShape[]
 };

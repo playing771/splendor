@@ -1,6 +1,6 @@
 import { EPLayerState, IGameConfig } from "../../../interfaces/game";
 import { EGemColor } from "../../../interfaces/gem";
-import { getCardsFromCSV } from "../Card/getCardsFromCSV";
+import { getCardsFromCSV } from "../../getCardsFromCSV";
 import { populateCardsByLevelFromPool } from "../DevDeck/populateCardByLevelFromPool";
 
 export const PLAYER_GEMS_MAX = 10;

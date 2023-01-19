@@ -13,11 +13,11 @@ export class TableManager<C extends { id: string }>
     this.table = table;
   }
 
-  addGems(color: EGemColor, count: number) {
+  public addGems(color: EGemColor, count: number) {
     this.table.gems[color] += count;
   }
 
-  removeGems(color: EGemColor, count: number) {
+  public removeGems(color: EGemColor, count: number) {
     const targetTokenCount = this.table.gems[color];
     if (count > targetTokenCount) {
       throw Error('No more gem');
@@ -27,42 +27,50 @@ export class TableManager<C extends { id: string }>
     return count;
   }
 
-  giveCardFromDeck(level: EDeckLevel): C | null {
+  public giveCardFromDeck(level: EDeckLevel): C | null {
     return this.table[level].deck.getTop();
   }
 
   public giveCardFromTable(cardId: string): C {
     const [card, index, level] = this.findCardOnTable(cardId);
     const topCardFromDeck = this.table[level].deck.getTop();
-    
+
     if (topCardFromDeck !== null) {
       this.table[level].cards[index] = topCardFromDeck;
     }
     return card;
   }
 
-  findCardOnTable(cardId: string) {
+  public findCardOnTable(cardId: string) {
     const lvls = Object.values(EDeckLevel);
     let cardIndex: number = -1;
     let deckLvl: Nullable<EDeckLevel> = null;
     for (let index = 0; index < lvls.length; index++) {
-      
+
       const targetLvl = lvls[index];
       const cardInLvlIndex = this.table[targetLvl].cards.findIndex(
         (card) => card.id === cardId
       );
-      
+
       if (cardInLvlIndex !== -1) {
         cardIndex = cardInLvlIndex;
         deckLvl = targetLvl
         break;
       }
     }
-    
+
     if (cardIndex === -1 || deckLvl === null) throw Error(`cant find a card with ID ${cardId}`);
 
     const card = this.table[deckLvl].cards[cardIndex];
-    
+
     return [card, cardIndex, deckLvl] as const;
+  }
+
+  public giveNoble(index: number) {
+    const noble = this.table.nobles[index];
+
+    this.table.nobles.splice(index, 1);
+
+    return noble;
   }
 }

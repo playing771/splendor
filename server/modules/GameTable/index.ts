@@ -7,7 +7,9 @@ import {
   TGameTableShape,
 } from '../../../interfaces/gameTable';
 import { EGemColor } from '../../../interfaces/gem';
+import { INobleShape } from '../../../interfaces/noble';
 import { DevDeck } from '../DevDeck';
+import { BaseDeck } from '../DevDeck/BaseDeck';
 
 export class GameTable<C> implements TGameTableShape<C> {
   [EDeckLevel.First]: TGameTableRowShape<C>;
@@ -15,6 +17,7 @@ export class GameTable<C> implements TGameTableShape<C> {
   [EDeckLevel.Third]: TGameTableRowShape<C>;
   
   gems: TGameTableShape<C>['gems']
+  nobles: INobleShape[];
 
   constructor(config: TGameTableConfig<C>) {
     const { willShuffleDecks = true } = config;
@@ -45,8 +48,18 @@ export class GameTable<C> implements TGameTableShape<C> {
 
       return acc
     }, {} as TGameTableShape<C>['gems']);
+    const noblesDeck = new BaseDeck({cards: config.nobles});
 
+    if (willShuffleDecks) {
+      noblesDeck.shuffle();
+    }
+    
+    this.nobles = noblesDeck.getTopCards(config.noblesInPlay);
   }
+  
+  [EDeckLevel.First]: TGameTableRowShape<C>;
+  [EDeckLevel.Second]: TGameTableRowShape<C>;
+  [EDeckLevel.Third]: TGameTableRowShape<C>;
 
 
   getSafeState(): TGameTableSafeState<C> {

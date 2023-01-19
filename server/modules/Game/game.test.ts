@@ -15,6 +15,7 @@ import {
   TAKE_GEM_LIMIT_SAME_COLOR,
 } from './constants';
 import { EGameBasicState } from './createGameSMDefinition';
+import { INobleShape } from '../../../interfaces/noble';
 
 const PLAYERS: IPlayerConfig[] = [
   {
@@ -33,6 +34,11 @@ const SECOND_PLAYER = PLAYERS[1];
 const MOCKED_CARDS_POOL_BY_LVL =
   populateCardsByLevelFromPool(MOCKED_CARDS_POOL);
 
+const MOCKED_NOBLES: INobleShape[] = [
+  { score: 3, requirements: { [EGemColor.Black]: 2, [EGemColor.Red]: 2 } },
+  { score: 3, requirements: { [EGemColor.White]: 2, [EGemColor.Green]: 1 } },
+];
+
 const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
   initialCardsOnTableCount: 3,
   willShuffleDecks: false,
@@ -43,6 +49,8 @@ const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
   [EGemColor.Red]: 5,
   [EGemColor.White]: 5,
   ...MOCKED_CARDS_POOL_BY_LVL,
+  noblesInPlay: 3,
+  nobles: MOCKED_NOBLES,
 };
 
 const GAME_CONFIG = {
@@ -612,7 +620,7 @@ describe('Game functionality', () => {
     expect(game.getPlayerAvailableActions(SECOND_PLAYER.id)).toHaveLength(0);
   });
 
-  it('can find a winner - player with the biggerst score', () => {
+  it('finds a winner - player with the biggerst score', () => {
     const onGameEndMocked = jest.fn();
     const game = new Game({
       ...GAME_CONFIG,
@@ -665,7 +673,7 @@ describe('Game functionality', () => {
     });
   });
 
-  it('can find a winner between players with equal score by smallest count of bought cards', () => {
+  it('finds a winner between players with equal score by smallest count of bought cards', () => {
     const onGameEndMocked = jest.fn();
     const game = new Game({
       ...GAME_CONFIG,
@@ -817,6 +825,87 @@ describe('Game functionality', () => {
         { score: 16, id: 'player_1', cardsBoughtCount: 1 },
         { score: 16, id: 'PL_3', cardsBoughtCount: 1 },
       ]),
+    });
+  });
+
+  it('lets to earn a noble', () => {
+    const game = new Game({
+      ...GAME_CONFIG,
+      players: [
+        {
+          ...PLAYERS[0],
+          cardsBought: {
+            [EGemColor.White]: [
+              {
+                color: EGemColor.White,
+                id: 'CARD_1',
+                score: 1,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+              {
+                color: EGemColor.White,
+                id: 'CARD_2',
+                score: 1,
+                lvl: EDeckLevel.Third,
+                cost: {},
+              },
+            ],
+          },
+          gems: {
+            [EGemColor.Gold]: 10,
+          },
+        },
+        PLAYERS[1],
+      ],
+    });
+
+    game.dispatch(FIRST_PLAYER.id, EPlayerAction.BuyCard, 'second_three');
+
+    expect(game.getPlayer(FIRST_PLAYER.id).nobles[0]).toEqual(MOCKED_NOBLES[1]);
+    expect(game.table.nobles).toEqual([MOCKED_NOBLES[0]]);
+  });
+
+  it('counts score from nobles earned', () => {
+    const onGameEndMocked = jest.fn();
+    const game = new Game({
+      ...GAME_CONFIG,
+      onGameEnd: onGameEndMocked,
+      players: [
+        { ...PLAYERS[0] },
+        {
+          id: 'ID_TWO',
+          name: 'Two',
+          cardsBought: {
+            [EGemColor.Black]: [
+              {
+                color: EGemColor.Black,
+                cost: {},
+                id: 'CARD',
+                lvl: EDeckLevel.First,
+                score: 2,
+              },
+            ],
+          },
+          nobles: [{ score: 3, requirements: { [EGemColor.Black]: 1 } }],
+        },
+      ],
+    });
+
+    expect(game.getGameResults()).toEqual({
+      players: [
+        {
+          cardsBoughtCount: 1,
+          id: 'ID_TWO',
+          score: 5,
+        },
+        {
+          cardsBoughtCount: 0,
+          id: 'player_1',
+          score: 0,
+        },
+      ],
+      winner: 'ID_TWO',
     });
   });
 });
