@@ -47,8 +47,8 @@ const sessionMiddleware = session({
 
 const corsMiddleware = cors({
   credentials: true,
-  origin: 'http://localhost:5173',
-  // origin: 'http://178.250.157.172',
+  // origin: 'http://localhost:5173',
+  origin: 'http://178.250.157.172',
 });
 
 export const Api = () => {
