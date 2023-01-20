@@ -16,11 +16,11 @@ export const AuthProvider = ({ children }: IProps) => {
 
   const { data, isLoading, error, refetch } = useRequest<IUser>('/auth/userInfo');
 
-  useEffect(() => {
-    if (error) {
-      toastError(error);
-    }
-  }, [error])
+  // useEffect(() => {
+  //   if (error) {
+  //     toastError(error);
+  //   }
+  // }, [error])
 
   const update = useCallback(()=>{
     return refetch();
