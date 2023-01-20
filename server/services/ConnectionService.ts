@@ -13,8 +13,6 @@ export class ConnectionService {
   }
 
   delete(userId: string) {
-    console.log('delete', userId);
-
     this.connections.delete(userId);
   }
 
@@ -41,7 +39,7 @@ export class ConnectionService {
     }
   }
 
-  broadcast<T>(observers: string[], data?: IMessage<T>) {
+  broadcast<T>(observers: string[], data: IMessage<T>) {
     const message = JSON.stringify(data);
     for (const userId of observers) {
       this.send(userId, message);

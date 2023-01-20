@@ -5,7 +5,7 @@ import { WEBSOCKETS_URL } from '../Api';
 
 
 
-export const useWebsockets = <T,>(onMessage: (message: string) => void, onError: (err: Error) => void) => {
+export const useWebsockets = <T,>(onMessage: (message: IMessage<T>) => void, onError: (err: Error) => void) => {
   const wsRef = useRef<Nullable<WebSocket>>(null);
   const [isOpened, setIsOpen] = useState(false);
 
@@ -37,7 +37,7 @@ export const useWebsockets = <T,>(onMessage: (message: string) => void, onError:
 
     // Listen for messages
     wsRef.current.onmessage = (event) => {
-      onMessage(event.data)
+      onMessage(JSON.parse(event.data))
     };
 
     wsRef.current.onerror = () => {

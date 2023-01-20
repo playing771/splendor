@@ -8,7 +8,9 @@ import { IUser } from "./user";
 export enum EMessageType {
   GameStateChange = 'GAME_STATE_CHANGE',
   RoomStateChange = 'ROOM_STATE_CHANGE',
+  RoomsChange = 'RoomsChange',
   GetGameState = 'GET_GAME_STATE',
+  GameStarted = 'GAME_STARTED'
 }
 export interface IMessage<T> {
   type: EMessageType,

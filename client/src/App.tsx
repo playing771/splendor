@@ -1,17 +1,18 @@
 import { BrowserRouter, Route, Navigate, Routes } from 'react-router-dom';
-import { GlobalStateProvider } from './context';
+
 import { GamePage } from './pages/GamePage';
 import { LoginPage } from './pages/LoginPage';
 import { RoomPage } from './pages/RoomPage';
 import Modal from 'react-modal';
 import { Toaster } from 'react-hot-toast';
 import { RoomsPage } from './pages/RoomsPage';
+import { AuthProvider } from './AuthProvider';
 
 Modal.setAppElement('#root');
 
 function App() {
   return (
-    <GlobalStateProvider>
+    <AuthProvider>
       <BrowserRouter>
         <Toaster />
         <Routes>
@@ -22,7 +23,7 @@ function App() {
           <Route path="/games/:gameId" element={<GamePage />} />
         </Routes>
       </BrowserRouter>
-    </GlobalStateProvider>
+    </AuthProvider>
   );
 }
 

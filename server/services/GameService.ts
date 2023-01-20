@@ -35,7 +35,7 @@ export class GameService {
     const room = this.getRoom(id);
 
     const user = userService.get(userId);
-    
+
     if (room.state !== ERoomState.Pending && user.role === EUserRole.Player) {
       throw Error(`Player cant leave room in ${room.state} state`);
     }
@@ -52,7 +52,7 @@ export class GameService {
     const room = this.getRoom(id);
 
     if (room.state !== ERoomState.Pending) {
-      throw Error(`Can't join a game in ${room.state} state`)
+      throw Error(`Can't join a game in ${room.state} state`);
     }
     const user = userService.get(userId);
 
@@ -84,7 +84,9 @@ export class GameService {
   }
 
   broadcastOnRoomsChange() {
-    connectionService.broadcast(connectionService.getAllIds());
+    connectionService.broadcast(connectionService.getAllIds(), {
+      type: EMessageType.RoomsChange,
+    }); // TODO: need to be narrowed
   }
 
   broadcastGameState(gameId: string, userId?: string) {
@@ -93,7 +95,9 @@ export class GameService {
       throw Error(`Game ${gameId} is not attached to any room`);
     }
     const room = this.getRoom(game.roomId);
-    const observers = !!userId ? room.users.filter((user) => user.id === userId) : room.users;
+    const observers = !!userId
+      ? room.users.filter((user) => user.id === userId)
+      : room.users;
 
     for (const { id: userId, role } of observers) {
       const connection = connectionService.get(userId);
@@ -126,6 +130,8 @@ export class GameService {
     this.games.set(game.id, game);
     room.startGame(game.id);
 
+    const userIds = room.users.map((user) => user.id);
+    connectionService.broadcast(userIds, { type: EMessageType.GameStarted, data: game.id });
     return game;
   }
 

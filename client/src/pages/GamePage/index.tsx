@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { EMessageType, IGameStateDTO, IMessage } from '../../../../interfaces/api';
 import { EPlayerAction } from '../../../../interfaces/game';
 import { TPlayerGems } from '../../../../interfaces/player';
-import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
@@ -12,7 +11,6 @@ import { Card } from './Card';
 import { EDeckLevel } from '../../../../interfaces/devDeck';
 import { PlayersList } from './PlayersList';
 import { GameTableTokens } from './GameTable/GameTableTokens';
-import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 
 import { useParams } from 'react-router-dom';
@@ -52,11 +50,10 @@ export const GamePage = () => {
     0
   );
 
-  const onMessage = useCallback((message: string) => {
-    const parsedMessage: IMessage<IGameStateDTO> = JSON.parse(message);
-    console.log('message', parsedMessage);
-    if (parsedMessage.type === EMessageType.GameStateChange) {
-      setGameState(parsedMessage.data);
+  const onMessage = useCallback((message: IMessage<IGameStateDTO | string>) => {
+    console.log('message', message);
+    if (message.type === EMessageType.GameStateChange) {
+      setGameState(message.data as IGameStateDTO);
     }
     
   }, []);

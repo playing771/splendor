@@ -81,6 +81,18 @@ export const Api = () => {
     }
   );
 
+  app.get<unknown, unknown>(
+    '/auth/userInfo',
+    isAuthenticated,
+    (req, res) => {
+
+      const userId = req.session.userId;
+      const user = userService.get(userId);
+
+      return res.status(200).json(user);
+    }
+  );
+
   // app.get('/game/state', isAuthenticated, (req, res) => {
   //   const currentGame = gameService.games[0];
   //   if (currentGame) {

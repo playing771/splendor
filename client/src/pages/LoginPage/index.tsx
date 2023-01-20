@@ -4,17 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { ILoginDTO } from '../../../../interfaces/api';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
-import { useGlobalState } from '../../context';
 
 import cn from 'classnames';
 
 import styles from './style.module.css';
+import { useAuth } from '../../AuthProvider/context';
 
 export function LoginPage() {
   const [username, setUsername] = useState('');
   const [error, setError] = useState<Nullable<string>>(null);
-  const { setUserState } = useGlobalState()
   const navigate = useNavigate()
+  const { update } = useAuth()
 
   const handleChange = (e: any) => {
     setUsername(e.target.value);
@@ -26,9 +26,8 @@ export function LoginPage() {
     try {
 
       const response = await Api.post<ILoginDTO>(`auth/login`, { username });
+      await update();
       console.log('login response', response);
-
-      setUserState({ username: response.data.name, userId: response.data.id })
 
       navigate('/rooms');
     } catch (error) {

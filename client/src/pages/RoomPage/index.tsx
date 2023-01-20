@@ -1,27 +1,42 @@
 import { AxiosError } from 'axios';
-import { useCallback, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IRoomUsersDTO } from '../../../../interfaces/api';
-import { IRoomShape } from '../../../../interfaces/room';
+import { EMessageType, IMessage } from '../../../../interfaces/api';
+import { ERoomState, IRoomShape } from '../../../../interfaces/room';
 import { EUserRole } from '../../../../interfaces/user';
-import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
+import { useAuth } from '../../AuthProvider/context';
 import { useErrorToast } from '../../utils/useErrorToast';
 import { useRequest } from '../../utils/useRequest';
 import { useWebsockets } from '../../utils/useWebsockets';
+import { RoomsPage } from '../RoomsPage';
 
 import styles from './styles.module.scss';
 
 export function RoomPage() {
   const navigate = useNavigate()
   const { roomId } = useParams<{ roomId: string }>();
-  const toastError = useErrorToast()
+  const toastError = useErrorToast();
+
+  const { userId } = useAuth();
+
+
 
   const { data: roomData, isLoading, refetch } = useRequest<IRoomShape>(`rooms?roomId=${roomId}`);
 
-  const onMessage = useCallback(() => {
-    refetch()
+  const spectators = roomData?.users.filter((user)=>user.role === EUserRole.Spectator) || [];
+  const players = roomData?.users.filter((user)=>user.role === EUserRole.Player) || [];
+
+  const onMessage = useCallback((message: IMessage<unknown>) => {
+    if (message.type === EMessageType.RoomStateChange) {
+      refetch()
+    }
+
+    if (message.type === EMessageType.GameStarted) {
+      const gameId = message.data;
+      navigate(`/games/${gameId}`)
+    }
+
   }, [])
   const onError = useCallback((error: any) => {
     toastError(error);
@@ -66,8 +81,8 @@ export function RoomPage() {
   const handleStartGameClick = async () => {
     const body = { roomId };
     try {
-      const { data: gameId } = await Api.post<string>('/rooms/start', body);
-      navigate(`/games/${gameId}`);
+      await Api.post<string>('/rooms/start', body);
+
     } catch (error) {
       toastError(error as unknown as AxiosError<string>);
     }
@@ -86,12 +101,12 @@ export function RoomPage() {
           <div className={styles.Room_content}>
 
             <span>{roomData.state}</span>
-            <span>Spectators: {roomData.users.filter((user) => user.role === EUserRole.Spectator).length}</span>
+            <span>Spectators: {spectators.length}</span>
           </div>
           <div className={styles.Room_content}>
             <span className={styles.Room_name}>Players:</span>
             <div>
-              {roomData.users.filter((user) => user.role === EUserRole.Player).map((user) => {
+              {players.map((user) => {
                 return <div key={user.id}>
                   {user.name}
                 </div>
@@ -99,9 +114,9 @@ export function RoomPage() {
             </div>
           </div>
           <div className={styles.Room_controls}>
-            <button onClick={handleJoinClick}>Join</button>
-            <button onClick={handleSpectateClick}>Spectate</button>
-            <button onClick={handleStartGameClick}>Start game</button>
+            {players.every((player)=>player.id !== userId) && <button onClick={handleJoinClick}>Join</button>}
+            {spectators.every((player)=>player.id !== userId) && <button onClick={handleSpectateClick}>Spectate</button>}
+            {roomData.owner.id === userId && <button onClick={handleStartGameClick}>Start game</button>}
           </div>
         </div>
 
