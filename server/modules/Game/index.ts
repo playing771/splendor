@@ -32,16 +32,17 @@ import {
 } from './createGameSMDefinition';
 import { createPlayerSMDefinition } from './createPlayerSMDefinition';
 import { EDeckLevel } from '../../../interfaces/devDeck';
+import { IUser } from '../../../interfaces/user';
 
 type PlayerId = string;
 type TGameState = PlayerId | EGameBasicState;
 
 export class Game implements IGameShape<ICardShape> {
   public id: string;
+  public roomId: string | undefined;
   public table: GameTable<ICardShape>;
 
   public players: Player[];
-  public spectators: string[];
   private tableManager: TableManager<ICardShape>;
   private sm: IStateMachine<TGameState, TGameEvent>;
   private smPlayers: {
@@ -54,20 +55,22 @@ export class Game implements IGameShape<ICardShape> {
   constructor({
     players,
     tableConfig,
-    onGameEnd
+    onGameEnd,
+    roomId
   }: IGameConfig & {
     players: IPlayerConfig[];
+    roomId?:string;
     onGameEnd?: (
       result: IGameResult
     ) => void;
   }) {
     this.id = uuidv4();
+    this.roomId = roomId;
 
     this.table = new GameTable(tableConfig);
     this.tableManager = new TableManager(this.table);
 
     this.players = players.map((playerConfig) => new Player(playerConfig));
-    this.spectators = [];
     this.smPlayers = this.initializePlayersSM();
 
     const gameSMDefinition = createGameSMDefinition(this.players, {
@@ -151,6 +154,11 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public dispatch(userId: string, action: EPlayerAction, data?: any) {
+    const playerStateMachine = this.smPlayers[userId];
+
+    if (!playerStateMachine) {
+      throw Error(`Cant dispatch: ${userId} is not a player`);
+    }
     const actionIsAllowed = this.smPlayers[userId].checkTransition(action);
 
     if (!actionIsAllowed) {

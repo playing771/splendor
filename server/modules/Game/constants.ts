@@ -1,6 +1,7 @@
 import { EPLayerState, IGameConfig } from "../../../interfaces/game";
 import { EGemColor } from "../../../interfaces/gem";
 import { getCardsFromCSV } from "../../getCardsFromCSV";
+import { getNoblesFromCSV } from "../../getNoblesFromCSV";
 import { populateCardsByLevelFromPool } from "../DevDeck/populateCardByLevelFromPool";
 
 export const PLAYER_GEMS_MAX = 10;
@@ -23,6 +24,7 @@ export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
 
 
 const cardsPool = getCardsFromCSV();
+const noblesPool = getNoblesFromCSV();
 
 export const DEFAULT_GAME_SETUP: IGameConfig = {
   tableConfig: {
@@ -34,7 +36,8 @@ export const DEFAULT_GAME_SETUP: IGameConfig = {
     [EGemColor.Green]: 8,
     [EGemColor.Red]: 8,
     [EGemColor.White]: 8,
-
+    noblesInPlay: 4,
+    nobles: noblesPool,
     ...populateCardsByLevelFromPool(cardsPool),
   },
 };

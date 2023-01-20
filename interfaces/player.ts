@@ -1,6 +1,7 @@
-import { ICardShape, TCardCost } from "./card";
+import { ICardShape} from "./card";
 import { EGemColor } from "./gem";
 import { INobleShape } from "./noble";
+import { IUser } from "./user";
 
 export type TPlayerGems = {
   [key in EGemColor]: number;
@@ -11,8 +12,8 @@ export type TPlayerCardsBought = {
 }
 
 export interface IPlayerShape {
-  name: string;
-  id: string;
+  id:string;
+  name:string;
   gems: TPlayerGems,
   cardsBought: { [key in EGemColor]: ICardShape[] };
   cardsHolded: ICardShape[];

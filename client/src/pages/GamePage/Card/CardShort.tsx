@@ -13,7 +13,6 @@ interface IProps {
 }
 
 export const CardShort = ({ color, counter, className }: IProps) => {
-  console.log('color',color,counter);
   
   return (
     <div className={cn(styles.CardShort, styles[`CardShort__${color}`], className)}>

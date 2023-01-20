@@ -2,8 +2,10 @@ import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
 import {
+  EMessageType,
   IGameAvailableActionsDTO,
   ILoginDTO,
+  IMessage,
 } from '../../interfaces/api';
 import { userService } from '../services/UserService';
 import { gameService } from '../services/GameService';
@@ -11,6 +13,7 @@ import { WebSocketServer } from 'ws';
 import { connectionService } from '../services/ConnectionService';
 import http from 'http';
 import { EPlayerAction } from '../../interfaces/game';
+import { EUserRole } from '../../interfaces/user';
 
 // middleware to test if authenticated
 function isAuthenticated(req, res, next) {
@@ -31,7 +34,7 @@ const sessionMiddleware = session({
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-  
+
   cookie: {
     // sameSite: 'none',
     // secure: false,
@@ -44,8 +47,8 @@ const sessionMiddleware = session({
 
 const corsMiddleware = cors({
   credentials: true,
-  origin: 'http://178.250.157.172',
-  
+  origin: 'http://localhost:5173',
+  // origin: 'http://178.250.157.172',
 });
 
 export const Api = () => {
@@ -53,31 +56,30 @@ export const Api = () => {
   app.use(sessionMiddleware);
   app.use(express.json());
 
-  app.post('/auth/login/:username', (req, res) => {
-    const { username } = req.params;
-    const userId = req.session.userId;
+  app.post<unknown, unknown, { username: string }>(
+    '/auth/login',
+    (req, res) => {
+      const { username } = req.body;
 
-    if (!!userId) {
-      const user = userService.get(userId);
-      if (!user) {
-        return res.sendStatus(500);
+      const userId = req.session.userId;
+
+      if (!!userId) {
+        const user = userService.getUnsafe(userId);
+        if (!user) {
+          return res.sendStatus(500);
+        }
+        return res.status(200).json(user);
       }
+
+      const user: ILoginDTO = userService.add(username);
+
+      console.log(`Updating session for user ${user.name} ${user.id}`);
+
+      req.session.userId = user.id;
+
       return res.status(200).json(user);
     }
-
-    const user: ILoginDTO = userService.add(username);
-
-    console.log(`Updating session for user ${user.name} ${user.id}`);
-
-    req.session.userId = user.id;
-
-    return res.status(200).json(user);
-  });
-
-  app.get('/room/users', isAuthenticated, (req, res) => {
-    const users = userService.users;
-    res.status(200).json({ users });
-  });
+  );
 
   // app.get('/game/state', isAuthenticated, (req, res) => {
   //   const currentGame = gameService.games[0];
@@ -89,50 +91,132 @@ export const Api = () => {
   //   }
   // });
 
-  app.get('/game/start', isAuthenticated, (req, res) => {
-    gameService.create();
-    res.sendStatus(200);
-  });
-
-  app.post('/game/dispatch', isAuthenticated, (req, res) => {
-    const payload: { action?: EPlayerAction, data?: any } = req.body;
-    const userId = req.session.userId;
-    console.log('/game/dispatch', payload );
-    
-    if (payload.action && userId) {
+  app.get<unknown, unknown, unknown, { roomId?: string }>(
+    '/rooms',
+    (req, res) => {
+      const { roomId } = req.query;
       try {
-        gameService.dispatch(payload.action, userId, payload.data);
+        const result =
+          typeof roomId === 'string'
+            ? gameService.getRoom(roomId)
+            : [...gameService.rooms.values()];
+
+        res.status(200).json(result);
+      } catch (error) {
+        console.log('error', error);
+
+        res.status(500).send(error.message);
+      }
+    }
+  );
+
+  app.post<unknown, unknown, { roomName?: string }>(
+    '/rooms/create',
+    isAuthenticated,
+    (req, res) => {
+      const { roomName } = req.body;
+      // console.log('roomName',roomName);
+
+      const userId = req.session.userId;
+      const user = userService.get(userId);
+
+      // console.log('user',user);
+
+      try {
+        const room = gameService.createRoom(
+          roomName || `${user.name}'s game`,
+          user.id
+        );
+        res.status(200).json(room);
+      } catch (error) {
+        res.status(500).send(error.message);
+      }
+    }
+  );
+
+  app.post<unknown, unknown, { roomId: string }>(
+    '/rooms/leave',
+    isAuthenticated,
+    (req, res) => {
+      const { roomId } = req.body;
+      const userId = req.session.userId!;
+      try {
+        gameService.leaveRoom(roomId, userId);
         res.sendStatus(200);
       } catch (error) {
-        
-        const err = error as Error;
-        
-        res.status(500).send(err.message);
+        res.status(500).send(error.message);
       }
-
-    } else {
-      res.sendStatus(500);
     }
+  );
 
-
-  })
-
-  app.get('/game/availableActions', isAuthenticated, (req, res) => {
-    const currentGame = gameService.games[0];
-    if (currentGame) {
+  app.post<unknown, unknown, { roomId: string; role: EUserRole }>(
+    '/rooms/join',
+    isAuthenticated,
+    (req, res) => {
+      const { roomId, role } = req.body;
       const userId = req.session.userId!;
-      const response: IGameAvailableActionsDTO = {
-        availableActions: currentGame.getPlayerAvailableActions(userId),
-      };
-      res.status(200).json(response);
-    } else {
-      res.sendStatus(500);
-    }
-  });
+      try {
+        switch (role) {
+          case EUserRole.Player:
+            gameService.joinRoomAsPlayer(roomId, userId);
+            break;
+          case EUserRole.Spectator:
+            gameService.joinRoomAsSpectator(roomId, userId);
+            break;
+          default:
+            throw Error(`Cant join room: uknown ${role} role`);
+        }
 
-  // app.listen(REST_PORT, () => {
-  //   console.log(`App listening on port ${REST_PORT}`)
-  // })
+        res.sendStatus(200);
+      } catch (error) {
+        res.status(500).send(error.message);
+      }
+    }
+  );
+
+  app.post<unknown, unknown, { roomId: string }>(
+    '/rooms/start',
+    isAuthenticated,
+    (req, res) => {
+      const { roomId } = req.body;
+      const userId = req.session.userId!;
+      try {
+        const game = gameService.startGame(roomId, userId);
+        res.status(200).json(game.id);
+      } catch (error) {
+        res.status(500).send(error.message);
+      }
+    }
+  );
+
+  app.post<unknown, unknown, { action?: EPlayerAction; data?: any }>(
+    '/game/dispatch',
+    isAuthenticated,
+    (req, res) => {
+      const payload = req.body;
+      const { gameId } = req.query;
+      const userId = req.session.userId;
+      console.log('/game/dispatch', payload);
+
+      if (payload.action && userId) {
+        try {
+          gameService.dispatch(
+            gameId as string,
+            payload.action,
+            userId,
+            payload.data
+          );
+          res.sendStatus(200);
+        } catch (error) {
+          const err = error as Error;
+
+          res.status(500).send(err.message);
+        }
+      } else {
+        res.sendStatus(500);
+      }
+    }
+  );
 
   //
   // Create an HTTP server.
@@ -160,33 +244,40 @@ export const Api = () => {
   });
 
   wss.on('connection', function connection(ws, request) {
+    console.log('new connection');
+
     const userId = request.session.userId;
+
     try {
       console.log('request.session', request.session);
       connectionService.add(userId, ws);
-  
-      const gameState = gameService.getGameState(userId);
-      const message = JSON.stringify(gameState);
-  
-      ws.send(message);
+
+      // const gameState = gameService.getGameState(userId);
+      // const message = JSON.stringify(gameState);
+
+      // ws.send(message);
+
+      ws.on('message', function (message) {
+        const parsedMessage: IMessage<unknown> = JSON.parse(message.toString());
+
+        if (!parsedMessage || !parsedMessage.data) {
+          throw Error(`Incorrect message contract`);
+        }
+
+        if (parsedMessage.type === EMessageType.GetGameState) {
+          const gameId = parsedMessage.data as string;
+          gameService.broadcastGameState(gameId, userId);
+        }
+      });
+
+      ws.on('close', function () {
+        console.log('WEBSOCKET CLOSED', userId);
+
+        connectionService.delete(userId);
+      });
     } catch (error) {
-      console.log(error);
-      
+      console.log('Error in websockets', error);
     }
-
-
-    // ws.on('message', function (message) {
-    //   //
-    //   // Here we can now use session parameters.
-    //   //
-    //   console.log(`Received message ${message} from user ${userId}`);
-
-    // });
-
-    ws.on('close', function () {
-      connectionService.delete(userId);
-    });
-
   });
 
   //

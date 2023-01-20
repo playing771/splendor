@@ -7,6 +7,7 @@ import { IPlayerShape } from "./player";
 
 export interface IGameShape<C> {
   id: string;
+  roomId?:string;
   table: TGameTableShape<C>
 }
 
@@ -33,14 +34,6 @@ export enum EPlayerAction {
   EndTurn = 'END_TURN'
 }
 
-export interface IGameMessage {
-  availableActions: EPlayerAction[];
-  table: TGameTableSafeState<ICardShape>;
-  players: IPlayerShape[];
-  playerState: Nullable<IPlayerShape>;
-  isPlayerActive: boolean;
-  gameResults: IGameResult;
-}
 export type IGameResult = {
   winner: Nullable<string>,
   players: Array<{

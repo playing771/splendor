@@ -1,25 +1,25 @@
-import { useCallback, useState } from 'react';
-import { IGameStateDTO } from '../../../../interfaces/api';
+import { useCallback, useEffect, useState } from 'react';
+import { EMessageType, IGameStateDTO, IMessage } from '../../../../interfaces/api';
 import { EPlayerAction } from '../../../../interfaces/game';
 import { TPlayerGems } from '../../../../interfaces/player';
 import { Nullable } from '../../../../utils/typescript';
 import { Api } from '../../Api';
-import { useWebsocket } from '../../utils/useWebsocket';
+import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
 import { GemsToTakeList, PlayerGemsList } from './GemsList';
 import { EGemColor } from '../../../../interfaces/gem';
 import { Card } from './Card';
-
 import { EDeckLevel } from '../../../../interfaces/devDeck';
 import { PlayersList } from './PlayersList';
-
-import './styles.css';
-import styles from './styles.module.scss';
 import { GameTableTokens } from './GameTable/GameTableTokens';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 
-interface IProps { }
+import { useParams } from 'react-router-dom';
+import { useErrorToast } from '../../utils/useErrorToast';
+
+import styles from './styles.module.scss';
+import './styles.css';
 
 const emptyTokensToTake = {
   [EGemColor.Black]: 0,
@@ -30,11 +30,14 @@ const emptyTokensToTake = {
   [EGemColor.White]: 0,
 };
 
-export const GamePage = (props: IProps) => {
+export const GamePage = () => {
+
+  const { gameId } = useParams<{ gameId: string }>();
+
   const [gameState, setGameState] = useState<IGameStateDTO>();
+  const toastError = useErrorToast();
   const [gemsToReturn, setGemsToReturn] =
     useState<Partial<TPlayerGems>>(emptyTokensToTake);
-  const [error, setError] = useState<Nullable<string>>(null);
 
   const gemsRemaining = Object.values(EGemColor).reduce(
     (acc, color) => {
@@ -50,28 +53,26 @@ export const GamePage = (props: IProps) => {
   );
 
   const onMessage = useCallback((message: string) => {
-    const gameStateDTO: IGameStateDTO = JSON.parse(message);
-    console.log('gameStateDTO', gameStateDTO);
-
-    setGameState(gameStateDTO);
+    const parsedMessage: IMessage<IGameStateDTO> = JSON.parse(message);
+    console.log('message', parsedMessage);
+    if (parsedMessage.type === EMessageType.GameStateChange) {
+      setGameState(parsedMessage.data);
+    }
+    
   }, []);
   const onError = useCallback(() => {
-    setError('Unknown error');
+    toastError(new Error('Error in websockets') as any);
   }, []);
 
   const handleDispatchAction =
     (action: EPlayerAction) => async (data?: string | Partial<TPlayerGems>) => {
       console.log('action - data', action, data);
-      console.log('toast', toast);
 
       try {
-        await Api.post('game/dispatch', { action, data });
+        await Api.post(`game/dispatch?gameId=${gameId}`, { action, data });
       } catch (error) {
         const axiosError = error as AxiosError<string>;
-        const text = axiosError.response?.data ? axiosError.response?.data : axiosError.message;
-        console.log('axiosError', axiosError);
-
-        toast(text, { style: { backgroundColor: '#c12e35', color: 'white' }, duration: 3000 });
+        toastError(axiosError);
 
       }
 
@@ -126,7 +127,14 @@ export const GamePage = (props: IProps) => {
     });
   };
 
-  useWebsocket(onMessage, onError);
+  const { isOpen, send: sendMessage, instance } = useWebsockets(onMessage, onError);
+
+  useEffect(() => {
+    if (isOpen) {
+      sendMessage({ type: EMessageType.GetGameState, data: gameId })
+    }
+  }, [sendMessage, isOpen, instance])
+
 
   if (!gameState) return <h1>...loading</h1>;
 
@@ -136,7 +144,7 @@ export const GamePage = (props: IProps) => {
   return (
     <div className={styles.Game}>
       <div className="StatusBar">
-        {error && <h3>Error: {error}</h3>}
+
         {isPlayerActive && <h3 className="StatusBar_yourTurn">Your turn</h3>}
         <h3 style={{ display: 'block' }}>
           Available actions: {availableActions.join('; ')}

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Api } from "../Api";
 
 export const useRequest = <D,>(url: string) => {
@@ -7,21 +7,27 @@ export const useRequest = <D,>(url: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>();
 
+  const refetch = useCallback(() => {
+    return request()
+  }, [url])
+
+  const request = useCallback(async ()=> {
+    try {
+      setIsLoading(true);
+      const response = await Api.get<D>(url);
+      setData(response.data);
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
+      setError(axiosError.message);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  },[url])
+
   useEffect(() => {
-    (async function request() {
-      try {
-        setIsLoading(true);
-        const response = await Api.get<D>(url);
-        setData(response.data);
-      } catch (error: unknown) {
-        const axiosError = error as AxiosError;
-        setError(axiosError.message);
-      }
-      finally {
-        setIsLoading(false);
-      }
-    })();
+    request()
   }, [url]);
 
-  return { data, isLoading, error }
+  return { data, isLoading, error, refetch }
 }

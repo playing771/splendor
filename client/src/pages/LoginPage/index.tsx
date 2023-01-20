@@ -25,12 +25,12 @@ export function LoginPage() {
 
     try {
 
-      const response = await Api.post<ILoginDTO>(`auth/login/${username}`);
-      console.log('login response',response);
-      
+      const response = await Api.post<ILoginDTO>(`auth/login`, { username });
+      console.log('login response', response);
+
       setUserState({ username: response.data.name, userId: response.data.id })
 
-      navigate('/room');
+      navigate('/rooms');
     } catch (error) {
       const axiosError = error as AxiosError;
       setError(axiosError.message);
@@ -40,7 +40,7 @@ export function LoginPage() {
 
   return (
     <div
-    className={cn(styles.Container)}
+      className={cn(styles.Container)}
       style={{
         maxWidth: 800,
         margin: 'auto',
