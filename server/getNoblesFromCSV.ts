@@ -2,6 +2,7 @@ import { parse } from 'csv-parse/sync';
 import fs from 'fs';
 import path from 'path';
 import { TCardCost } from '../interfaces/card';
+import { EGemColor } from '../interfaces/gem';
 import { INobleShape } from '../interfaces/noble';
 
 const pathToCSV = path.join('server', 'nobles.csv');
@@ -20,7 +21,7 @@ export const getNoblesFromCSV = () => {
     for (let index = 0; index < nobleDto.length; index += 2) {
       const color = nobleDto[index];
       if (!!color) {
-        requirements[color] = Number(nobleDto[index + 1]);
+        requirements[color as EGemColor] = Number(nobleDto[index + 1]);
       }
     }
     nobles.push({ requirements, score: 3 });

@@ -6,7 +6,7 @@ export class BaseDeck<C> implements IBaseDeckShape<C> {
 
   constructor({ cards, name }: IBaseDeckConfig<C>) {
     this.cards = [...cards];
-    this.name = name;
+    this.name = name || '';
   }
 
   getTop() {
