@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { TPlayerGems } from '../../../../../interfaces/player';
 import { EGemColor } from '../../../../../interfaces/gem';
-import { PlayerGemsList, GemsToTakeList } from '../GemsList';
+import { PlayerGemsList, GemsToTakeList } from '../../../components/GemsList';
 import { Modal } from '../../../components/Modal';
 
 const emptyTokensToTake = {

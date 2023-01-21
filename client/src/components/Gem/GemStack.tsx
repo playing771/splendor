@@ -1,6 +1,6 @@
 import React from 'react';
 import { Gem, IGemProps } from '.';
-import { EGemColor } from '../../../../../interfaces/gem';
+import { EGemColor } from '../../../../interfaces/gem';
 
 import cn from 'classnames'
 

@@ -5,10 +5,10 @@ $white_gem_light: #a49c95;
 $green_gem_light: #21482e;
 $gold_gem_light: #a49b3b;
 
-$red_gem: #c12e35;
-$black_gem: #14150c;
+$red_gem: #882a2e;
+$black_gem: #3f3939;
 $blue_gem: #224173;
-$white_gem: #dfd4ca;
+$white_gem: #959ea6;
 $green_gem: #166735;
 $gold_gem: #f5ea42;
 
@@ -26,7 +26,29 @@ $gold_gem: #f5ea42;
   border-style: solid;
   transition: background-color 0.5s;
   transition: border-color 0.3s;
+  transition: transform 0.3s;
   // border: 1px solid #6d6d6d;
+
+  &_info {
+    position: relative;
+    display: flex;
+    height: 100%;
+  }
+
+  &_gem {
+    position: absolute;
+    top:0;
+    right: 0;
+  }
+
+  &_score {
+    position: absolute;
+    font-size: 32px;
+    font-weight: 500;
+    right: 0;
+    top: 0;
+  }
+
   &__md {
     height: 154px;
   }
@@ -37,8 +59,8 @@ $gold_gem: #f5ea42;
 
   &:hover {
     cursor: pointer;
-    border-color: #e91e63;
-    z-index: 999;
+    transform: scale(1.1);
+    // border-color: #e91e63;
   }
 
   &__Red {
@@ -66,18 +88,22 @@ $gold_gem: #f5ea42;
     border-color: $gold_gem_light;
   }
 
-  &_header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 24px;
-  }
+  // &_header {
+  //   display: flex;
+  //   justify-content: space-between;
+
+    
+  // }
 
   &_cost {
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     margin-top: auto;
     margin-right: auto;
     row-gap: 4px;
+    column-gap: 4px;
+    max-height: 100px;
+    flex-wrap: wrap;
   }
 }
 

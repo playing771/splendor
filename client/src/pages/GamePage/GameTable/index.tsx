@@ -7,10 +7,11 @@ import { TPlayerGems } from '../../../../../interfaces/player';
 
 import { Modal } from '../../../components/Modal';
 import { Nullable } from '../../../../../utils/typescript';
-import { Card } from '../Card';
+import { Card } from '../../../components/Card';
 
 import './styles.css';
 import styles from './styles.module.scss';
+import { NoblesList } from '../NoblesList';
 
 const levels = Object.values(EDeckLevel).reverse();
 
@@ -54,7 +55,9 @@ export const GameTable = memo(({
 
   return (
     <div className="GameTable">
+
       <div className="GameTable_mainColumn">
+        <NoblesList nobles={table.nobles} />
         {levels.map((lvl) => {
           const cards = table[lvl].cards;
           const cardsCountInDeck = table[lvl].deck;

@@ -1,9 +1,9 @@
 import { ICardShape } from '../../../../../interfaces/card';
 import { EDeckLevel } from '../../../../../interfaces/devDeck';
 import { EGemColor } from '../../../../../interfaces/gem';
-import { Card } from '../Card';
-import { CardStack } from '../Card/CardStack';
-import { CardWithActions } from '../Card/CardWithActions';
+import { Card } from '../../../components/Card';
+import { CardStack } from '../../../components/Card/CardStack';
+import { CardWithActions } from '../../../components/Card/CardWithActions';
 
 import cn from 'classnames';
 

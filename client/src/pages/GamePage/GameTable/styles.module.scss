@@ -1,7 +1,8 @@
 .CardModal {
   &_content {
     display: flex;
-    max-width: 800px;
+    flex-direction: column;
+    max-width: 200px;
   }
 
   &_cardColumn {
@@ -13,12 +14,12 @@
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    padding-left: 24px;
-    width: 50%;
+    row-gap: 12px;
+    margin-top: 12px;
   }
 
   &_controlsColumn {
-    flex: 2;
+    flex: 1;
   }
 }
 

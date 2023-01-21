@@ -3,6 +3,7 @@
   flex-direction: column;
   max-width: 400px;
   padding: 12px;
+
   &_header {
     padding: 12px 0;
     display: flex;
@@ -19,8 +20,13 @@
 
   .ColorList {
     display: flex;
+    column-gap: 8px;
+
     &_column {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      row-gap: 8px;
     }
   }
 
@@ -31,5 +37,3 @@
     }
   }
 }
-
-

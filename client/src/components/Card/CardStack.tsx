@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 import styles from './styles.module.scss';
 
 import cn from 'classnames';
 import { Card } from '.';
-import { EGemColor } from '../../../../../interfaces/gem';
+import { EGemColor } from '../../../../interfaces/gem';
 import { CardShort } from './CardShort';
 
 interface IProps {
@@ -14,7 +14,7 @@ interface IProps {
   maxCountVisible?: number;
 }
 
-export const CardStack = ({ count, color, cardClassName, maxCountVisible = 6 }: IProps) => {
+export const CardStack = memo(({ count, color, cardClassName, maxCountVisible = 6 }: IProps) => {
 
   const countCorrected = Math.min(count, maxCountVisible);
 
@@ -28,4 +28,4 @@ export const CardStack = ({ count, color, cardClassName, maxCountVisible = 6 }: 
     ))}
     {/* <span className={cn(styles.GemStack_counter, styles[`GemStack_counter__${gemSize}`])}>{count}</span> */}
   </ul>
-};
+});

@@ -16,6 +16,7 @@ export type TGameTableRowSafeShape<C> = {
 
 export type TGameTableSafeState<C> = {
   gems: TPlayerGems;
+  nobles: INobleShape[];
 } & { [key in EDeckLevel]: TGameTableRowSafeShape<C> }
 
 export type TGameTableShape<C> = {

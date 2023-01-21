@@ -1,5 +1,5 @@
 import React from 'react';
-import { EGemColor } from '../../../../../interfaces/gem';
+import { EGemColor } from '../../../../interfaces/gem';
 import { GemIcon } from '../Gem/GemIcon';
 
 import cn from 'classnames';

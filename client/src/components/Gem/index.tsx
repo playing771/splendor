@@ -1,5 +1,5 @@
 import React, { ComponentType, ReactElement } from 'react';
-import { EGemColor } from '../../../../../interfaces/gem';
+import { EGemColor } from '../../../../interfaces/gem';
 
 import cn from 'classnames';
 
@@ -10,15 +10,17 @@ export interface IGemProps {
   color: EGemColor;
   size?: 'xxs' | 'xs' | 'sm' | 'lg';
   value?: number;
+  className?:string;
 }
 
-export const Gem = ({ color, size = 'sm', value }: IGemProps) => {
+export const Gem = ({ color, className, size = 'sm', value }: IGemProps) => {
   return (
     <div
       className={cn(
         styles.Gem,
         styles[`Gem__${color}`],
-        styles[`Gem__${size}`]
+        styles[`Gem__${size}`],
+        className
       )}
     >
       {typeof value !== 'undefined' ? (

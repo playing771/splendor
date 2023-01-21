@@ -5,9 +5,9 @@ import { TPlayerGems } from '../../../../interfaces/player';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
-import { GemsToTakeList, PlayerGemsList } from './GemsList';
+import { GemsToTakeList, PlayerGemsList } from '../../components/GemsList';
 import { EGemColor } from '../../../../interfaces/gem';
-import { Card } from './Card';
+import { Card } from '../../components/Card';
 import { EDeckLevel } from '../../../../interfaces/devDeck';
 import { PlayersList } from './PlayersList';
 import { GameTableTokens } from './GameTable/GameTableTokens';
@@ -18,6 +18,7 @@ import { useErrorToast } from '../../utils/useErrorToast';
 
 import styles from './styles.module.scss';
 import './styles.css';
+import { NoblesList } from './NoblesList';
 
 const emptyTokensToTake = {
   [EGemColor.Black]: 0,
@@ -55,7 +56,7 @@ export const GamePage = () => {
     if (message.type === EMessageType.GameStateChange) {
       setGameState(message.data as IGameStateDTO);
     }
-    
+
   }, []);
   const onError = useCallback(() => {
     toastError(new Error('Error in websockets') as any);
@@ -270,6 +271,9 @@ export const GamePage = () => {
             })}
           </ul>
         </div>
+
+        Nobles:
+        {playerState && <NoblesList nobles={playerState.nobles}/>}
       </div>
 
       <button disabled={!isPlayerActive} onClick={handleEndTurnClick}>

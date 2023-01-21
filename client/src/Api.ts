@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const SERVER_URL = 'localhost:8080';
-const SERVER_URL = '178.250.157.172:8080';
+const SERVER_URL = 'localhost:8080';
+// const SERVER_URL = '178.250.157.172:8080';
 
 export const Api = axios.create({
   // baseURL: 'http://localhost:8080',

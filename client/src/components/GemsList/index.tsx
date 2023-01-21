@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
-import { TPlayerGems } from '../../../../../interfaces/player';
-import { EGemColor } from '../../../../../interfaces/gem';
-import { getKeys } from '../../../../../utils/typescript';
+import { TPlayerGems } from '../../../../interfaces/player';
+import { EGemColor } from '../../../../interfaces/gem';
+import { getKeys } from '../../../../utils/typescript';
 
 import './styles.css';
 import { GemStack } from '../Gem/GemStack';

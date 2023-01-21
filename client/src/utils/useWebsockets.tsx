@@ -26,8 +26,6 @@ export const useWebsockets = <T,>(onMessage: (message: IMessage<T>) => void, onE
 
     // Connection opened
     wsRef.current.onopen = (e) => {
-      console.log('OPENED', e)
-      
       
       if (wsRef.current?.readyState) {
         setIsOpen(true);
