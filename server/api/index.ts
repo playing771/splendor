@@ -57,7 +57,7 @@ const corsMiddleware = cors({
   //   }
   // }
   // origin: 'http://localhost:5173',
-  origin: `http://${SERVER_URL}:${CLIENT_PORT}`,
+  origin: `http://${SERVER_URL}`,
 });
 
 export const Api = () => {
