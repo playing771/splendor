@@ -45,19 +45,19 @@ const sessionMiddleware = session({
   },
 });
 
-const whitelist = [`http://${SERVER_URL}:${CLIENT_PORT}`, `http://${SERVER_URL}`];
+const whitelist = [`http://${SERVER_URL}:${CLIENT_PORT}`, `http://${SERVER_URL}:`];
 
 const corsMiddleware = cors({
   credentials: true,
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin as string) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
+  // origin: function (origin, callback) {
+  //   if (whitelist.indexOf(origin as string) !== -1) {
+  //     callback(null, true)
+  //   } else {
+  //     callback(new Error('Not allowed by CORS'))
+  //   }
+  // }
   // origin: 'http://localhost:5173',
-  // origin: `http://${SERVER_URL}:${CLIENT_PORT}`,
+  origin: `http://${SERVER_URL}:${CLIENT_PORT}`,
 });
 
 export const Api = () => {
