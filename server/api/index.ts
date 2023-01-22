@@ -6,7 +6,7 @@ import {
   ILoginDTO,
   IMessage,
 } from '../../interfaces/api';
-import {CLIENT_PORT, SERVER_PORT, SERVER_URL} from '../../constants';
+import {ORIGIN, SERVER_PORT} from '../../constants';
 import { userService } from '../services/UserService';
 import { gameService } from '../services/GameService';
 import { WebSocketServer } from 'ws';
@@ -45,19 +45,10 @@ const sessionMiddleware = session({
   },
 });
 
-const whitelist = [`http://${SERVER_URL}:${CLIENT_PORT}`, `http://${SERVER_URL}:`];
-
 const corsMiddleware = cors({
   credentials: true,
-  // origin: function (origin, callback) {
-  //   if (whitelist.indexOf(origin as string) !== -1) {
-  //     callback(null, true)
-  //   } else {
-  //     callback(new Error('Not allowed by CORS'))
-  //   }
-  // }
   // origin: 'http://localhost:5173',
-  origin: `http://${SERVER_URL}`,
+  origin: ORIGIN,
 });
 
 export const Api = () => {
