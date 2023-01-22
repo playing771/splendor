@@ -1,17 +1,19 @@
 
-.TokensList {
+.GemsList {
   display: flex;
+  row-gap: 14px;
+  column-gap: 14px;
 }
 
-.TokensList__horizontal {
+.GemsList__horizontal {
   flex-direction: row;
 }
 
-.TokensList__vertical {
+.GemsList__vertical {
   flex-direction: column
 }
 
-.TokensList_item {
+.GemsList_item {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,30 +25,30 @@
   font-size: 24px;
 }
 
-.TokensList_item__active {
+.GemsList_item__active {
   cursor: pointer;
   
 }
 
-.TokensList_item__active:hover{
+.GemsList_item__active:hover{
   opacity: 0.8;
 }
 
-.TokensList_item__Red {
+.GemsList_item__Red {
   border-color: #c12e35;
 }
-.TokensList_item__Black {
+.GemsList_item__Black {
   border-color: #14150c;
 }
-.TokensList_item__Blue {
+.GemsList_item__Blue {
   border-color: #224173;
 }
-.TokensList_item__White {
+.GemsList_item__White {
   border-color: #dfd4ca;
 }
-.TokensList_item__Green {
+.GemsList_item__Green {
   border-color: #166735;
 }
-.TokensList_item__Gold {
+.GemsList_item__Gold {
   border-color: #f5ea42;
 }

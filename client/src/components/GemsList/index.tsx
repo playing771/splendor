@@ -3,8 +3,11 @@ import { TPlayerGems } from '../../../../interfaces/player';
 import { EGemColor } from '../../../../interfaces/gem';
 import { getKeys } from '../../../../utils/typescript';
 
-import './styles.css';
 import { GemStack } from '../Gem/GemStack';
+
+import cn from 'classnames'
+
+import styles from './styles.module.scss';
 
 interface ITableTokensProps extends IBasicTokensList {
   gems: TPlayerGems;
@@ -30,7 +33,7 @@ export const BasicGemsList = memo(
     gemsList: Array<{ color: EGemColor; value: number }>;
   }) => {
     return (
-      <ul className={`TokensList TokensList__${orientaion}`}>
+      <ul className={cn(styles.GemsList, styles[`GemsList__${orientaion}`])}>
         {gemsList.map(({ color, value }) => {
           return (
             <GemStack key={color} count={value} gemSize='lg' color={color} onClick={onClick}/>

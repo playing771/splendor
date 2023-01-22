@@ -20,7 +20,16 @@ const GEM_COLORS = Object.values(EGemColor);
 const scoreFromCardsBought = (cardsBought: ICardShape[]) =>
   cardsBought.reduce((total, card) => (total += card.score), 0);
 
-const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles }: IPlayerShape) => {
+interface IPlayerInfoProps {
+  name?: IPlayerShape['name'];
+  cardsBought: IPlayerShape['cardsBought'];
+  cardsHolded: IPlayerShape['cardsHolded'];
+  gems: IPlayerShape['gems'];
+  nobles: IPlayerShape['nobles'];
+  size: 'sm' | 'xs'
+}
+
+export const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles, size }: IPlayerInfoProps) => {
   const totalScore = useMemo(() => {
     const cardsByColor = Object.values(cardsBought);
     return cardsByColor.reduce(
@@ -39,12 +48,12 @@ const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles }: IPlayerSha
         {GEM_COLORS.map((color) => {
           return (
             <div className={styles.ColorList_column} key={color}>
-              <GemStack color={color} gemSize="xs" count={gems[color]} />
+              <GemStack color={color} gemSize={size} count={gems[color]} />
               <CardStack count={color === EGemColor.Gold ? cardsHolded.length : cardsBought[color].length} color={color} />
             </div>
           );
         })}
-        <NobleCardStack nobles={nobles} size='xs'/>
+        <NobleCardStack nobles={nobles} size={size}/>
       </div>
 
     </div>
@@ -55,7 +64,7 @@ export const PlayersList = memo(({ players = [] }: IProps) => {
   return (
     <div>
       {players.map((player) => {
-        return <PlayerInfo key={player.id} {...player} />;
+        return <PlayerInfo key={player.id} {...player} size='xs'/>;
       })}
     </div>
   );

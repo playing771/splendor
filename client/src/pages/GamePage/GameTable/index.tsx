@@ -12,69 +12,77 @@ import { Card } from '../../../components/Card';
 import './styles.css';
 import styles from './styles.module.scss';
 import { NoblesList } from '../NoblesList';
+import { CardModal } from '../CardModal';
 
 const levels = Object.values(EDeckLevel).reverse();
 
-export const GameTable = memo(({
-  isPlayerActive,
-  table,
-  onBuyCard,
-  onHoldCard,
-  onHoldCardFromDeck,
-  onTakeTokensSubmit
-}: {
-  isPlayerActive: boolean;
-  table: TGameTableSafeState<ICardShape>;
-  onBuyCard: (cardId: string) => void;
-  onHoldCard: (cardId: string) => void;
-  onHoldCardFromDeck: (deckLvl: EDeckLevel) => void;
-  onTakeTokensSubmit: (gems: Partial<TPlayerGems>) => void;
-}) => {
+export const GameTable = memo(
+  ({
+    isPlayerActive,
+    table,
+    onBuyCard,
+    onHoldCard,
+    onHoldCardFromDeck,
+    onTakeTokensSubmit,
+  }: {
+    isPlayerActive: boolean;
+    table: TGameTableSafeState<ICardShape>;
+    onBuyCard: (cardId: string) => void;
+    onHoldCard: (cardId: string) => void;
+    onHoldCardFromDeck: (deckLvl: EDeckLevel) => void;
+    onTakeTokensSubmit: (gems: Partial<TPlayerGems>) => void;
+  }) => {
+    const [activeCard, setActiveCard] = useState<Nullable<ICardShape>>(null);
 
-  const [activeCard, setActiveCard] = useState<Nullable<ICardShape>>(null);
+    const handleCardClick = useCallback(
+      (cardId: string, cardInfo: ICardShape) => {
+        console.log('handleCardClick');
 
-  const handleCardClick = useCallback((cardId: string, cardInfo: ICardShape) => {
-    console.log('handleCardClick');
+        setActiveCard(cardInfo);
+      },
+      []
+    );
 
-    setActiveCard(cardInfo);
-  }, [])
+    const handleCloseModal = useCallback(() => {
+      setActiveCard(null);
+    }, []);
 
-  const handleCloseModal = useCallback(() => {
-    setActiveCard(null);
-  }, [])
+    const handleBuyClick = () => {
+      activeCard && onBuyCard(activeCard.id);
+      handleCloseModal();
+    };
 
-  const handleBuyClick = () => {
-    activeCard && onBuyCard(activeCard.id)
-    handleCloseModal();
-  }
+    const handleHoldClick = () => {
+      activeCard && onHoldCard(activeCard.id);
+      handleCloseModal();
+    };
 
-  const handleHoldClick = () => {
-    activeCard && onHoldCard(activeCard.id)
-    handleCloseModal();
-  }
-
-  return (
-    <div className="GameTable">
-
-      <div className="GameTable_mainColumn">
-        <NoblesList nobles={table.nobles} />
-        {levels.map((lvl) => {
-          const cards = table[lvl].cards;
-          const cardsCountInDeck = table[lvl].deck;
-          return (
-            <DeckLevelRow
-              key={lvl}
-              cardsCountInDeck={cardsCountInDeck}
-              cards={cards}
-              lvl={lvl}
-              onClick={handleCardClick}
-              onHoldCardFromDeck={onHoldCardFromDeck}
-            />
-          );
-        })}
-
-      </div>
-      <Modal
+    return (
+      <div className="GameTable">
+        <div className="GameTable_mainColumn">
+          <NoblesList nobles={table.nobles} />
+          {levels.map((lvl) => {
+            const cards = table[lvl].cards;
+            const cardsCountInDeck = table[lvl].deck;
+            return (
+              <DeckLevelRow
+                key={lvl}
+                cardsCountInDeck={cardsCountInDeck}
+                cards={cards}
+                lvl={lvl}
+                onClick={handleCardClick}
+                onHoldCardFromDeck={onHoldCardFromDeck}
+              />
+            );
+          })}
+        </div>
+        <CardModal
+          activeCard={activeCard}
+          handleClose={handleCloseModal}
+          handleBuyClick={handleBuyClick}
+          handleHoldClick={handleHoldClick}
+        />
+        {/* <Modal
         isOpen={!!activeCard}
         onRequestClose={handleCloseModal}
         className={styles.CardModal}
@@ -90,7 +98,8 @@ export const GameTable = memo(({
             </div>
           </div>
         </div>
-      </Modal>
-    </div>
-  );
-});
+      </Modal> */}
+      </div>
+    );
+  }
+);

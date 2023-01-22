@@ -13,11 +13,11 @@ $green_gem: #166735;
 $gold_gem: #f5ea42;
 
 .Card {
-  
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   flex-shrink: 0;
+  min-width: 110px;
   /* flex-basis: 100px; */
   background-color: #9e9e9e;
   padding: 12px;

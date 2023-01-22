@@ -1,4 +1,9 @@
 .Game {
+  height: 100vh;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+
   &_info {
     display: flex;
     flex-wrap: wrap;
@@ -14,5 +19,29 @@
 
   &_infoGems {
     flex: 1;
+  }
+}
+
+.EndTurnButton {
+  position: fixed;
+  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  bottom: 32px;
+  right: 32px;
+  opacity: 0.5;
+  transition: all 0.3s;
+  &:hover {
+    &:not(&__active){
+      transform: scale(1.2);
+    }
+    
+    opacity: 1;
+  }
+
+  &__active {
+    border: 1px solid goldenrod;
+    transform: scale(1.4);
+    opacity: 1; 
   }
 }
