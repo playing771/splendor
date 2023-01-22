@@ -140,7 +140,7 @@ export const Api = () => {
 
         if (parsedMessage.type === EMessageType.GetGameState) {
           const gameId = parsedMessage.data as string;
-          gameService.broadcastGameState(gameId, userId);
+          gameService.sendGameState(gameId, userId);
         }
       });
 

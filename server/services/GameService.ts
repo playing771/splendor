@@ -89,15 +89,34 @@ export class GameService {
     }); // TODO: need to be narrowed
   }
 
-  broadcastGameState(gameId: string, userId?: string) {
+  // send game state to single user
+  sendGameState(gameId: string, userId: string) {
+    const game = this.getGame(gameId);
+    if (!game.roomId) {
+      throw Error(`Game ${gameId} is not attached to any room`);
+    }
+
+    const connection = connectionService.get(userId);
+
+    const user = userService.get(userId);
+    const isPlayer = user.role === EUserRole.Player;
+    const gameState = this.getGameState(gameId, userId, isPlayer);
+    const message = JSON.stringify({
+      data: gameState,
+      type: EMessageType.GameStateChange,
+    } as IMessage<IGameStateDTO>);
+
+    connection.send(message);
+  }
+
+  // send game state to all users in room/game
+  broadcastGameState(gameId: string) {
     const game = this.getGame(gameId);
     if (!game.roomId) {
       throw Error(`Game ${gameId} is not attached to any room`);
     }
     const room = this.getRoom(game.roomId);
-    const observers = !!userId
-      ? room.users.filter((user) => user.id === userId)
-      : room.users;
+    const observers = room.users;
 
     for (const { id: userId, role } of observers) {
       const connection = connectionService.get(userId);
