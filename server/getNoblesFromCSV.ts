@@ -28,7 +28,6 @@ export const getNoblesFromCSV = () => {
     }
     nobles.push({ requirements, score: Number(nobleDto[0]), id: uuidv4() });
   })
-  console.log('nobles',nobles);
   
   return nobles;
 

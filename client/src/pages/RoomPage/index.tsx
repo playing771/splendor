@@ -24,8 +24,8 @@ export function RoomPage() {
 
   const { data: roomData, isLoading, refetch } = useRequest<IRoomShape>(`rooms?roomId=${roomId}`);
 
-  const spectators = roomData?.users.filter((user)=>user.role === EUserRole.Spectator) || [];
-  const players = roomData?.users.filter((user)=>user.role === EUserRole.Player) || [];
+  const spectators = roomData?.users.filter((user) => user.role === EUserRole.Spectator) || [];
+  const players = roomData?.users.filter((user) => user.role === EUserRole.Player) || [];
 
   const onMessage = useCallback((message: IMessage<unknown>) => {
     if (message.type === EMessageType.RoomStateChange) {
@@ -60,7 +60,11 @@ export function RoomPage() {
   const handleSpectateClick = async () => {
     const body = { roomId, role: EUserRole.Spectator };
     try {
-      await Api.post('/rooms/join', body);
+      const response = await Api.post<{ gameId?: string }>('/rooms/join', body);
+
+      if (roomData?.state === ERoomState.Started && response.data.gameId) {
+        navigate(`/games/${response.data.gameId}`)
+      }
       refetch()
     } catch (error) {
       toastError(error as unknown as AxiosError<string>);
@@ -114,8 +118,8 @@ export function RoomPage() {
             </div>
           </div>
           <div className={styles.Room_controls}>
-            {players.every((player)=>player.id !== userId) && <button onClick={handleJoinClick}>Join</button>}
-            {spectators.every((player)=>player.id !== userId) && <button onClick={handleSpectateClick}>Spectate</button>}
+            {players.every((player) => player.id !== userId) && <button onClick={handleJoinClick}>Join</button>}
+            {spectators.every((player) => player.id !== userId) && <button onClick={handleSpectateClick}>Spectate</button>}
             {roomData.owner.id === userId && <button onClick={handleStartGameClick}>Start game</button>}
           </div>
         </div>

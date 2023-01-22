@@ -41,3 +41,21 @@
     background-color: #136f9a;
   }
 }
+
+.GameTableGems {
+  margin-top: 24px;
+
+  &__disabled {
+    opacity: 0.3;
+  }
+
+  .Columns {
+    display: flex;
+
+    &_column {
+      display: flex;
+      justify-content: center;
+      flex: 1;
+    }
+  }
+}

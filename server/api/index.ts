@@ -3,10 +3,10 @@ import session from 'express-session';
 import cors from 'cors';
 import {
   EMessageType,
-  IGameAvailableActionsDTO,
   ILoginDTO,
   IMessage,
 } from '../../interfaces/api';
+import {CLIENT_PORT, SERVER_PORT, SERVER_URL} from '../../constants';
 import { userService } from '../services/UserService';
 import { gameService } from '../services/GameService';
 import { WebSocketServer } from 'ws';
@@ -14,6 +14,7 @@ import { connectionService } from '../services/ConnectionService';
 import http from 'http';
 import { EPlayerAction } from '../../interfaces/game';
 import { EUserRole } from '../../interfaces/user';
+import { ERoomState } from '../../interfaces/room';
 
 // middleware to test if authenticated
 function isAuthenticated(req, res, next) {
@@ -27,7 +28,6 @@ declare module 'express-session' {
 }
 
 const app = express();
-const APP_PORT = 8080;
 const SECRET = 'FCP_UNLIMITED';
 
 const sessionMiddleware = session({
@@ -45,10 +45,19 @@ const sessionMiddleware = session({
   },
 });
 
+const whitelist = [`http://${SERVER_URL}:${CLIENT_PORT}`, `http://${SERVER_URL}`];
+
 const corsMiddleware = cors({
   credentials: true,
-  origin: 'http://localhost:5173',
-  // origin: 'http://178.250.157.172',
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin as string) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+  // origin: 'http://localhost:5173',
+  // origin: `http://${SERVER_URL}:${CLIENT_PORT}`,
 });
 
 export const Api = () => {
@@ -171,15 +180,21 @@ export const Api = () => {
         switch (role) {
           case EUserRole.Player:
             gameService.joinRoomAsPlayer(roomId, userId);
+            res.sendStatus(200);
             break;
           case EUserRole.Spectator:
             gameService.joinRoomAsSpectator(roomId, userId);
+            const room = gameService.getRoom(roomId);
+            
+            if (room.state === ERoomState.Started) {
+              res.status(200).json({gameId: room.gameId})
+            }
             break;
           default:
             throw Error(`Cant join room: uknown ${role} role`);
         }
 
-        res.sendStatus(200);
+        
       } catch (error) {
         res.status(500).send(error.message);
       }
@@ -295,7 +310,7 @@ export const Api = () => {
   //
   // Start the server.
   //
-  server.listen(APP_PORT, function () {
-    console.log(`Listening on http://localhost:${APP_PORT}`);
+  server.listen(SERVER_PORT, function () {
+    console.log(`Listening on http://localhost:${SERVER_PORT}`);
   });
 };

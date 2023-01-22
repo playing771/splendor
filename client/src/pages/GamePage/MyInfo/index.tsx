@@ -1,18 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { EPlayerAction } from '../../../../../interfaces/game';
-import { PlayerGemsList, GemsToTakeList } from '../../../components/GemsList';
 import { EGemColor } from '../../../../../interfaces/gem';
 import { IPlayerShape, TPlayerGems } from '../../../../../interfaces/player';
 import { Nullable } from '../../../../../utils/typescript';
-import { PlayerInfo, PlayersList } from '../PlayersList';
-import { TokensModal } from '../TokensModal';
-
-import cn from 'classnames';
-
-import styles from './styles.module.scss';
+import { GemsModal } from '../GemsModal';
 import { Card } from '../../../components/Card';
 import { CardModal } from '../CardModal';
-import { ICardShape } from '../../../../../interfaces/card';
+import { PlayerInfo } from '../PlayerInfo';
+
+
+import styles from './styles.module.scss';
 
 const emptyTokensToTake = {
   [EGemColor.Black]: 0,
@@ -117,7 +114,7 @@ export const MyInfo = ({
         size="sm"
       />
       {needToReturnGems && (
-        <TokensModal
+        <GemsModal
           handleGemTakeClick={handleReturnGemClick}
           gemsRemaining={gemsRemaining}
           gemsToTake={gemsToReturn}

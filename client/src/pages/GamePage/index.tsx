@@ -11,7 +11,7 @@ import { useWebsockets } from '../../utils/useWebsockets';
 import { GameTable } from './GameTable';
 import { EDeckLevel } from '../../../../interfaces/devDeck';
 import { PlayersList } from './PlayersList';
-import { GameTableTokens } from './GameTable/GameTableTokens';
+import { GameTableGems } from './GameTable/GameTableGems';
 import { AxiosError } from 'axios';
 
 import { useParams } from 'react-router-dom';
@@ -95,6 +95,9 @@ export const GamePage = () => {
   const needToEndTurn =
     availableActions.length === 1 &&
     availableActions[0] === EPlayerAction.EndTurn;
+  const canTakeGems = availableActions.includes(EPlayerAction.TakeGems);
+
+  const rivals = players.filter((player)=>player.id !== playerState?.id);
 
   return (
     <div className={styles.Game}>
@@ -106,7 +109,7 @@ export const GamePage = () => {
       </div>
       <div className={styles.Game_info}>
         <div className={styles.Game_infoPlayers}>
-          <PlayersList players={players} />
+          <PlayersList players={rivals} />
         </div>
         <div className={styles.Game_infoTable}>
           <GameTable
@@ -115,13 +118,13 @@ export const GamePage = () => {
             onBuyCard={handleBuyCard}
             onHoldCard={handleHoldCard}
             onHoldCardFromDeck={handleHoldCardFromDeck}
-            onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
           />
         </div>
         <div className={styles.Game_infoGems}>
-          <GameTableTokens
+          <GameTableGems
             gems={table.gems}
             onTakeTokensSubmit={handleDispatchAction(EPlayerAction.TakeGems)}
+            isDisabled={!canTakeGems}
           />
         </div>
       </div>

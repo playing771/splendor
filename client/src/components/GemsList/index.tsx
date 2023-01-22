@@ -10,7 +10,7 @@ import cn from 'classnames'
 import styles from './styles.module.scss';
 
 interface ITableTokensProps extends IBasicTokensList {
-  gems: TPlayerGems;
+  gems: Partial<TPlayerGems>;
 }
 
 interface ITokensToTakeProps extends IBasicTokensList {
@@ -36,7 +36,7 @@ export const BasicGemsList = memo(
       <ul className={cn(styles.GemsList, styles[`GemsList__${orientaion}`])}>
         {gemsList.map(({ color, value }) => {
           return (
-            <GemStack key={color} count={value} gemSize='lg' color={color} onClick={onClick}/>
+            <GemStack key={color} count={value} gemSize='lg' color={color} onClick={onClick} isActive={isActive}/>
           );
         })}
       </ul>
@@ -48,7 +48,10 @@ export const PlayerGemsList = memo(
   ({ gems, ...rest }: ITableTokensProps) => {
     const gemsList = getKeys(gems).reduce((acc, color) => {
       const value = gems[color];
-      acc.push({ color, value });
+      if (value !== undefined) {
+        acc.push({ color, value });
+      }
+
       return acc;
     }, [] as Array<{ color: EGemColor; value: number }>);
 

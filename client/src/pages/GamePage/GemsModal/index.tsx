@@ -15,7 +15,7 @@ interface IProps {
   gemsToTake: Partial<TPlayerGems>;
 }
 
-export const TokensModal = ({
+export const GemsModal = ({
   handleClose,
   handleGemTakeClick,
   onClear,

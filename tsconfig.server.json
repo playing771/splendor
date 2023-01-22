@@ -11,5 +11,5 @@
     "strictPropertyInitialization": false,
   },
   "lib": ["es2015"],
-  "include": ["server", "interfaces"],
+  "include": ["server", "interfaces", "constants.ts"],
 }
