@@ -1,20 +1,17 @@
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
-import {
-  EMessageType,
-  ILoginDTO,
-  IMessage,
-} from '../../interfaces/api';
-import {ORIGIN, SERVER_PORT} from '../../constants';
-import { userService } from '../services/UserService';
+import { EMessageType, IMessage } from '../../interfaces/api';
+import { ORIGIN, SERVER_PORT } from '../../constants';
 import { gameService } from '../services/GameService';
 import { WebSocketServer } from 'ws';
 import { connectionService } from '../services/ConnectionService';
 import http from 'http';
 import { EPlayerAction } from '../../interfaces/game';
 import { EUserRole } from '../../interfaces/user';
-import { ERoomState } from '../../interfaces/room';
+import { authController } from './controllers/auth';
+import { roomController } from './controllers/room';
+import { gameController } from './controllers/game';
 
 // middleware to test if authenticated
 function isAuthenticated(req, res, next) {
@@ -35,14 +32,7 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
 
-  cookie: {
-    // sameSite: 'none',
-    // secure: false,
-    // secure: false,
-    // httpOnly: false
-    // secure: true,
-    // httpOnly: true,
-  },
+  cookie: {},
 });
 
 const corsMiddleware = cors({
@@ -50,7 +40,7 @@ const corsMiddleware = cors({
   // origin: 'http://localhost:5173',
   origin: ORIGIN,
 });
-
+// TODO: https://khalilstemmler.com/articles/enterprise-typescript-nodejs/clean-consistent-expressjs-controllers/
 export const Api = () => {
   app.use(corsMiddleware);
   app.use(sessionMiddleware);
@@ -58,182 +48,48 @@ export const Api = () => {
 
   app.post<unknown, unknown, { username: string }>(
     '/auth/login',
-    (req, res) => {
-      const { username } = req.body;
-
-      const userId = req.session.userId;
-
-      if (!!userId) {
-        const user = userService.getUnsafe(userId);
-        if (!user) {
-          return res.sendStatus(500);
-        }
-        return res.status(200).json(user);
-      }
-
-      const user: ILoginDTO = userService.add(username);
-
-      console.log(`Updating session for user ${user.name} ${user.id}`);
-
-      req.session.userId = user.id;
-
-      return res.status(200).json(user);
-    }
+    authController.login
   );
 
   app.get<unknown, unknown>(
     '/auth/userInfo',
     isAuthenticated,
-    (req, res) => {
-
-      const userId = req.session.userId;
-      const user = userService.get(userId);
-
-      return res.status(200).json(user);
-    }
+    authController.userInfo
   );
-
-  // app.get('/game/state', isAuthenticated, (req, res) => {
-  //   const currentGame = gameService.games[0];
-  //   if (currentGame) {
-  //     const safeState: IGameStateDTO = currentGame.getSafeState();
-  //     res.status(200).json(safeState);
-  //   } else {
-  //     res.status(500);
-  //   }
-  // });
 
   app.get<unknown, unknown, unknown, { roomId?: string }>(
     '/rooms',
-    (req, res) => {
-      const { roomId } = req.query;
-      try {
-        const result =
-          typeof roomId === 'string'
-            ? gameService.getRoom(roomId)
-            : [...gameService.rooms.values()];
-
-        res.status(200).json(result);
-      } catch (error) {
-        console.log('error', error);
-
-        res.status(500).send(error.message);
-      }
-    }
+    roomController.rooms
   );
 
   app.post<unknown, unknown, { roomName?: string }>(
     '/rooms/create',
     isAuthenticated,
-    (req, res) => {
-      const { roomName } = req.body;
-      // console.log('roomName',roomName);
-
-      const userId = req.session.userId;
-      const user = userService.get(userId);
-
-      // console.log('user',user);
-
-      try {
-        const room = gameService.createRoom(
-          roomName || `${user.name}'s game`,
-          user.id
-        );
-        res.status(200).json(room);
-      } catch (error) {
-        res.status(500).send(error.message);
-      }
-    }
+    roomController.create
   );
 
   app.post<unknown, unknown, { roomId: string }>(
     '/rooms/leave',
     isAuthenticated,
-    (req, res) => {
-      const { roomId } = req.body;
-      const userId = req.session.userId!;
-      try {
-        gameService.leaveRoom(roomId, userId);
-        res.sendStatus(200);
-      } catch (error) {
-        res.status(500).send(error.message);
-      }
-    }
+    roomController.leave
   );
 
   app.post<unknown, unknown, { roomId: string; role: EUserRole }>(
     '/rooms/join',
     isAuthenticated,
-    (req, res) => {
-      const { roomId, role } = req.body;
-      const userId = req.session.userId!;
-      try {
-        switch (role) {
-          case EUserRole.Player:
-            gameService.joinRoomAsPlayer(roomId, userId);
-            res.sendStatus(200);
-            break;
-          case EUserRole.Spectator:
-            gameService.joinRoomAsSpectator(roomId, userId);
-            const room = gameService.getRoom(roomId);
-            
-            if (room.state === ERoomState.Started) {
-              res.status(200).json({gameId: room.gameId})
-            }
-            break;
-          default:
-            throw Error(`Cant join room: uknown ${role} role`);
-        }
-
-        
-      } catch (error) {
-        res.status(500).send(error.message);
-      }
-    }
+    roomController.join
   );
 
   app.post<unknown, unknown, { roomId: string }>(
     '/rooms/start',
     isAuthenticated,
-    (req, res) => {
-      const { roomId } = req.body;
-      const userId = req.session.userId!;
-      try {
-        const game = gameService.startGame(roomId, userId);
-        res.status(200).json(game.id);
-      } catch (error) {
-        res.status(500).send(error.message);
-      }
-    }
+    roomController.start
   );
 
   app.post<unknown, unknown, { action?: EPlayerAction; data?: any }>(
     '/game/dispatch',
     isAuthenticated,
-    (req, res) => {
-      const payload = req.body;
-      const { gameId } = req.query;
-      const userId = req.session.userId;
-      console.log('/game/dispatch', payload);
-
-      if (payload.action && userId) {
-        try {
-          gameService.dispatch(
-            gameId as string,
-            payload.action,
-            userId,
-            payload.data
-          );
-          res.sendStatus(200);
-        } catch (error) {
-          const err = error as Error;
-
-          res.status(500).send(err.message);
-        }
-      } else {
-        res.sendStatus(500);
-      }
-    }
+    gameController.dispatch
   );
 
   //
