@@ -1,7 +1,7 @@
-import { EPLayerState, IGameConfig } from "../../../interfaces/game";
-import { EGemColor } from "../../../interfaces/gem";
+import { EPLayerState, IGameConfig, IGameSetup } from "../../../interfaces/game";
 import { populateCardsByLevelFromPool } from "../DevDeck/populateCardByLevelFromPool";
 import { getCardsFromCSV, getNoblesFromCSV } from '../../utils/csv';
+import { INITIAL_CARDS_ON_TABLE_COUNT } from "../../../gameRules";
 
 export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
   [EPLayerState.Idle]: false,
@@ -14,18 +14,19 @@ export const STATES_AVAILABLE_FOR_ACTION: { [key in EPLayerState]: boolean } = {
 const cardsPool = getCardsFromCSV();
 const noblesPool = getNoblesFromCSV();
 
-export const DEFAULT_GAME_SETUP: IGameConfig = {
-  tableConfig: {
-    initialCardsOnTableCount: 4,
+export const GAME_SETUP: Map<number, IGameSetup> = new Map();
+GAME_SETUP.set(1, { gems: 7, nobles: 4 });
+GAME_SETUP.set(2, { gems: 4, nobles: 3 });
+GAME_SETUP.set(3, { gems: 5, nobles: 4 });
+GAME_SETUP.set(4, { gems: 7, nobles: 5 });
 
-    [EGemColor.Black]: 8,
-    [EGemColor.Blue]: 8,
-    [EGemColor.Gold]: 5,
-    [EGemColor.Green]: 8,
-    [EGemColor.Red]: 8,
-    [EGemColor.White]: 8,
-    noblesInPlay: 4,
+export const DEFAULT_GAME_CONFIG: IGameConfig = {
+  setup: GAME_SETUP,
+  tableConfig: {
+    initialCardsOnTableCount: INITIAL_CARDS_ON_TABLE_COUNT,
     nobles: noblesPool,
-    ...populateCardsByLevelFromPool(cardsPool),
+    decks: {
+      ...populateCardsByLevelFromPool(cardsPool),
+    }
   },
 };

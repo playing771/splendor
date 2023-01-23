@@ -1,7 +1,11 @@
 import { Game } from '.';
 import { ICardShape } from '../../../interfaces/card';
 import { EDeckLevel } from '../../../interfaces/devDeck';
-import { EPlayerAction, EPLayerState } from '../../../interfaces/game';
+import {
+  EPlayerAction,
+  EPLayerState,
+  IGameSetup,
+} from '../../../interfaces/game';
 import { TGameTableConfig } from '../../../interfaces/gameTable';
 import { IPlayerConfig } from '../../../interfaces/player';
 import { EGemColor } from '../../../interfaces/gem';
@@ -31,6 +35,11 @@ const PLAYERS: IPlayerConfig[] = [
 const FIRST_PLAYER = PLAYERS[0];
 const SECOND_PLAYER = PLAYERS[1];
 
+const MOCKED_GAME_SETUP = new Map<number, IGameSetup>();
+MOCKED_GAME_SETUP.set(1, { gems: 0, nobles: 0 });
+MOCKED_GAME_SETUP.set(2, { gems: 0, nobles: 0 });
+MOCKED_GAME_SETUP.set(3, { gems: 0, nobles: 0 });
+
 const MOCKED_CARDS_POOL_BY_LVL =
   populateCardsByLevelFromPool(MOCKED_CARDS_POOL);
 
@@ -47,24 +56,29 @@ const MOCKED_NOBLES: INobleShape[] = [
   },
 ];
 
-const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
+const TABLE_CONFIG = {
   initialCardsOnTableCount: 3,
   willShuffleDecks: false,
-  [EGemColor.Blue]: 5,
-  [EGemColor.Black]: 5,
-  [EGemColor.Gold]: 5,
-  [EGemColor.Green]: 5,
-  [EGemColor.Red]: 5,
-  [EGemColor.White]: 5,
-  ...MOCKED_CARDS_POOL_BY_LVL,
+  gems: {
+    [EGemColor.Blue]: 5,
+    [EGemColor.Black]: 5,
+    [EGemColor.Gold]: 5,
+    [EGemColor.Green]: 5,
+    [EGemColor.Red]: 5,
+    [EGemColor.White]: 5,
+  },
+  decks: {
+    ...MOCKED_CARDS_POOL_BY_LVL,
+  },
   noblesInPlay: 3,
   nobles: MOCKED_NOBLES,
-};
+} as const;
 
 const GAME_CONFIG = {
   players: PLAYERS,
   tableConfig: TABLE_CONFIG,
   hasAutostart: true,
+  setup: MOCKED_GAME_SETUP,
 };
 
 describe('Game functionality', () => {
@@ -86,6 +100,38 @@ describe('Game functionality', () => {
       });
     }
   );
+
+  it('has setup', () => {
+    const newGameSetup = new Map<number, IGameSetup>();
+    newGameSetup.set(2, {
+      gems: 10,
+      nobles: 1
+    })
+
+    const game = new Game({
+      players: GAME_CONFIG.players,
+      tableConfig: {
+        initialCardsOnTableCount: 4,
+        nobles: MOCKED_NOBLES,
+        decks: TABLE_CONFIG.decks,
+      },
+      hasAutostart: true,
+      setup: newGameSetup
+    });
+    
+    expect(game.table.gems).toEqual({
+      [EGemColor.Gold]: 5,
+      [EGemColor.Blue]: 10,
+      [EGemColor.Red]: 10,
+      [EGemColor.Black]: 10,
+      [EGemColor.Green]: 10,
+      [EGemColor.White]: 10,
+    })
+    expect(game.table.nobles).toHaveLength(1);
+    expect(game.table.First.cards).toHaveLength(4);
+    expect(game.table.Second.cards).toHaveLength(4);
+    expect(game.table.Third.cards).toHaveLength(4);
+  });
 
   it('can change game state', () => {
     const game = new Game(GAME_CONFIG);
@@ -155,13 +201,13 @@ describe('Game functionality', () => {
     game.dispatch(FIRST_PLAYER.id, EPlayerAction.TakeGems, GEMS_TO_TAKE);
 
     expect(game.table.gems[EGemColor.Blue]).toBe(
-      TABLE_CONFIG[EGemColor.Blue] - GEMS_TO_TAKE[EGemColor.Blue]
+      TABLE_CONFIG.gems[EGemColor.Blue] - GEMS_TO_TAKE[EGemColor.Blue]
     );
     expect(game.table.gems[EGemColor.Red]).toBe(
-      TABLE_CONFIG[EGemColor.Red] - GEMS_TO_TAKE[EGemColor.Red]
+      TABLE_CONFIG.gems[EGemColor.Red] - GEMS_TO_TAKE[EGemColor.Red]
     );
     expect(game.table.gems[EGemColor.Black]).toBe(
-      TABLE_CONFIG[EGemColor.Black] - GEMS_TO_TAKE[EGemColor.Black]
+      TABLE_CONFIG.gems[EGemColor.Black] - GEMS_TO_TAKE[EGemColor.Black]
     );
 
     expect(game.getPlayer(FIRST_PLAYER.id).gemsCount).toBe(3);
@@ -194,7 +240,7 @@ describe('Game functionality', () => {
       ...GAME_CONFIG,
       tableConfig: {
         ...GAME_CONFIG.tableConfig,
-        [EGemColor.Blue]: 3,
+        gems: { [EGemColor.Blue]: 3 },
       },
     });
 
@@ -339,22 +385,22 @@ describe('Game functionality', () => {
     });
     expect(game.table.gems).toEqual({
       [EGemColor.Black]:
-        GAME_CONFIG.tableConfig[EGemColor.Black] +
+        GAME_CONFIG.tableConfig.gems[EGemColor.Black] +
         (CARD_TO_TAKE.cost[EGemColor.Black] || 0),
       [EGemColor.Blue]:
-        GAME_CONFIG.tableConfig[EGemColor.Blue] +
+        GAME_CONFIG.tableConfig.gems[EGemColor.Blue] +
         (CARD_TO_TAKE.cost[EGemColor.Blue] || 0),
       [EGemColor.Gold]:
-        GAME_CONFIG.tableConfig[EGemColor.Gold] +
+        GAME_CONFIG.tableConfig.gems[EGemColor.Gold] +
         (CARD_TO_TAKE.cost[EGemColor.Gold] || 0),
       [EGemColor.Green]:
-        GAME_CONFIG.tableConfig[EGemColor.Green] +
+        GAME_CONFIG.tableConfig.gems[EGemColor.Green] +
         (CARD_TO_TAKE.cost[EGemColor.Green] || 0),
       [EGemColor.Red]:
-        GAME_CONFIG.tableConfig[EGemColor.Red] +
+        GAME_CONFIG.tableConfig.gems[EGemColor.Red] +
         (CARD_TO_TAKE.cost[EGemColor.Red] || 0),
       [EGemColor.White]:
-        GAME_CONFIG.tableConfig[EGemColor.White] +
+        GAME_CONFIG.tableConfig.gems[EGemColor.White] +
         (CARD_TO_TAKE.cost[EGemColor.White] || 0),
     });
     expect(game.getPlayerState(FIRST_PLAYER.id)).toBe(EPLayerState.OutOfAction);
@@ -398,7 +444,7 @@ describe('Game functionality', () => {
       game.table[EDeckLevel.First].cards[0].id
     );
     expect(game.table.gems[EGemColor.Black]).toBe(
-      TABLE_CONFIG[EGemColor.Black]
+      TABLE_CONFIG.gems[EGemColor.Black]
     );
   });
 

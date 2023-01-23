@@ -31,6 +31,7 @@ import {
   PLAYER_CARDS_HOLDED_MAX,
   GOLD_GEMS_FOR_CARD_HOLD,
   SCORE_TO_END_GAME,
+  INITIAL_GOLD_GEMS_COUNT,
 } from '../../../gameRules';
 
 type PlayerId = string;
@@ -60,6 +61,7 @@ export class Game implements IGameShape<ICardShape> {
     onGameStart,
     roomId,
     hasAutostart,
+    setup,
   }: IGameConfig & {
     players: IPlayerConfig[];
     roomId?: string;
@@ -68,7 +70,29 @@ export class Game implements IGameShape<ICardShape> {
     this.roomId = roomId;
     this.round = 0;
 
-    this.table = new GameTable(tableConfig);
+    const targetSetup = setup.get(players.length);
+
+    if (!targetSetup) {
+      throw Error(`Wrong setup for game`);
+    }
+
+    const gemsSetup: TPlayerGems = Object.values(EGemColor).reduce(
+      (acc, color) => {
+        acc[color] =
+          color === EGemColor.Gold ? INITIAL_GOLD_GEMS_COUNT : targetSetup.gems;
+
+        return acc;
+      },
+      {} as TPlayerGems
+    );
+
+    const noblesSetup = targetSetup.nobles;
+
+    this.table = new GameTable({
+      gems: gemsSetup,
+      noblesInPlay: noblesSetup,
+      ...tableConfig,
+    });
     this.tableManager = new TableManager(this.table);
 
     this.players = players.map((playerConfig) => new Player(playerConfig));

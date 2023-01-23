@@ -13,6 +13,7 @@ export interface IGameShape<C> {
 }
 
 export interface IGameConfig {
+  setup: Map<number,IGameSetup>,
   tableConfig: TGameTableConfig<ICardShape>
   hasAutostart?:boolean;
   onGameEnd?: (
@@ -48,4 +49,9 @@ export type IGameResult = {
     cardsBoughtCount: number,
     id: string
   }>
+}
+
+export interface IGameSetup {
+  gems: number;
+  nobles: number;
 }

@@ -3,7 +3,7 @@ import { EPlayerAction, IGameConfig } from '../../interfaces/game';
 import { ERoomState } from '../../interfaces/room';
 import { EUserRole } from '../../interfaces/user';
 import { Game } from '../modules/Game';
-import { DEFAULT_GAME_SETUP } from '../modules/Game/constants';
+import { DEFAULT_GAME_CONFIG } from '../modules/Game/constants';
 import { MAX_PLAYERS } from '../../gameRules';
 import { GameBot } from '../modules/GameBot';
 import { Room } from '../modules/Room';
@@ -64,7 +64,7 @@ export class GameService {
 
     if (room.players.length === MAX_PLAYERS) {
       throw Error(`Cant't join the game as player: MAX_PLAYERS exceeded`)
-    } 
+    }
 
     if (room.state !== ERoomState.Pending) {
       throw Error(`Can't join a game in ${room.state} state`);
@@ -97,7 +97,7 @@ export class GameService {
     if (room.players.length === MAX_PLAYERS) {
       if (room.players.length === MAX_PLAYERS) {
         throw Error(`Cant't add bot: MAX_PLAYERS exceeded`)
-      } 
+      }
     }
 
     if (userId !== room.owner.id) {
@@ -201,9 +201,12 @@ export class GameService {
     const game = new Game({
       players: shuffledPlayers,
       roomId,
-      onGameStart: gameService.broadcastGameState,
-      ...DEFAULT_GAME_SETUP,
+      ...DEFAULT_GAME_CONFIG,
       ...gameConfig,
+      onGameStart: () => {
+        gameConfig?.onGameStart && gameConfig.onGameStart(game.id);
+        gameService.broadcastGameState(game.id);
+      }
     });
 
     this.games.set(game.id, game);

@@ -23,25 +23,19 @@ export type TGameTableShape<C> = {
   [EDeckLevel.First]: TGameTableRowShape<C>;
   [EDeckLevel.Second]: TGameTableRowShape<C>;
   [EDeckLevel.Third]: TGameTableRowShape<C>;
-  gems: {
-    [key in EGemColor]: number;
-  }
-  nobles: INobleShape[]
+  gems: TPlayerGems;
+  nobles: INobleShape[];
 };
 
 export type TGameTableConfig<C> = {
-  [EDeckLevel.First]: Array<C>;
-  [EDeckLevel.Second]: Array<C>;
-  [EDeckLevel.Third]: Array<C>;
-
-  [EGemColor.Blue]: number,
-  [EGemColor.Black]: number,
-  [EGemColor.Gold]: number,
-  [EGemColor.Green]: number,
-  [EGemColor.Red]: number,
-  [EGemColor.White]: number,
+  decks?: {
+    [EDeckLevel.First]: Array<C>;
+    [EDeckLevel.Second]: Array<C>;
+    [EDeckLevel.Third]: Array<C>;
+  }
+  gems?: Partial<TPlayerGems>,
   initialCardsOnTableCount: number,
-  noblesInPlay: number,
+  noblesInPlay?: number,
   willShuffleDecks?: boolean,
   nobles: INobleShape[]
 };

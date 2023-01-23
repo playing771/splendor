@@ -1,3 +1,4 @@
+import { ICardShape } from '../../../interfaces/card';
 import { EDeckLevel } from '../../../interfaces/devDeck';
 import {
   TGameTableConfig,
@@ -15,76 +16,82 @@ export class GameTable<C> implements TGameTableShape<C> {
   [EDeckLevel.First]: TGameTableRowShape<C>;
   [EDeckLevel.Second]: TGameTableRowShape<C>;
   [EDeckLevel.Third]: TGameTableRowShape<C>;
-  
-  gems: TGameTableShape<C>['gems']
+
+  gems: TGameTableShape<C>['gems'];
   nobles: INobleShape[];
 
   constructor(config: TGameTableConfig<C>) {
     const { willShuffleDecks = true } = config;
-    // Rows initialize    
+    
+    // Rows initialize
     Object.values(EDeckLevel).forEach((level) => {
-      const initialCards = config[level];
+      const initialCards = config.decks ? config.decks[level] : [];
 
-      const deck = new DevDeck({
+      const deck = new DevDeck<C>({
         level,
         cards: initialCards,
         name: `${level} level deck`,
-      })
+      });
 
       if (willShuffleDecks) {
         deck.shuffle();
       }
 
-      // draw initial cards in play      
+      // draw initial cards in play
       const topcards = deck.getTopCards(config.initialCardsOnTableCount);
       this[level] = {
         cards: topcards,
         deck,
       };
     });
-  
-    this.gems = Object.values(EGemColor).reduce((acc, color) => {
-      acc[color] = config[color];
 
-      return acc
+    this.gems = Object.values(EGemColor).reduce((acc, color) => {
+      if (config.gems) {
+        const value = config.gems[color];
+        if (typeof value === 'number') {
+          acc[color] = value;
+        }
+      }
+
+      return acc;
     }, {} as TGameTableShape<C>['gems']);
-    const noblesDeck = new BaseDeck({cards: config.nobles});
+    
+
+    const noblesDeck = new BaseDeck({ cards: config.nobles });
 
     if (willShuffleDecks) {
       noblesDeck.shuffle();
     }
-    
-    this.nobles = noblesDeck.getTopCards(config.noblesInPlay);
+
+    this.nobles = noblesDeck.getTopCards(config.noblesInPlay || 0);
   }
-  
+
   [EDeckLevel.First]: TGameTableRowShape<C>;
   [EDeckLevel.Second]: TGameTableRowShape<C>;
   [EDeckLevel.Third]: TGameTableRowShape<C>;
-
 
   getSafeState(): TGameTableSafeState<C> {
     return {
       ...this.getSafeDecksState(),
       gems: this.getTokensState(),
-      nobles: this.nobles
-    }
+      nobles: this.nobles,
+    };
   }
 
   private getTokensState() {
     return Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = this.gems[color];
       return acc;
-    }, {} as { [key in EGemColor]: number })
+    }, {} as { [key in EGemColor]: number });
   }
 
   private getSafeDecksState() {
     return Object.values(EDeckLevel).reduce((acc, lvl) => {
       acc[lvl] = {
         deck: this[lvl].deck.cards.length,
-        cards: this[lvl].cards
-      }
+        cards: this[lvl].cards,
+      };
       return acc;
-    }, {} as { [key in EDeckLevel]: TGameTableRowSafeShape<C> })
+    }, {} as { [key in EDeckLevel]: TGameTableRowSafeShape<C> });
   }
-
 }
