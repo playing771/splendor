@@ -8,7 +8,7 @@ import { EGemColor } from '../../../interfaces/gem';
 import { populateCardsByLevelFromPool } from '../DevDeck/populateCardByLevelFromPool';
 import { MOCKED_CARDS_POOL } from './mockedCards';
 import {
-  GEMS_IN_STOCK_LIMIT,
+  SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT,
   PLAYER_CARDS_HOLDED_MAX,
   PLAYER_GEMS_MAX,
   TAKE_GEM_LIMIT,
@@ -35,8 +35,16 @@ const MOCKED_CARDS_POOL_BY_LVL =
   populateCardsByLevelFromPool(MOCKED_CARDS_POOL);
 
 const MOCKED_NOBLES: INobleShape[] = [
-  { score: 3, requirements: { [EGemColor.Black]: 2, [EGemColor.Red]: 2 } },
-  { score: 3, requirements: { [EGemColor.White]: 2, [EGemColor.Green]: 1 } },
+  {
+    score: 3,
+    requirements: { [EGemColor.Black]: 2, [EGemColor.Red]: 2 },
+    id: 'N',
+  },
+  {
+    score: 3,
+    requirements: { [EGemColor.White]: 2, [EGemColor.Green]: 1 },
+    id: 'NN',
+  },
 ];
 
 const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
@@ -56,6 +64,7 @@ const TABLE_CONFIG: TGameTableConfig<ICardShape> = {
 const GAME_CONFIG = {
   players: PLAYERS,
   tableConfig: TABLE_CONFIG,
+  hasAutostart: true,
 };
 
 describe('Game functionality', () => {
@@ -92,6 +101,7 @@ describe('Game functionality', () => {
 
   it('will throw an Error if player cant change a state', () => {
     const game = new Game(GAME_CONFIG);
+
     expect(() => {
       game.dispatch(SECOND_PLAYER.id, EPlayerAction.EndTurn);
     }).toThrow();
@@ -179,7 +189,7 @@ describe('Game functionality', () => {
     ).toThrow();
   });
 
-  it(`will throw an error if player takes ${TAKE_GEM_LIMIT_SAME_COLOR} of gems if stock is less than ${GEMS_IN_STOCK_LIMIT}`, () => {
+  it(`will throw an error if player takes ${TAKE_GEM_LIMIT_SAME_COLOR} of gems if stock is less than ${SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT}`, () => {
     const game = new Game({
       ...GAME_CONFIG,
       tableConfig: {
@@ -887,7 +897,9 @@ describe('Game functionality', () => {
               },
             ],
           },
-          nobles: [{ score: 3, requirements: { [EGemColor.Black]: 1 } }],
+          nobles: [
+            { score: 3, requirements: { [EGemColor.Black]: 1 }, id: 'N' },
+          ],
         },
       ],
     });

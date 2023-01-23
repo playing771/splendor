@@ -86,7 +86,7 @@ export const GamePage = () => {
 
   if (!gameState) return <h1>...loading</h1>;
 
-  const { availableActions, playerState, players, table, isPlayerActive } =
+  const { availableActions, playerState, players, table, isPlayerActive, activePlayer } =
     gameState;
 
   const needToReturnGems =
@@ -98,7 +98,8 @@ export const GamePage = () => {
   const canTakeGems = availableActions.includes(EPlayerAction.TakeGems);
 
   const rivals = players.filter((player)=>player.id !== playerState?.id);
-
+  console.log('activePlayer',activePlayer);
+  
   return (
     <div className={styles.Game}>
       <div className="StatusBar">
@@ -109,7 +110,7 @@ export const GamePage = () => {
       </div>
       <div className={styles.Game_info}>
         <div className={styles.Game_infoPlayers}>
-          <PlayersList players={rivals} />
+          <PlayersList players={rivals} activePlayerId={activePlayer}/>
         </div>
         <div className={styles.Game_infoTable}>
           <GameTable

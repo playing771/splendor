@@ -26,7 +26,10 @@ export const getCardsFromCSV = () => {
     color: EGemColor[dto.Color],
     cost: Object.values(EGemColor).reduce((acc, color) => {
       const price = Number.parseFloat(dto[color]) || 0;
-      acc[color] = price;
+      if (price > 0) {
+        acc[color] = price;
+      }
+
       return acc;
     }, {} as TCardCost),
     score: Number.parseFloat(dto.Score),

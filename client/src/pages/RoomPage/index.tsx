@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { EMessageType, IMessage } from '../../../../interfaces/api';
 import { ERoomState, IRoomShape } from '../../../../interfaces/room';
 import { EUserRole } from '../../../../interfaces/user';
+import { MAX_PLAYERS } from '../../../../server/modules/Game/constants';
 import { Api } from '../../Api';
 import { useAuth } from '../../AuthProvider/context';
 import { useErrorToast } from '../../utils/useErrorToast';
@@ -102,7 +103,7 @@ export function RoomPage() {
     }
   }
 
-  
+  const playersLimitReached = roomData?.users.filter((user)=>user.role === EUserRole.Player).length === MAX_PLAYERS
 
   return (
     !roomData ? <span> ...loading</span> :
@@ -130,9 +131,9 @@ export function RoomPage() {
             </div>
           </div>
           <div className={styles.Room_controls}>
-            {players.every((player) => player.id !== userId) && <button onClick={handleJoinClick}>Join</button>}
+            {players.every((player) => player.id !== userId) && <button onClick={handleJoinClick} disabled={playersLimitReached}>Join</button>}
             {spectators.every((player) => player.id !== userId) && <button onClick={handleSpectateClick}>Spectate</button>}
-            {roomData.owner.id === userId && <button onClick={handleAddBot}>Add bot</button>}
+            {roomData.owner.id === userId && <button onClick={handleAddBot} disabled={playersLimitReached}>Add bot</button>}
             {roomData.owner.id === userId && <button onClick={handleStartGameClick}>Start game</button>}
           </div>
         </div>

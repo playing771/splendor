@@ -9,10 +9,16 @@ export interface IGameShape<C> {
   id: string;
   roomId?:string;
   table: TGameTableShape<C>
+  round: number;
 }
 
 export interface IGameConfig {
   tableConfig: TGameTableConfig<ICardShape>
+  hasAutostart?:boolean;
+  onGameEnd?: (
+    result: IGameResult
+  ) => void;
+  onGameStart?: (gameId: string)=>void;
 }
 
 export enum EPLayerState {
@@ -35,6 +41,7 @@ export enum EPlayerAction {
 }
 
 export type IGameResult = {
+  round: number,
   winner: Nullable<string>,
   players: Array<{
     score: number,

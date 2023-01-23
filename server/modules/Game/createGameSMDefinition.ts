@@ -16,6 +16,7 @@ export const createGameSMDefinition = (
     move: () => void;
     startTurn: (playerId: string) => () => void;
     endTurn: (playerId: string) => () => void;
+    updateRoundCounter: ()=>void;
   }
 ) => {
   const playerIds = players.map((player) => player.id);
@@ -69,6 +70,7 @@ export const createGameSMDefinition = (
     },
     [EGameBasicState.RoundStarted]: {
       actions: {
+        onExit: actions.updateRoundCounter,
         onEnter: actions.move, // we need this state only for ONE player setup, so just skip it to FIRST player state
       },
       transitions: {
@@ -84,7 +86,7 @@ export const createGameSMDefinition = (
     },
   };
 
-  // addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
+  addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
 
   return finalGameSMDefinition;
 };

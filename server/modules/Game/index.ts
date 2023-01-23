@@ -19,7 +19,7 @@ import {
   TAKE_GEM_LIMIT,
   PLAYER_GEMS_MAX,
   TAKE_GEM_LIMIT_SAME_COLOR,
-  GEMS_IN_STOCK_LIMIT,
+  SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT,
   STATES_AVAILABLE_FOR_ACTION,
   GOLD_GEMS_FOR_CARD_HOLD,
   PLAYER_CARDS_HOLDED_MAX,
@@ -41,6 +41,7 @@ export class Game implements IGameShape<ICardShape> {
   public id: string;
   public roomId: string | undefined;
   public table: GameTable<ICardShape>;
+  public round: number;
 
   public players: Player[];
   private tableManager: TableManager<ICardShape>;
@@ -51,21 +52,22 @@ export class Game implements IGameShape<ICardShape> {
 
   private isLastRound: boolean;
   private onGameEnd: ((result: IGameResult) => void) | undefined;
+  private onGameStart: ((gameId: string) => void) | undefined;
 
   constructor({
     players,
     tableConfig,
     onGameEnd,
-    roomId
+    onGameStart,
+    roomId,
+    hasAutostart,
   }: IGameConfig & {
     players: IPlayerConfig[];
-    roomId?:string;
-    onGameEnd?: (
-      result: IGameResult
-    ) => void;
+    roomId?: string;
   }) {
     this.id = uuidv4();
     this.roomId = roomId;
+    this.round = 0;
 
     this.table = new GameTable(tableConfig);
     this.tableManager = new TableManager(this.table);
@@ -77,9 +79,11 @@ export class Game implements IGameShape<ICardShape> {
       startTurn: this.startTurnPlayerActionCreator,
       endTurn: this.endTurnPlayerActionCreator,
       move: this.move,
+      updateRoundCounter: () => (this.round += 1),
     });
 
     this.onGameEnd = onGameEnd;
+    this.onGameStart = onGameStart;
 
     this.sm = createStateMachine(
       EGameBasicState.Initialization,
@@ -87,11 +91,15 @@ export class Game implements IGameShape<ICardShape> {
     );
 
     this.isLastRound = false;
-    this.start();
+
+    if (hasAutostart) {
+      this.start();
+    }
   }
 
   public start = () => {
     this.sm.dispatchTransition('start');
+    this.onGameStart && this.onGameStart(this.id);
   };
 
   public move = () => {
@@ -99,8 +107,7 @@ export class Game implements IGameShape<ICardShape> {
       this.getGameResults();
       this.sm.dispatchTransition('end');
       if (this.onGameEnd) {
-
-        this.onGameEnd(this.getGameResults())
+        this.onGameEnd(this.getGameResults());
       }
     } else {
       this.sm.dispatchTransition('next');
@@ -154,6 +161,8 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public dispatch(userId: string, action: EPlayerAction, data?: any) {
+    console.log('dispatch', userId, action);
+
     const playerStateMachine = this.smPlayers[userId];
 
     if (!playerStateMachine) {
@@ -218,22 +227,24 @@ export class Game implements IGameShape<ICardShape> {
 
     return stateHasActions
       ? getKeys(
-        playerStateMachine.definition[playerStateMachine.value].transitions
-      ).filter((action) => action !== EPlayerAction.TakeGemsOverLimit)
+          playerStateMachine.definition[playerStateMachine.value].transitions
+        ).filter((action) => action !== EPlayerAction.TakeGemsOverLimit)
       : [];
   }
 
-
   public checkAndGetNobles = () => {
-   const nobleToGetIndex = this.tableManager.table.nobles.findIndex((noble) => Object.entries(noble.requirements).every(([color, value])=>{
-      return this.getActivePlayer().cardsBought[color as EGemColor].length >= value;
-    }));
+    const nobleToGetIndex = this.tableManager.table.nobles.findIndex((noble) =>
+      Object.entries(noble.requirements).every(([color, value]) => {
+        return (
+          this.getActivePlayer().cardsBought[color as EGemColor].length >= value
+        );
+      })
+    );
 
     if (~nobleToGetIndex) {
       const noble = this.tableManager.giveNoble(nobleToGetIndex);
       this.getActivePlayer().earnNoble(noble);
     }
-    
   };
 
   private dispatchPlayerAction(
@@ -243,7 +254,7 @@ export class Game implements IGameShape<ICardShape> {
   ) {
     const targetPlayerId = playerId || this.getActivePlayer().id;
     this.smPlayers[targetPlayerId].dispatchTransition(action, data);
-  };
+  }
 
   public getGameResults = (): IGameResult => {
     const playersWithResults = this.players.map((player) => ({
@@ -252,22 +263,36 @@ export class Game implements IGameShape<ICardShape> {
       id: player.id,
     }));
 
-    playersWithResults.sort((a, b) => b.score - a.score || a.cardsBoughtCount - b.cardsBoughtCount);
+    playersWithResults.sort(
+      (a, b) => b.score - a.score || a.cardsBoughtCount - b.cardsBoughtCount
+    );
 
     const maxScore = playersWithResults[0].score;
 
-    const playersWithMaxScore = playersWithResults.filter(player => player.score === maxScore);
+    const playersWithMaxScore = playersWithResults.filter(
+      (player) => player.score === maxScore
+    );
     if (playersWithMaxScore.length > 1) {
       const minBoughtCards = playersWithMaxScore[0].cardsBoughtCount;
-      const playersWithMinCardsBought = playersWithMaxScore.filter(player => player.cardsBoughtCount === minBoughtCards);
+      const playersWithMinCardsBought = playersWithMaxScore.filter(
+        (player) => player.cardsBoughtCount === minBoughtCards
+      );
 
-      return playersWithMinCardsBought.length > 1 ? { winner: null, players: playersWithResults } : { winner: playersWithMinCardsBought[0].id, players: playersWithResults }
+      return playersWithMinCardsBought.length > 1
+        ? { winner: null, players: playersWithResults, round: this.round }
+        : {
+            winner: playersWithMinCardsBought[0].id,
+            players: playersWithResults,
+            round: this.round,
+          };
     }
 
-    return { winner: playersWithMaxScore[0].id, players: playersWithResults }
+    return {
+      winner: playersWithMaxScore[0].id,
+      players: playersWithResults,
+      round: this.round,
+    };
   };
-
-
 
   private takeGemsByPlayer(gems: TPlayerGems) {
     if (gems[EGemColor.Gold] > 0) {
@@ -287,10 +312,11 @@ export class Game implements IGameShape<ICardShape> {
       }
       if (
         value === TAKE_GEM_LIMIT_SAME_COLOR &&
-        this.tableManager.table.gems[color] < GEMS_IN_STOCK_LIMIT
+        this.tableManager.table.gems[color] <
+          SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT
       ) {
         throw Error(
-          `Cant take ${value} ${color} gems because the stock is less than ${GEMS_IN_STOCK_LIMIT}`
+          `Cant take ${value} ${color} gems because the stock is less than ${SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT}`
         );
       }
 
@@ -479,7 +505,6 @@ export class Game implements IGameShape<ICardShape> {
       this.isLastRound = true;
     }
   };
-
 
   private startTurnPlayerActionCreator = (playerId: string) => () => {
     this.dispatchPlayerAction(EPlayerAction.StartTurn, undefined, playerId);

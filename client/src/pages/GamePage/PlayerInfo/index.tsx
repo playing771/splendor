@@ -6,6 +6,8 @@ import { CardStack } from '../../../components/Card/CardStack';
 import { GemStack } from '../../../components/Gem/GemStack';
 import { NobleCardStack } from '../../../components/NobleCard/NobleCardStack';
 
+import cn from 'classnames'
+
 import styles from './styles.module.scss';
 
 const GEM_COLORS = Object.values(EGemColor);
@@ -19,10 +21,11 @@ interface IPlayerInfoProps {
   cardsHolded: IPlayerShape['cardsHolded'];
   gems: IPlayerShape['gems'];
   nobles: IPlayerShape['nobles'];
-  size: 'sm' | 'xs'
+  size: 'sm' | 'xs';
+  isActive?: boolean
 }
 
-export const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles, size }: IPlayerInfoProps) => {
+export const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles, size, isActive }: IPlayerInfoProps) => {
   const totalScore = useMemo(() => {
     const cardsByColor = Object.values(cardsBought);
     return cardsByColor.reduce(
@@ -32,7 +35,7 @@ export const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles, size 
   }, [cardsBought]);
 
   return (
-    <div className={styles.PlayerInfo}>
+    <div className={cn(styles.PlayerInfo, { [styles.PlayerInfo__isActive]: isActive })}>
       <div className={styles.PlayerInfo_header}>
         <span className={styles.PlayerScore}>Score: {totalScore}</span>
         <span className={styles.PlayerName}>{name}</span>
@@ -46,7 +49,7 @@ export const PlayerInfo = ({ cardsBought, cardsHolded, name, gems, nobles, size 
             </div>
           );
         })}
-        <NobleCardStack nobles={nobles} size={size}/>
+        <NobleCardStack nobles={nobles} size={size} />
       </div>
 
     </div>

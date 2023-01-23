@@ -21,8 +21,10 @@ export interface IGameStateDTO {
   table: TGameTableSafeState<ICardShape>;
   players: IPlayerShape[];
   playerState: Nullable<IPlayerShape>;
+  activePlayer: string;
   isPlayerActive: boolean;
   gameResults: IGameResult;
+  round: number;
 }
 
 export interface IGameAvailableActionsDTO {

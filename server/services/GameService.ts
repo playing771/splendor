@@ -1,15 +1,22 @@
 import { EMessageType, IGameStateDTO, IMessage } from '../../interfaces/api';
-import { EPlayerAction } from '../../interfaces/game';
+import { EPlayerAction, IGameConfig } from '../../interfaces/game';
 import { ERoomState } from '../../interfaces/room';
 import { EUserRole } from '../../interfaces/user';
 import { Game } from '../modules/Game';
-import { DEFAULT_GAME_SETUP } from '../modules/Game/constants';
+import { DEFAULT_GAME_SETUP, MAX_PLAYERS } from '../modules/Game/constants';
 import { GameBot } from '../modules/GameBot';
 import { Room } from '../modules/Room';
 import { BotConnection } from '../modules/BotConnection';
 import { shuffle } from '../utils/array';
 import { connectionService } from './ConnectionService';
 import { userService } from './UserService';
+import { random } from '../utils/math';
+import { EGameBasicState } from '../modules/Game/createGameSMDefinition';
+
+
+const BOT_NAMES = ['Alex', 'Max', 'Evgen', 'Kiko', 'Narek'];
+const BOT_NAME_PREFIXES = ['Super', "Old", "Mr", "Miss", "Blind", ""];
+// const BOT_NAME_POSTFIX = ['the greatest', "Powerless", "Mr", "Miss", ""];
 
 export class GameService {
   public games: Map<string, Game>;
@@ -54,6 +61,10 @@ export class GameService {
   joinRoomAsPlayer(id: string, userId: string) {
     const room = this.getRoom(id);
 
+    if (room.players.length === MAX_PLAYERS) {
+      throw Error(`Cant't join the game as player: MAX_PLAYERS exceeded`)
+    } 
+
     if (room.state !== ERoomState.Pending) {
       throw Error(`Can't join a game in ${room.state} state`);
     }
@@ -78,6 +89,41 @@ export class GameService {
     this.broadcastOnRoomStateChange(room.id);
   }
 
+
+  addBot(roomId: string, userId: string, id?: string) {
+    const room = this.getRoom(roomId);
+
+    if (room.players.length === MAX_PLAYERS) {
+      if (room.players.length === MAX_PLAYERS) {
+        throw Error(`Cant't add bot: MAX_PLAYERS exceeded`)
+      } 
+    }
+
+    if (userId !== room.owner.id) {
+      throw Error(
+        `Cant start a game in room ${room.id}: ${userId} is not an owner`
+      );
+    }
+
+    if (room.state !== ERoomState.Pending) {
+      throw Error(`Can't add bot in ${room.state} state`);
+    }
+
+    const botName = `${BOT_NAME_PREFIXES[random(0, BOT_NAME_PREFIXES.length - 1)]} ${BOT_NAMES[random(0, BOT_NAMES.length - 1)]}`.trim();
+    const bot = new GameBot(botName, this.dispatch, id);
+    const botConnection = new BotConnection();
+
+    botConnection.subscribe(EMessageType.GameStateChange, bot.updateGameState);
+
+    connectionService.add(bot.id, botConnection);
+
+    room.addBot(bot);
+
+    this.broadcastOnRoomStateChange(room.id);
+
+    return bot;
+  }
+
   broadcastOnRoomStateChange(roomId: string) {
     const room = this.getRoom(roomId);
     connectionService.broadcast(
@@ -93,7 +139,7 @@ export class GameService {
   }
 
   // send game state to single user
-  sendGameState(gameId: string, userId: string) {
+  sendGameState = (gameId: string, userId: string) => {
     const game = this.getGame(gameId);
     if (!game.roomId) {
       throw Error(`Game ${gameId} is not attached to any room`);
@@ -112,11 +158,17 @@ export class GameService {
     } as IMessage<IGameStateDTO>);
 
     connection.send(message);
-  }
+  };
 
   // send game state to all users in room/game
-  broadcastGameState(gameId: string) {
+  broadcastGameState = (gameId: string) => {
     const game = this.getGame(gameId);
+
+    if (game.getState() === EGameBasicState.GameEnded) {
+      // TODO: hack to prevent crash in game with bots
+      return
+    }
+
     if (!game.roomId) {
       throw Error(`Game ${gameId} is not attached to any room`);
     }
@@ -135,9 +187,9 @@ export class GameService {
 
       connection.send(message);
     }
-  }
+  };
 
-  startGame(roomId: string, userId: string) {
+  startGame(roomId: string, userId: string, gameConfig?: Partial<IGameConfig>) {
     const room = this.getRoom(roomId);
     if (userId !== room.owner.id) {
       throw Error(
@@ -148,50 +200,21 @@ export class GameService {
     const game = new Game({
       players: shuffledPlayers,
       roomId,
+      onGameStart: gameService.broadcastGameState,
       ...DEFAULT_GAME_SETUP,
+      ...gameConfig,
     });
-
-
 
     this.games.set(game.id, game);
     room.startGame(game.id);
+    game.start();
 
     const userIds = room.users.map((user) => user.id);
-    connectionService.broadcast(userIds, { type: EMessageType.GameStarted, data: game.id });
+    connectionService.broadcast(userIds, {
+      type: EMessageType.GameStarted,
+      data: game.id,
+    });
     return game;
-  }
-
-  addBot(roomId: string, userId: string) {
-    const room = this.getRoom(roomId);
-
-
-    if (userId !== room.owner.id) {
-      throw Error(
-        `Cant start a game in room ${room.id}: ${userId} is not an owner`
-      );
-    }
-
-    if (room.state !== ERoomState.Pending) {
-      throw Error(`Can't add bot in ${room.state} state`);
-    }
-    
-    const bot = new GameBot("Bot", this.dispatch);
-    const botConnection = new BotConnection();
-    
-    botConnection.subscribe(EMessageType.GameStateChange, bot.updateGameState)
-    
-    connectionService.add(bot.id, botConnection)
-    
-    room.addBot(bot);
-
-    this.broadcastOnRoomStateChange(room.id);
-  }
-
-  spectate(userId: string) {
-    const game = this.games[0];
-    if (!game.spectators.includes(userId)) {
-      game.spectators.push(userId);
-    }
   }
 
   removeGame(id: string) {
@@ -208,13 +231,13 @@ export class GameService {
     return room;
   }
 
-  getGame(id: string) {
+  getGame = (id: string) => {
     const game = this.games.get(id);
     if (!game) throw Error(`No game with ID ${id} found`);
     return game;
-  }
+  };
 
-  getGameState(gameId: string, userId: string, isPlayer: boolean) {
+  getGameState = (gameId: string, userId: string, isPlayer: boolean) => {
     const game = this.getGame(gameId);
 
     const { players, table } = game.getSafeState();
@@ -231,18 +254,25 @@ export class GameService {
       table,
       playerState,
       isPlayerActive: game.checkPlayerIsActive(userId),
+      activePlayer: game.getActivePlayer().id,
       gameResults: game.getGameResults(),
+      round: game.round
     };
 
     return state;
-  }
+  };
 
-  dispatch = (gameId: string, action: EPlayerAction, userId: string, data?: any) => {
+  dispatch = (
+    gameId: string,
+    action: EPlayerAction,
+    userId: string,
+    data?: any
+  ) => {
     const game = this.getGame(gameId);
 
     game.dispatch(userId, action, data);
     this.broadcastGameState(gameId);
-  }
+  };
 }
 
 export const gameService = new GameService();

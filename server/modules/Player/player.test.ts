@@ -12,7 +12,7 @@ const HOLDED_CARD: ICardShape = {
   id: 'HOLDED_CARD',
   lvl: EDeckLevel.First,
   score: 0,
-}
+};
 
 const CARD_MOCKED_ONE: ICardShape = {
   color: EGemColor.Blue,
@@ -71,9 +71,7 @@ describe('Player functionality', () => {
         [EGemColor.Blue]: 2,
         [EGemColor.Red]: 2,
       },
-      cardsHolded: [
-        HOLDED_CARD
-      ],
+      cardsHolded: [HOLDED_CARD],
     });
 
     expect(player.buyHoldedCard(HOLDED_CARD)).toEqual({
@@ -85,9 +83,7 @@ describe('Player functionality', () => {
       [EGemColor.White]: 0,
     });
 
-    expect(player.cardsBought[HOLDED_CARD.color][0].id).toBe(
-      HOLDED_CARD.id
-    );
+    expect(player.cardsBought[HOLDED_CARD.color][0].id).toBe(HOLDED_CARD.id);
     expect(player.gems[EGemColor.Blue]).toBe(1);
     expect(player.gems[EGemColor.Red]).toBe(1);
   });
@@ -147,10 +143,68 @@ describe('Player functionality', () => {
     const player = new Player({
       name: 'max',
       id: 'ID_1',
-      cardsBought: { [EGemColor.Black]: [{ color: EGemColor.Black, score: 4, cost: {}, id: 'SOME', lvl: EDeckLevel.First }] },
-      nobles: [{ requirements: { [EGemColor.Black]: 1 }, score: 2 }]
+      cardsBought: {
+        [EGemColor.Black]: [
+          {
+            color: EGemColor.Black,
+            score: 4,
+            cost: {},
+            id: 'SOME',
+            lvl: EDeckLevel.First,
+          },
+        ],
+      },
+      nobles: [{ requirements: { [EGemColor.Black]: 1 }, score: 2, id: 'ID' }],
     });
 
     expect(player.score).toBe(6);
-  })
+  });
+
+  it.only('has getAllGemsAvailable', () => {
+    const player = new Player({
+      name: 'max',
+      id: 'ID_1',
+      gems: {
+        [EGemColor.Gold]: 1,
+        [EGemColor.Red]: 1,
+      },
+      cardsBought: {
+        [EGemColor.Black]: [
+          {
+            color: EGemColor.Black,
+            score: 1,
+            cost: {},
+            id: 'SOME',
+            lvl: EDeckLevel.First,
+          },
+        ],
+        [EGemColor.Red]: [
+          {
+            color: EGemColor.Red,
+            score: 1,
+            cost: {},
+            id: 'TWO',
+            lvl: EDeckLevel.First,
+          },
+          {
+            color: EGemColor.Red,
+            score: 1,
+            cost: {},
+            id: 'ONE',
+            lvl: EDeckLevel.First,
+          },
+        ],
+      },
+      nobles: [{ requirements: { [EGemColor.Black]: 1 }, score: 2, id: 'ID' }],
+    });
+
+    expect(player.getAllGemsAvailable).toEqual({
+      [EGemColor.Black]: 1,
+      [EGemColor.Gold]: 1,
+      [EGemColor.Red]: 3,
+      [EGemColor.Green]: 0,
+      [EGemColor.Blue]: 0,
+      [EGemColor.White]: 0,
+    });
+  });
 });

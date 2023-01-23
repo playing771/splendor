@@ -10,37 +10,40 @@ import { countTokens } from '../Game/countTokens';
 import { getKeys } from '../../../utils/typescript';
 import { PLAYER_CARDS_HOLDED_MAX } from '../Game/constants';
 import { INobleShape } from '../../../interfaces/noble';
+import { PlayerResources } from './PlayerResources';
 
-export class Player implements IPlayerShape {
-  gems: TPlayerGems;
-  cardsBought: TPlayerCardsBought;
-  cardsHolded: ICardShape[];
+export class Player extends PlayerResources implements IPlayerShape {
+  // gems: TPlayerGems;
+  // cardsBought: TPlayerCardsBought;
+  // cardsHolded: ICardShape[];
   name: string;
   id: string;
-  nobles: INobleShape[];
+  // nobles: INobleShape[];
 
   constructor({
     name,
     id,
-    gems: initialTokens = {} as TPlayerGems,
-    cardsBought: initialCardsBought = {} as TPlayerCardsBought,
-    cardsHolded = [],
+    gems = {},
+    cardsBought = {} as TPlayerCardsBought,
+    cardsHolded = [] as ICardShape[],
     nobles = [] as INobleShape[]
   }: IPlayerConfig) {
-    this.gems = Object.values(EGemColor).reduce((acc, color) => {
-      acc[color] = initialTokens[color] || 0;
-      return acc;
-    }, {} as TPlayerGems);
+    super({ cardsBought, cardsHolded, nobles, gems: gems as TPlayerGems })
 
-    this.cardsBought = Object.values(EGemColor).reduce((acc, color) => {
-      acc[color] = initialCardsBought[color] || [];
-      return acc;
-    }, {} as TPlayerCardsBought);
+    // this.gems = Object.values(EGemColor).reduce((acc, color) => {
+    //   acc[color] = initialTokens[color] || 0;
+    //   return acc;
+    // }, {} as TPlayerGems);
 
-    this.cardsHolded = cardsHolded;
+    // this.cardsBought = Object.values(EGemColor).reduce((acc, color) => {
+    //   acc[color] = initialCardsBought[color] || [];
+    //   return acc;
+    // }, {} as TPlayerCardsBought);
+
+    // this.cardsHolded = cardsHolded;
     this.name = name;
     this.id = id;
-    this.nobles = nobles;
+    // this.nobles = nobles;
   }
 
 
@@ -117,41 +120,41 @@ export class Player implements IPlayerShape {
   }
 
 
-  private calculateGemsFromBoughtCards(color: EGemColor) {
-    return this.cardsBought[color].length;
-  }
+  // private calculateGemsFromBoughtCards(color: EGemColor) {
+  //   return this.cardsBought[color].length;
+  // }
 
-  private calculateScoreFromBoughtCards(color: EGemColor) {
-    return this.cardsBought[color].reduce((total, card) => total += card.score, 0);
-  }
+  // private calculateScoreFromBoughtCards(color: EGemColor) {
+  //   return this.cardsBought[color].reduce((total, card) => total += card.score, 0);
+  // }
 
-  get gemsCount() {
-    return countTokens(this.gems);
-  }
+  // get gemsCount() {
+  //   return countTokens(this.gems);
+  // }
 
-  get cardsHoldedCount() {
-    return this.cardsHolded.length;
-  }
+  // get cardsHoldedCount() {
+  //   return this.cardsHolded.length;
+  // }
 
-  get cardsBoughtCount() {
-    return Object.values(this.cardsBought).reduce((count, arr) => count += arr.length, 0);
-  }
+  // get cardsBoughtCount() {
+  //   return Object.values(this.cardsBought).reduce((count, arr) => count += arr.length, 0);
+  // }
 
-  get gemsFromCardsBought() {
-    return getKeys(this.cardsBought).reduce((acc, color) => {
-      acc[color] = this.calculateGemsFromBoughtCards(color);
-      return acc;
-    }, {} as TCardCost);
-  }
+  // get gemsFromCardsBought() {
+  //   return getKeys(this.cardsBought).reduce((acc, color) => {
+  //     acc[color] = this.calculateGemsFromBoughtCards(color);
+  //     return acc;
+  //   }, {} as TCardCost);
+  // }
 
-  get score() {
-    const cardsScore = getKeys(this.cardsBought).reduce((total, color) => {
-      return total += this.calculateScoreFromBoughtCards(color)
-    }, 0);
+  // get score() {
+  //   const cardsScore = getKeys(this.cardsBought).reduce((total, color) => {
+  //     return total += this.calculateScoreFromBoughtCards(color)
+  //   }, 0);
 
-    const noblesScore = this.nobles.reduce((total, noble) => total += noble.score, 0)
-    return cardsScore + noblesScore
-  }
+  //   const noblesScore = this.nobles.reduce((total, noble) => total += noble.score, 0)
+  //   return cardsScore + noblesScore
+  // }
 
   get state(): IPlayerShape {
     return {
