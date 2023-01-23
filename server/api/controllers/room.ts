@@ -73,16 +73,18 @@ export const roomController = {
       res.status(500).send(error.message);
     }
   },
-  start: <R>(req: Request<R>, res: Response) => {
+
+
+  addBot: <R>(req: Request<R>, res: Response) => {
 
     const { roomId } = req.body;
     const userId = req.session.userId!;
     try {
-      const game = gameService.startGame(roomId, userId);
-      res.status(200).json(game.id);
+      gameService.addBot(roomId, userId);
+      res.sendStatus(200);
     } catch (error) {
       res.status(500).send(error.message);
     }
-  }
+  },
 
 };

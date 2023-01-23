@@ -4,7 +4,10 @@ import { ERoomState } from '../../interfaces/room';
 import { EUserRole } from '../../interfaces/user';
 import { Game } from '../modules/Game';
 import { DEFAULT_GAME_SETUP } from '../modules/Game/constants';
+import { GameBot } from '../modules/GameBot';
 import { Room } from '../modules/Room';
+import { BotConnection } from '../modules/BotConnection';
+import { shuffle } from '../utils/array';
 import { connectionService } from './ConnectionService';
 import { userService } from './UserService';
 
@@ -98,8 +101,10 @@ export class GameService {
 
     const connection = connectionService.get(userId);
 
-    const user = userService.get(userId);
-    const isPlayer = user.role === EUserRole.Player;
+    // const user = userService.get(userId);
+    const room = this.getRoom(game.roomId);
+
+    const isPlayer = room.players.some((player) => player.id === userId);
     const gameState = this.getGameState(gameId, userId, isPlayer);
     const message = JSON.stringify({
       data: gameState,
@@ -139,12 +144,14 @@ export class GameService {
         `Cant start a game in room ${room.id}: ${userId} is not an owner`
       );
     }
-
+    const shuffledPlayers = shuffle(room.players);
     const game = new Game({
-      players: room.players,
+      players: shuffledPlayers,
       roomId,
       ...DEFAULT_GAME_SETUP,
     });
+
+
 
     this.games.set(game.id, game);
     room.startGame(game.id);
@@ -154,15 +161,31 @@ export class GameService {
     return game;
   }
 
-  // create() {
-  //   const users = userService.users;
-  //   const game = new Game({
-  //     players: users,
-  //     ...DEFAULT_GAME_SETUP,
-  //   });
-  //   this.games = [game]; // TODO:
-  //   return this.games[this.games.length - 1];
-  // }
+  addBot(roomId: string, userId: string) {
+    const room = this.getRoom(roomId);
+
+
+    if (userId !== room.owner.id) {
+      throw Error(
+        `Cant start a game in room ${room.id}: ${userId} is not an owner`
+      );
+    }
+
+    if (room.state !== ERoomState.Pending) {
+      throw Error(`Can't add bot in ${room.state} state`);
+    }
+    
+    const bot = new GameBot("Bot", this.dispatch);
+    const botConnection = new BotConnection();
+    
+    botConnection.subscribe(EMessageType.GameStateChange, bot.updateGameState)
+    
+    connectionService.add(bot.id, botConnection)
+    
+    room.addBot(bot);
+
+    this.broadcastOnRoomStateChange(room.id);
+  }
 
   spectate(userId: string) {
     const game = this.games[0];
@@ -214,7 +237,7 @@ export class GameService {
     return state;
   }
 
-  dispatch(gameId: string, action: EPlayerAction, userId: string, data?: any) {
+  dispatch = (gameId: string, action: EPlayerAction, userId: string, data?: any) => {
     const game = this.getGame(gameId);
 
     game.dispatch(userId, action, data);

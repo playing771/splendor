@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export const RoomsPage = (props: IProps) => {
-  const { data = [], isLoading, refetch } = useRequest<IRoomShape[]>('/rooms');
+  const { data = [], isLoading, refetch } = useRequest<IRoomShape[]>('/room');
   const navigate = useNavigate();
   const toastError = useErrorToast()
   
@@ -34,7 +34,7 @@ export const RoomsPage = (props: IProps) => {
 
   const createRoomRequest = async () => {
     try {
-      const response = await Api.post<IRoomShape>('/rooms/create');
+      const response = await Api.post<IRoomShape>('/room/create');
       navigate(response.data.id)
       
     } catch (error) {

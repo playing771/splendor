@@ -1,15 +1,20 @@
 import WebSocket from 'ws';
 import { IMessage } from '../../interfaces/api';
 
+interface IConnection {
+  send: (message: string)=>void;
+  readyState: 0 | 1 | 2 | 3;
+}
+
 export class ConnectionService {
-  private connections: Map<string, WebSocket.WebSocket>;
+  private connections: Map<string, IConnection>;
 
   constructor() {
-    this.connections = new Map<string, WebSocket.WebSocket>();
+    this.connections = new Map<string, IConnection>();
   }
 
-  add(userId: string, ws: WebSocket.WebSocket) {
-    this.connections.set(userId, ws);
+  add(userId: string, connection: IConnection) {
+    this.connections.set(userId, connection);
   }
 
   delete(userId: string) {

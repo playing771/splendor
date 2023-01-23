@@ -1,4 +1,5 @@
 import { IBaseDeckShape, IBaseDeckConfig } from '../../../interfaces/baseDeck';
+import { shuffle } from '../../utils/array'
 
 export class BaseDeck<C> implements IBaseDeckShape<C> {
   cards: Array<C>;
@@ -33,12 +34,6 @@ export class BaseDeck<C> implements IBaseDeckShape<C> {
   }
 
   shuffle() {
-    // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-    for (let i = this.cards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const temp = this.cards[i];
-      this.cards[i] = this.cards[j];
-      this.cards[j] = temp;
-    }
+    this.cards = shuffle(this.cards);
   }
 }

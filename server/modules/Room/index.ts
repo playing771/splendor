@@ -2,6 +2,7 @@ import { ERoomState, IRoomConfig, IRoomShape } from '../../../interfaces/room';
 import { Nullable } from '../../../utils/typescript';
 import { v4 as uuidv4 } from 'uuid';
 import { EUserRole, IUser } from '../../../interfaces/user';
+import { GameBot } from '../GameBot';
 
 export class Room implements IRoomShape {
   id: string;
@@ -10,10 +11,12 @@ export class Room implements IRoomShape {
   owner: IUser;
   state: ERoomState;
   gameId: Nullable<string>;
+  bots: GameBot[];
 
   constructor({ id, users, name, owner, gameId }: IRoomConfig) {
     this.id = id || uuidv4();
     this.users = users || [];
+    this.bots = [];
     this.owner = owner;
     this.name = name || '';
     this.gameId = gameId || null;
@@ -26,6 +29,11 @@ export class Room implements IRoomShape {
 
   public joinAsSpectator(user: IUser) {
     this.users.push(user);
+  }
+
+  public addBot(bot: GameBot) {
+    this.bots.push(bot);
+    this.users.push(bot);
   }
 
   public leave(userId: string) {
@@ -45,6 +53,9 @@ export class Room implements IRoomShape {
     }
     this.state = ERoomState.Started;
     this.gameId = gameId;
+    this.bots.forEach((bot)=>{
+      bot.attachToGame(gameId);
+    })
   }
 
   public endGame() {

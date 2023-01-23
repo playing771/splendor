@@ -1,12 +1,12 @@
 import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
+import http from 'http';
 import { EMessageType, IMessage } from '../../interfaces/api';
 import { ORIGIN, SERVER_PORT } from '../../constants';
 import { gameService } from '../services/GameService';
 import { WebSocketServer } from 'ws';
 import { connectionService } from '../services/ConnectionService';
-import http from 'http';
 import { EPlayerAction } from '../../interfaces/game';
 import { EUserRole } from '../../interfaces/user';
 import { authController } from './controllers/auth';
@@ -58,32 +58,38 @@ export const Api = () => {
   );
 
   app.get<unknown, unknown, unknown, { roomId?: string }>(
-    '/rooms',
+    '/room',
     roomController.rooms
   );
 
   app.post<unknown, unknown, { roomName?: string }>(
-    '/rooms/create',
+    '/room/create',
     isAuthenticated,
     roomController.create
   );
 
   app.post<unknown, unknown, { roomId: string }>(
-    '/rooms/leave',
+    '/room/leave',
     isAuthenticated,
     roomController.leave
   );
 
+  app.post<unknown, unknown, { roomId: string }>(
+    '/room/addBot',
+    isAuthenticated,
+    roomController.addBot
+  );
+
   app.post<unknown, unknown, { roomId: string; role: EUserRole }>(
-    '/rooms/join',
+    '/room/join',
     isAuthenticated,
     roomController.join
   );
 
   app.post<unknown, unknown, { roomId: string }>(
-    '/rooms/start',
+    '/game/start',
     isAuthenticated,
-    roomController.start
+    gameController.start
   );
 
   app.post<unknown, unknown, { action?: EPlayerAction; data?: any }>(
@@ -123,7 +129,7 @@ export const Api = () => {
     const userId = request.session.userId;
 
     try {
-      console.log('request.session', request.session);
+      // console.log('request.session', request.session);
       connectionService.add(userId, ws);
 
       // const gameState = gameService.getGameState(userId);

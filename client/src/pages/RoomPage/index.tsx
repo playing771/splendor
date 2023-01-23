@@ -22,7 +22,7 @@ export function RoomPage() {
 
 
 
-  const { data: roomData, isLoading, refetch } = useRequest<IRoomShape>(`rooms?roomId=${roomId}`);
+  const { data: roomData, isLoading, refetch } = useRequest<IRoomShape>(`room?roomId=${roomId}`);
 
   const spectators = roomData?.users.filter((user) => user.role === EUserRole.Spectator) || [];
   const players = roomData?.users.filter((user) => user.role === EUserRole.Player) || [];
@@ -50,7 +50,7 @@ export function RoomPage() {
   const handleJoinClick = async () => {
     const body = { roomId, role: EUserRole.Player };
     try {
-      await Api.post('/rooms/join', body);
+      await Api.post('/room/join', body);
       refetch()
     } catch (error) {
       toastError(error as unknown as AxiosError<string>);
@@ -60,7 +60,7 @@ export function RoomPage() {
   const handleSpectateClick = async () => {
     const body = { roomId, role: EUserRole.Spectator };
     try {
-      const response = await Api.post<{ gameId?: string }>('/rooms/join', body);
+      const response = await Api.post<{ gameId?: string }>('/room/join', body);
 
       if (roomData?.state === ERoomState.Started && response.data.gameId) {
         navigate(`/games/${response.data.gameId}`)
@@ -75,7 +75,7 @@ export function RoomPage() {
   const handleLeaveClick = async () => {
     const body = { roomId };
     try {
-      await Api.post('/rooms/leave', body);
+      await Api.post('/room/leave', body);
       navigate('/rooms')
     } catch (error) {
       toastError(error as unknown as AxiosError<string>);
@@ -85,12 +85,24 @@ export function RoomPage() {
   const handleStartGameClick = async () => {
     const body = { roomId };
     try {
-      await Api.post<string>('/rooms/start', body);
+      await Api.post<string>('/game/start', body);
 
     } catch (error) {
       toastError(error as unknown as AxiosError<string>);
     }
   }
+  
+  const handleAddBot = async () => {
+    const body = { roomId };
+    try {
+      await Api.post<string>('/room/addBot', body);
+
+    } catch (error) {
+      toastError(error as unknown as AxiosError<string>);
+    }
+  }
+
+  
 
   return (
     !roomData ? <span> ...loading</span> :
@@ -120,6 +132,7 @@ export function RoomPage() {
           <div className={styles.Room_controls}>
             {players.every((player) => player.id !== userId) && <button onClick={handleJoinClick}>Join</button>}
             {spectators.every((player) => player.id !== userId) && <button onClick={handleSpectateClick}>Spectate</button>}
+            {roomData.owner.id === userId && <button onClick={handleAddBot}>Add bot</button>}
             {roomData.owner.id === userId && <button onClick={handleStartGameClick}>Start game</button>}
           </div>
         </div>

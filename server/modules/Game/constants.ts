@@ -1,8 +1,7 @@
 import { EPLayerState, IGameConfig } from "../../../interfaces/game";
 import { EGemColor } from "../../../interfaces/gem";
-import { getCardsFromCSV } from "../../getCardsFromCSV";
-import { getNoblesFromCSV } from "../../getNoblesFromCSV";
 import { populateCardsByLevelFromPool } from "../DevDeck/populateCardByLevelFromPool";
+import { getCardsFromCSV, getNoblesFromCSV } from '../../utils/csv';
 
 export const PLAYER_GEMS_MAX = 10;
 export const PLAYER_CARDS_HOLDED_MAX = 3;
