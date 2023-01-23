@@ -1,6 +1,7 @@
-import { ICardShape, TCardCost } from '../../interfaces/card'
-import { EDeckLevel } from '../../interfaces/devDeck';
-import { EGemColor } from '../../interfaces/gem';
+import { ICardShape, TCardCost } from "../../../interfaces/card";
+import { EDeckLevel } from "../../../interfaces/devDeck";
+import { EGemColor } from "../../../interfaces/gem";
+
 
 export class Card implements ICardShape {
   id: string;

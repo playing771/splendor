@@ -6,10 +6,10 @@ import { EGemColor } from '../../../interfaces/gem';
 import { INobleShape } from '../../../interfaces/noble';
 
 const MOCKED_NOBLES: INobleShape[] = [
-  { score: 3, requirements: { [EGemColor.Black]: 2, [EGemColor.Red]: 2 } },
-  { score: 2, requirements: { [EGemColor.White]: 2, [EGemColor.Green]: 1 } },
-  { score: 4, requirements: { [EGemColor.White]: 2, [EGemColor.Red]: 1 } },
-  { score: 5, requirements: { [EGemColor.Blue]: 2, [EGemColor.Green]: 1 } },
+  { score: 3, requirements: { [EGemColor.Black]: 2, [EGemColor.Red]: 2 }, id: 'ONE' },
+  { score: 2, requirements: { [EGemColor.White]: 2, [EGemColor.Green]: 1 }, id: 'TWO' },
+  { score: 4, requirements: { [EGemColor.White]: 2, [EGemColor.Red]: 1 }, id: 'THREE' },
+  { score: 5, requirements: { [EGemColor.Blue]: 2, [EGemColor.Green]: 1 }, id: 'FOUR' },
 ];
 
 const TABLE_CONFIG: TGameTableConfig<{ id: string }> = {

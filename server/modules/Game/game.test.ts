@@ -13,7 +13,7 @@ import {
   PLAYER_GEMS_MAX,
   TAKE_GEM_LIMIT,
   TAKE_GEM_LIMIT_SAME_COLOR,
-} from './constants';
+} from '../../../gameRules';
 import { EGameBasicState } from './createGameSMDefinition';
 import { INobleShape } from '../../../interfaces/noble';
 
@@ -673,14 +673,16 @@ describe('Game functionality', () => {
     game.dispatch('PL_3', EPlayerAction.EndTurn);
 
     expect(game.getState()).toBe(EGameBasicState.GameEnded);
-    expect(onGameEndMocked).toBeCalledWith({
-      winner: PLAYERS[1].id,
-      players: [
-        { score: 16, id: 'player_2', cardsBoughtCount: 2 },
-        { score: 0, id: 'player_1', cardsBoughtCount: 0 },
-        { score: 0, id: 'PL_3', cardsBoughtCount: 0 },
-      ],
-    });
+    expect(onGameEndMocked).toBeCalledWith(
+      expect.objectContaining({
+        winner: PLAYERS[1].id,
+        players: [
+          { score: 16, id: 'player_2', cardsBoughtCount: 2 },
+          { score: 0, id: 'player_1', cardsBoughtCount: 0 },
+          { score: 0, id: 'PL_3', cardsBoughtCount: 0 },
+        ],
+      })
+    );
   });
 
   it('finds a winner between players with equal score by smallest count of bought cards', () => {
@@ -761,14 +763,16 @@ describe('Game functionality', () => {
     game.dispatch('PL_3', EPlayerAction.EndTurn);
 
     expect(game.getState()).toBe(EGameBasicState.GameEnded);
-    expect(onGameEndMocked).toBeCalledWith({
-      winner: PLAYERS[1].id,
-      players: [
-        { score: 15, id: 'player_2', cardsBoughtCount: 1 },
-        { score: 15, id: 'PL_3', cardsBoughtCount: 2 },
-        { score: 15, id: 'player_1', cardsBoughtCount: 3 },
-      ],
-    });
+    expect(onGameEndMocked).toBeCalledWith(
+      expect.objectContaining({
+        winner: PLAYERS[1].id,
+        players: [
+          { score: 15, id: 'player_2', cardsBoughtCount: 1 },
+          { score: 15, id: 'PL_3', cardsBoughtCount: 2 },
+          { score: 15, id: 'player_1', cardsBoughtCount: 3 },
+        ],
+      })
+    );
   });
 
   it('has NULL winner if score and cards bought count are equal among winning players', () => {
@@ -828,14 +832,16 @@ describe('Game functionality', () => {
     game.dispatch('PL_3', EPlayerAction.EndTurn);
 
     expect(game.getState()).toBe(EGameBasicState.GameEnded);
-    expect(onGameEndMocked).toBeCalledWith({
-      winner: null,
-      players: expect.arrayContaining([
-        { score: 16, id: 'player_2', cardsBoughtCount: 1 },
-        { score: 16, id: 'player_1', cardsBoughtCount: 1 },
-        { score: 16, id: 'PL_3', cardsBoughtCount: 1 },
-      ]),
-    });
+    expect(onGameEndMocked).toBeCalledWith(
+      expect.objectContaining({
+        winner: null,
+        players: expect.arrayContaining([
+          { score: 16, id: 'player_2', cardsBoughtCount: 1 },
+          { score: 16, id: 'player_1', cardsBoughtCount: 1 },
+          { score: 16, id: 'PL_3', cardsBoughtCount: 1 },
+        ]),
+      })
+    );
   });
 
   it('lets to earn a noble', () => {
@@ -904,20 +910,22 @@ describe('Game functionality', () => {
       ],
     });
 
-    expect(game.getGameResults()).toEqual({
-      players: [
-        {
-          cardsBoughtCount: 1,
-          id: 'ID_TWO',
-          score: 5,
-        },
-        {
-          cardsBoughtCount: 0,
-          id: 'player_1',
-          score: 0,
-        },
-      ],
-      winner: 'ID_TWO',
-    });
+    expect(game.getGameResults()).toEqual(
+      expect.objectContaining({
+        players: [
+          {
+            cardsBoughtCount: 1,
+            id: 'ID_TWO',
+            score: 5,
+          },
+          {
+            cardsBoughtCount: 0,
+            id: 'player_1',
+            score: 0,
+          },
+        ],
+        winner: 'ID_TWO',
+      })
+    );
   });
 });

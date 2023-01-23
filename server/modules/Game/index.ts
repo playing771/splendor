@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getKeys, Nullable } from '../../../utils/typescript';
+import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
 import {
   EPlayerAction,
@@ -15,16 +15,7 @@ import { Player } from '../Player';
 import { createStateMachine } from '../StateMachine';
 import { IStateMachine } from '../StateMachine/models';
 import { TableManager } from '../TableManager';
-import {
-  TAKE_GEM_LIMIT,
-  PLAYER_GEMS_MAX,
-  TAKE_GEM_LIMIT_SAME_COLOR,
-  SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT,
-  STATES_AVAILABLE_FOR_ACTION,
-  GOLD_GEMS_FOR_CARD_HOLD,
-  PLAYER_CARDS_HOLDED_MAX,
-  SCORE_TO_END_GAME,
-} from './constants';
+import { STATES_AVAILABLE_FOR_ACTION } from './constants';
 import {
   createGameSMDefinition,
   EGameBasicState,
@@ -32,7 +23,15 @@ import {
 } from './createGameSMDefinition';
 import { createPlayerSMDefinition } from './createPlayerSMDefinition';
 import { EDeckLevel } from '../../../interfaces/devDeck';
-import { IUser } from '../../../interfaces/user';
+import {
+  TAKE_GEM_LIMIT,
+  TAKE_GEM_LIMIT_SAME_COLOR,
+  SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT,
+  PLAYER_GEMS_MAX,
+  PLAYER_CARDS_HOLDED_MAX,
+  GOLD_GEMS_FOR_CARD_HOLD,
+  SCORE_TO_END_GAME,
+} from '../../../gameRules';
 
 type PlayerId = string;
 type TGameState = PlayerId | EGameBasicState;

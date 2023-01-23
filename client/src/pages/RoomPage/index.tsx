@@ -4,13 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { EMessageType, IMessage } from '../../../../interfaces/api';
 import { ERoomState, IRoomShape } from '../../../../interfaces/room';
 import { EUserRole } from '../../../../interfaces/user';
-import { MAX_PLAYERS } from '../../../../server/modules/Game/constants';
 import { Api } from '../../Api';
 import { useAuth } from '../../AuthProvider/context';
 import { useErrorToast } from '../../utils/useErrorToast';
 import { useRequest } from '../../utils/useRequest';
 import { useWebsockets } from '../../utils/useWebsockets';
-import { RoomsPage } from '../RoomsPage';
+import { MAX_PLAYERS } from '../../../../gameRules';
 
 import styles from './styles.module.scss';
 
@@ -92,7 +91,7 @@ export function RoomPage() {
       toastError(error as unknown as AxiosError<string>);
     }
   }
-  
+
   const handleAddBot = async () => {
     const body = { roomId };
     try {
@@ -103,7 +102,7 @@ export function RoomPage() {
     }
   }
 
-  const playersLimitReached = roomData?.users.filter((user)=>user.role === EUserRole.Player).length === MAX_PLAYERS
+  const playersLimitReached = roomData?.users.filter((user) => user.role === EUserRole.Player).length === MAX_PLAYERS
 
   return (
     !roomData ? <span> ...loading</span> :

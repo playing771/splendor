@@ -12,7 +12,7 @@ import {
   PLAYER_GEMS_MAX,
   TAKE_GEM_LIMIT,
   TAKE_GEM_LIMIT_SAME_COLOR,
-} from '../Game/constants';
+} from '../../../gameRules';
 import { PlayerResources } from '../Player/PlayerResources';
 
 const canAffordToPayCost = (cost: TCardCost, gems: TPlayerGems) => {
@@ -129,7 +129,7 @@ export class GameBot extends PlayerResources implements IUser {
     if (
       !this.desiredCard ||
       this.tableState[this.desiredCard.lvl].cards[this.desiredCard.index].id !==
-        this.desiredCard.id
+      this.desiredCard.id
     ) {
       this.desiredCard = this.chooseDesiredCard(EDeckLevel.First);
     }

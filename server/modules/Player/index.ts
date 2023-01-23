@@ -6,9 +6,8 @@ import {
   TPlayerCardsBought,
   TPlayerGems,
 } from '../../../interfaces/player';
-import { countTokens } from '../Game/countTokens';
 import { getKeys } from '../../../utils/typescript';
-import { PLAYER_CARDS_HOLDED_MAX } from '../Game/constants';
+import { PLAYER_CARDS_HOLDED_MAX } from '../../../gameRules';
 import { INobleShape } from '../../../interfaces/noble';
 import { PlayerResources } from './PlayerResources';
 

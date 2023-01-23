@@ -160,7 +160,7 @@ describe('Player functionality', () => {
     expect(player.score).toBe(6);
   });
 
-  it.only('has getAllGemsAvailable', () => {
+  it('has getAllGemsAvailable', () => {
     const player = new Player({
       name: 'max',
       id: 'ID_1',
