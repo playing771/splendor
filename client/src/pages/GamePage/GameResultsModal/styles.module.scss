@@ -1,0 +1,19 @@
+.GameResultsModal {
+  max-width: 400px;
+
+  &_content {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    row-gap: 12px;
+  }
+
+
+}
+
+.PlayerInfo {
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px;
+  margin: 12px;
+}

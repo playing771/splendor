@@ -196,6 +196,7 @@ export class GameService {
         `Cant start a game in room ${room.id}: ${userId} is not an owner`
       );
     }
+
     const shuffledPlayers = shuffle(room.players);
     const game = new Game({
       players: shuffledPlayers,
@@ -208,6 +209,7 @@ export class GameService {
       },
       onGameEnd: (results) => {
         gameConfig?.onGameEnd && gameConfig.onGameEnd(results)
+        room.endGame();
         // gameService
       }
     });

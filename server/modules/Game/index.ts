@@ -281,6 +281,8 @@ export class Game implements IGameShape<ICardShape> {
       score: player.score,
       cardsBoughtCount: player.cardsBoughtCount,
       id: player.id,
+      name: player.name,
+      nobles: player.nobles.length
     }));
 
     playersWithResults.sort(

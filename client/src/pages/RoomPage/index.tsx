@@ -129,12 +129,12 @@ export function RoomPage() {
               })}
             </div>
           </div>
-          <div className={styles.Room_controls}>
+          {roomData.state !== ERoomState.Finished && <div className={styles.Room_controls}>
             {players.every((player) => player.id !== userId) && <button onClick={handleJoinClick} disabled={playersLimitReached}>Join</button>}
             {spectators.every((player) => player.id !== userId) && <button onClick={handleSpectateClick}>Spectate</button>}
             {roomData.owner.id === userId && <button onClick={handleAddBot} disabled={playersLimitReached}>Add bot</button>}
             {roomData.owner.id === userId && <button onClick={handleStartGameClick}>Start game</button>}
-          </div>
+          </div>}
         </div>
 
 

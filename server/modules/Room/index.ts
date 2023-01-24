@@ -59,7 +59,7 @@ export class Room implements IRoomShape {
   }
 
   public endGame() {
-    if (this.state !== ERoomState.Pending) {
+    if (this.state !== ERoomState.Started) {
       throw Error(`Cant end a game in room ${this.id} in ${this.state} state`);
     }
     this.state = ERoomState.Finished;

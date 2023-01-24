@@ -42,9 +42,11 @@ export type IGameResult = {
   round: number,
   winner: Nullable<string>,
   players: Array<{
+    id: string,
+    name: string
     score: number,
     cardsBoughtCount: number,
-    id: string
+    nobles: number
   }>
 }
 

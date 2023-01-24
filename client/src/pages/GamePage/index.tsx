@@ -4,7 +4,7 @@ import {
   IGameStateDTO,
   IMessage,
 } from '../../../../interfaces/api';
-import { EPlayerAction } from '../../../../interfaces/game';
+import { EGameBasicState, EPlayerAction } from '../../../../interfaces/game';
 import { TPlayerGems } from '../../../../interfaces/player';
 import { Api } from '../../Api';
 import { useWebsockets } from '../../utils/useWebsockets';
@@ -17,6 +17,8 @@ import { AxiosError } from 'axios';
 import { useParams } from 'react-router-dom';
 import { useErrorToast } from '../../utils/useErrorToast';
 import { MyInfo } from './MyInfo';
+import { GameResultsModal } from './GameResultsModal';
+import { useModal } from '../../components/Modal/useModal';
 
 import cn from 'classnames';
 
@@ -79,15 +81,20 @@ export const GamePage = () => {
 
   useEffect(() => {
     if (isOpen) {
-
       sendMessage({ type: EMessageType.GetGameState, data: gameId });
     }
   }, [sendMessage, isOpen, instance]);
 
   if (!gameState) return <h1>...loading</h1>;
 
-  const { availableActions, playerState, players, table, isPlayerActive, activePlayer } =
-    gameState;
+  const {
+    availableActions,
+    playerState,
+    players,
+    table,
+    isPlayerActive,
+    activePlayer,
+  } = gameState;
 
   const needToReturnGems =
     availableActions.length === 1 &&
@@ -97,9 +104,8 @@ export const GamePage = () => {
     availableActions[0] === EPlayerAction.EndTurn;
   const canTakeGems = availableActions.includes(EPlayerAction.TakeGems);
 
-  const rivals = players.filter((player)=>player.id !== playerState?.id);
-  console.log('activePlayer',activePlayer);
-  
+  const rivals = players.filter((player) => player.id !== playerState?.id);
+
   return (
     <div className={styles.Game}>
       <div className="StatusBar">
@@ -110,7 +116,7 @@ export const GamePage = () => {
       </div>
       <div className={styles.Game_info}>
         <div className={styles.Game_infoPlayers}>
-          <PlayersList players={rivals} activePlayerId={activePlayer}/>
+          <PlayersList players={rivals} activePlayerId={activePlayer} />
         </div>
         <div className={styles.Game_infoTable}>
           <GameTable
@@ -141,7 +147,6 @@ export const GamePage = () => {
         />
       )}
 
-
       {needToReturnGems ? (
         <button
           disabled={!isPlayerActive}
@@ -162,6 +167,10 @@ export const GamePage = () => {
         >
           End turn
         </button>
+      )}
+
+      {gameState.currentState === EGameBasicState.GameEnded && (
+        <GameResultsModal results={gameState.gameResults} />
       )}
     </div>
   );

@@ -14,7 +14,7 @@ interface IProps {
 
 export const Modal = ({ className, ...props }: IProps) => {
   return <RModal
-    className={cn(styles.Modal)}
+    className={cn(styles.Modal, className)}
     overlayClassName={styles.Modal_overlay}
 
     {...props}
