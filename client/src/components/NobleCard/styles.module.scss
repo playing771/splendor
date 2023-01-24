@@ -1,3 +1,17 @@
+$red_gem_light: #762b2e;
+$black_gem_light: #3e3e3e;
+$blue_gem_light: #22395d;
+$white_gem_light: #a49c95;
+$green_gem_light: #21482e;
+$gold_gem_light: #a49b3b;
+
+$red_gem: #882a2e;
+$black_gem: #3f3939;
+$blue_gem: #224173;
+$white_gem: #959ea6;
+$green_gem: #166735;
+$gold_gem: #f5ea42;
+
 .Noble {
   display: flex;
   flex-direction: column;
@@ -65,6 +79,42 @@
   //   justify-content: center;
   //   align-items: center;
   // }
+}
+
+.RequirementCard {
+  border: 1px solid grey;
+  border-radius: 4px;
+  padding: 4px;
+  // width: 50px;
+  // height: 100px;
+  &__Red {
+    background-color:$red_gem;
+    // border-color: $red_gem_light;
+  }
+  &__Black {
+    background-color:$black_gem;
+    // border-color: $black_gem_light;
+  }
+  &__Blue {
+    background-color:$blue_gem;
+    // border-color: $blue_gem_light;
+  }
+  &__White {
+    background-color:$white_gem;
+    // border-color: $white_gem_light;
+  }
+  &__Green {
+    background-color:$green_gem;
+    // border-color: $green_gem_light;
+  }
+  &__Gold {
+    background-color:$gold_gem;
+    // border-color: $gold_gem_light;
+  }
+
+  &_value {
+    font-weight: 500;
+  }
 }
 
 .NobleStack {
