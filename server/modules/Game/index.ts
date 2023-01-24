@@ -303,14 +303,14 @@ export class Game implements IGameShape<ICardShape> {
       return playersWithMinCardsBought.length > 1
         ? { winner: null, players: playersWithResults, round: this.round }
         : {
-          winner: playersWithMinCardsBought[0].id,
+          winner: playersWithMinCardsBought[0].name,
           players: playersWithResults,
           round: this.round,
         };
     }
 
     return {
-      winner: playersWithMaxScore[0].id,
+      winner: playersWithMaxScore[0].name,
       players: playersWithResults,
       round: this.round,
     };
