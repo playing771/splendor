@@ -25,9 +25,9 @@ export class Player extends PlayerResources implements IPlayerShape {
     gems = {},
     cardsBought = {} as TPlayerCardsBought,
     cardsHolded = [] as ICardShape[],
-    nobles = [] as INobleShape[]
+    nobles = [] as INobleShape[],
   }: IPlayerConfig) {
-    super({ cardsBought, cardsHolded, nobles, gems: gems as TPlayerGems })
+    super({ cardsBought, cardsHolded, nobles, gems: gems as TPlayerGems });
 
     // this.gems = Object.values(EGemColor).reduce((acc, color) => {
     //   acc[color] = initialTokens[color] || 0;
@@ -45,7 +45,6 @@ export class Player extends PlayerResources implements IPlayerShape {
     // this.nobles = nobles;
   }
 
-
   public getGems(color: EGemColor, count: number): void {
     this.gems[color] += count;
   }
@@ -54,62 +53,69 @@ export class Player extends PlayerResources implements IPlayerShape {
     this.gems[color] -= count;
   }
 
-  public payCost(cost: TCardCost) {
+  public calculateGemsToSpend(cost: TCardCost) {
     const extraGems = this.gemsFromCardsBought;
 
-    const gemsSpent = Object.values(EGemColor).reduce((acc, color) => {
+    const gemsToSpend = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = 0;
       return acc;
     }, {} as TPlayerGems);
 
     for (const color of getKeys(cost)) {
-
       let nonGoldTokensToSpend = Math.max(
         (cost[color] || 0) - (extraGems[color] || 0),
         0
       );
 
-      if (nonGoldTokensToSpend > this.gems[color]) {
+      if (nonGoldTokensToSpend > this.gems[color] - gemsToSpend[color]) {
+        const goldTokensToSpend =
+          nonGoldTokensToSpend - this.gems[color] - gemsToSpend[color];
 
-        const goldTokensToSpend = nonGoldTokensToSpend - this.gems[color];
-
-        if (goldTokensToSpend > this.gems[EGemColor.Gold]) {
+        if (
+          goldTokensToSpend >
+          this.gems[EGemColor.Gold] - gemsToSpend[EGemColor.Gold]
+        ) {
           throw Error(
             `Player (id=${this.id}) doesn't have ${nonGoldTokensToSpend} ${color} gems or enough ${EGemColor.Gold} gems`
           );
         }
 
-        this.spendGems(EGemColor.Gold, goldTokensToSpend);
-        gemsSpent[EGemColor.Gold] += goldTokensToSpend;
+        gemsToSpend[EGemColor.Gold] += goldTokensToSpend;
 
         nonGoldTokensToSpend -= goldTokensToSpend;
       }
 
-      this.spendGems(color, nonGoldTokensToSpend);
-      gemsSpent[color] += nonGoldTokensToSpend;
+      gemsToSpend[color] += nonGoldTokensToSpend;
     }
 
-    return gemsSpent;
+    return gemsToSpend;
   }
 
   public buyCard(card: ICardShape) {
     const { cost, color } = card;
-    const gemsSpent = this.payCost(cost);
+    const gemsToSpent = this.calculateGemsToSpend(cost);
+    Object.entries(gemsToSpent).forEach(([color, count]) => {
+      this.spendGems(color as EGemColor, count);
+    });
     this.cardsBought[color].push(card);
 
-    return gemsSpent;
+    return gemsToSpent;
   }
 
   public buyHoldedCard(card: ICardShape) {
     const gemsSpent = this.buyCard(card);
-    this.cardsHolded = this.cardsHolded.filter((holdedCard) => holdedCard.id !== card.id)
+    this.cardsHolded = this.cardsHolded.filter(
+      (holdedCard) => holdedCard.id !== card.id
+    );
 
     return gemsSpent;
   }
 
   public holdCard(card: ICardShape) {
     if (this.cardsHolded.length >= PLAYER_CARDS_HOLDED_MAX) {
-      throw Error(`Cant hold a card: ${this.cardsHolded.length} exceeds ${PLAYER_CARDS_HOLDED_MAX} of cards holded limit`);
+      throw Error(
+        `Cant hold a card: ${this.cardsHolded.length} exceeds ${PLAYER_CARDS_HOLDED_MAX} of cards holded limit`
+      );
     }
     this.cardsHolded.push(card);
   }
@@ -117,7 +123,6 @@ export class Player extends PlayerResources implements IPlayerShape {
   public earnNoble(noble: INobleShape) {
     this.nobles.push(noble);
   }
-
 
   // private calculateGemsFromBoughtCards(color: EGemColor) {
   //   return this.cardsBought[color].length;
@@ -163,7 +168,7 @@ export class Player extends PlayerResources implements IPlayerShape {
       name: this.name,
       gems: this.gems,
       gemsCount: this.gemsCount,
-      nobles: this.nobles
-    }
+      nobles: this.nobles,
+    };
   }
 }

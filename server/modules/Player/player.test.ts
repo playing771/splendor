@@ -139,6 +139,33 @@ describe('Player functionality', () => {
     expect(player.gems[EGemColor.Gold]).toBe(1);
   });
 
+  it('throws an error if gems are not enough to pay cost', () => {
+    const initialGemsHolded = {
+      [EGemColor.Gold]: 1,
+      [EGemColor.Red]: 1,
+      [EGemColor.Blue]: 1,
+      [EGemColor.White]: 1,
+      [EGemColor.Black]: 0,
+      [EGemColor.Green]: 0,
+    }
+    const player = new Player({
+      name: 'max',
+      id: 'ID_1',
+      gems: initialGemsHolded,
+    });
+    const cardToBuy = {
+      color: EGemColor.Black, id: 'SOME', lvl: EDeckLevel.First, score: 0, cost: {
+        [EGemColor.Red]: 1,
+        [EGemColor.Blue]: 1,
+        [EGemColor.Green]: 1,
+        [EGemColor.Black]: 1,
+      }
+    };
+
+    expect(() => player.buyCard(cardToBuy)).toThrow();
+    expect(player.gems).toEqual(initialGemsHolded)
+  })
+
   it('has score calculated by cards and nobles owned', () => {
     const player = new Player({
       name: 'max',
