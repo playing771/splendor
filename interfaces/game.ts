@@ -1,9 +1,6 @@
-import { Player } from "../server/modules/Player";
 import { Nullable } from "../utils/typescript";
 import { ICardShape } from "./card";
-import { TGameTableConfig, TGameTableSafeState, TGameTableShape } from "./gameTable";
-import { INobleShape } from "./noble";
-import { IPlayerShape } from "./player";
+import { TGameTableConfig, TGameTableShape } from "./gameTable";
 
 export interface IGameShape<C> {
   id: string;
@@ -55,3 +52,14 @@ export interface IGameSetup {
   gems: number;
   nobles: number;
 }
+
+export type PlayerId = string;
+
+export type TGameState = PlayerId | EGameBasicState;
+
+export enum EGameBasicState {
+  Initialization = 'INITIALIZATION',
+  RoundStarted = 'ROUND_STARTED',
+  GameEnded = 'GAME_ENDED',
+}
+export type TGameEvent = 'next' | 'start' | 'end';

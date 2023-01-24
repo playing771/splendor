@@ -2,11 +2,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { getKeys } from '../../../utils/typescript';
 import { ICardShape } from '../../../interfaces/card';
 import {
+  EGameBasicState,
   EPlayerAction,
   EPLayerState,
   IGameConfig,
   IGameResult,
   IGameShape,
+  PlayerId,
+  TGameEvent,
+  TGameState,
 } from '../../../interfaces/game';
 import { IPlayerConfig, TPlayerGems } from '../../../interfaces/player';
 import { EGemColor } from '../../../interfaces/gem';
@@ -16,11 +20,7 @@ import { createStateMachine } from '../StateMachine';
 import { IStateMachine } from '../StateMachine/models';
 import { TableManager } from '../TableManager';
 import { STATES_AVAILABLE_FOR_ACTION } from './constants';
-import {
-  createGameSMDefinition,
-  EGameBasicState,
-  TGameEvent,
-} from './createGameSMDefinition';
+import { createGameSMDefinition } from './createGameSMDefinition';
 import { createPlayerSMDefinition } from './createPlayerSMDefinition';
 import { EDeckLevel } from '../../../interfaces/devDeck';
 import {
@@ -33,9 +33,6 @@ import {
   SCORE_TO_END_GAME,
   INITIAL_GOLD_GEMS_COUNT,
 } from '../../../gameRules';
-
-type PlayerId = string;
-type TGameState = PlayerId | EGameBasicState;
 
 export class Game implements IGameShape<ICardShape> {
   public id: string;
@@ -250,8 +247,8 @@ export class Game implements IGameShape<ICardShape> {
 
     return stateHasActions
       ? getKeys(
-          playerStateMachine.definition[playerStateMachine.value].transitions
-        ).filter((action) => action !== EPlayerAction.TakeGemsOverLimit)
+        playerStateMachine.definition[playerStateMachine.value].transitions
+      ).filter((action) => action !== EPlayerAction.TakeGemsOverLimit)
       : [];
   }
 
@@ -304,10 +301,10 @@ export class Game implements IGameShape<ICardShape> {
       return playersWithMinCardsBought.length > 1
         ? { winner: null, players: playersWithResults, round: this.round }
         : {
-            winner: playersWithMinCardsBought[0].id,
-            players: playersWithResults,
-            round: this.round,
-          };
+          winner: playersWithMinCardsBought[0].id,
+          players: playersWithResults,
+          round: this.round,
+        };
     }
 
     return {
@@ -336,7 +333,7 @@ export class Game implements IGameShape<ICardShape> {
       if (
         value === TAKE_GEM_LIMIT_SAME_COLOR &&
         this.tableManager.table.gems[color] <
-          SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT
+        SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT
       ) {
         throw Error(
           `Cant take ${value} ${color} gems because the stock is less than ${SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT}`

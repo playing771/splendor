@@ -1,5 +1,5 @@
 import { EMessageType, IGameStateDTO, IMessage } from '../../interfaces/api';
-import { EPlayerAction, IGameConfig } from '../../interfaces/game';
+import { EGameBasicState, EPlayerAction, IGameConfig } from '../../interfaces/game';
 import { ERoomState } from '../../interfaces/room';
 import { EUserRole } from '../../interfaces/user';
 import { Game } from '../modules/Game';
@@ -12,7 +12,6 @@ import { shuffle } from '../utils/array';
 import { connectionService } from './ConnectionService';
 import { userService } from './UserService';
 import { random } from '../utils/math';
-import { EGameBasicState } from '../modules/Game/createGameSMDefinition';
 
 
 const BOT_NAMES = ['Alex', 'Max', 'Evgen', 'Kiko', 'Narek'];
@@ -165,10 +164,10 @@ export class GameService {
   broadcastGameState = (gameId: string) => {
     const game = this.getGame(gameId);
 
-    if (game.getState() === EGameBasicState.GameEnded) {
-      // TODO: hack to prevent crash in game with bots
-      return
-    }
+    // if (game.getState() === EGameBasicState.GameEnded) {
+    //   // TODO: hack to prevent crash in game with bots
+    //   return
+    // }
 
     if (!game.roomId) {
       throw Error(`Game ${gameId} is not attached to any room`);
@@ -206,6 +205,10 @@ export class GameService {
       onGameStart: () => {
         gameConfig?.onGameStart && gameConfig.onGameStart(game.id);
         gameService.broadcastGameState(game.id);
+      },
+      onGameEnd: (results) => {
+        gameConfig?.onGameEnd && gameConfig.onGameEnd(results)
+        // gameService
       }
     });
 
@@ -250,15 +253,21 @@ export class GameService {
       ? game.getPlayerAvailableActions(userId)
       : [];
 
+    const gameState = game.getState();
     const playerState = isPlayer ? game.getPlayer(userId).state : null;
-
+    const activePlayer = (
+      gameState === EGameBasicState.GameEnded ||
+      gameState === EGameBasicState.Initialization ||
+      gameState === EGameBasicState.RoundStarted
+    ) ? null : game.getActivePlayer();
     const state: IGameStateDTO = {
+      currentState: game.getState(),
       availableActions,
       players,
       table,
       playerState,
       isPlayerActive: game.checkPlayerIsActive(userId),
-      activePlayer: game.getActivePlayer().id,
+      activePlayer: activePlayer ? activePlayer.id : null,
       gameResults: game.getGameResults(),
       round: game.round
     };

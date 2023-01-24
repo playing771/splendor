@@ -1,6 +1,6 @@
 import { Nullable } from "../utils/typescript";
 import { ICardShape } from "./card";
-import { EPlayerAction, IGameResult } from "./game";
+import { EPlayerAction, IGameResult, TGameState } from "./game";
 import { TGameTableSafeState } from "./gameTable";
 import { IPlayerShape } from "./player";
 import { IUser } from "./user";
@@ -17,11 +17,12 @@ export interface IMessage<T> {
   data?: T
 }
 export interface IGameStateDTO {
+  currentState: TGameState;
   availableActions: EPlayerAction[];
   table: TGameTableSafeState<ICardShape>;
   players: IPlayerShape[];
   playerState: Nullable<IPlayerShape>;
-  activePlayer: string;
+  activePlayer: Nullable<string>;
   isPlayerActive: boolean;
   gameResults: IGameResult;
   round: number;

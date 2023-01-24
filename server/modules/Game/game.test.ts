@@ -2,6 +2,7 @@ import { Game } from '.';
 import { ICardShape } from '../../../interfaces/card';
 import { EDeckLevel } from '../../../interfaces/devDeck';
 import {
+  EGameBasicState,
   EPlayerAction,
   EPLayerState,
   IGameSetup,
@@ -18,7 +19,6 @@ import {
   TAKE_GEM_LIMIT,
   TAKE_GEM_LIMIT_SAME_COLOR,
 } from '../../../gameRules';
-import { EGameBasicState } from './createGameSMDefinition';
 import { INobleShape } from '../../../interfaces/noble';
 
 const PLAYERS: IPlayerConfig[] = [

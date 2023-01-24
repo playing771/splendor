@@ -1,14 +1,9 @@
-import { EPlayerAction } from '../../../interfaces/game';
+import { EGameBasicState, EPlayerAction, TGameEvent } from '../../../interfaces/game';
 import { IPlayerShape } from '../../../interfaces/player';
 import { addStateLogger } from '../StateMachine/addStateLogger';
 import { TStateMachineDefinition } from '../StateMachine/models';
 
-export enum EGameBasicState {
-  Initialization = 'INITIALIZATION',
-  RoundStarted = 'ROUND_STARTED',
-  GameEnded = 'GAME_ENDED',
-}
-export type TGameEvent = 'next' | 'start' | 'end';
+
 
 export const createGameSMDefinition = (
   players: IPlayerShape[],
@@ -86,7 +81,7 @@ export const createGameSMDefinition = (
     },
   };
 
-  // addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
+  addStateLogger(finalGameSMDefinition, 'GAME_STATE:');
 
   return finalGameSMDefinition;
 };

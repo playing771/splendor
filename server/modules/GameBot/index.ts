@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IGameStateDTO, IMessage } from '../../../interfaces/api';
 import { ICardShape, TCardCost } from '../../../interfaces/card';
 import { EDeckLevel } from '../../../interfaces/devDeck';
-import { EPlayerAction } from '../../../interfaces/game';
+import { EGameBasicState, EPlayerAction } from '../../../interfaces/game';
 import { TPlayerGems } from '../../../interfaces/player';
 import { EUserRole, IUser } from '../../../interfaces/user';
 import { Nullable } from '../../../utils/typescript';
@@ -30,7 +30,9 @@ export class GameBot extends PlayerResources implements IUser {
   role: Nullable<EUserRole>;
 
   gameId: string;
-  state: Pick<IGameStateDTO, 'availableActions' | 'isPlayerActive'>;
+  state: Pick<IGameStateDTO, 'availableActions' | 'isPlayerActive'> & {
+    isGameEnded: boolean
+  };
   tableState: IGameStateDTO['table'];
 
   // gemsRated: Record<EGemColorPickable, number>
@@ -76,14 +78,16 @@ export class GameBot extends PlayerResources implements IUser {
   }
 
   public updateGameState(state: IMessage<IGameStateDTO>) {
-    console.log('updateGameState', state.data?.availableActions);
+    console.log('updateGameState, actions:', state.data?.availableActions);
 
     try {
       // console.log('GameBot updateGameState', state);
       if (!state.data) {
         throw Error(`Wrong contract in messaging with bot`);
       }
+
       this.state = {
+        isGameEnded: state.data.currentState === EGameBasicState.GameEnded,
         availableActions: state.data.availableActions,
         isPlayerActive: state.data.isPlayerActive,
         // players: state.data.players,
@@ -122,7 +126,10 @@ export class GameBot extends PlayerResources implements IUser {
   }
 
   private tryToAct() {
-    if (!this.canAct) {
+
+    if (this.state.isGameEnded || !this.canAct) {
+      console.log('Failed to act: isGameEnded',this.state.isGameEnded);
+      
       return;
     }
 
@@ -153,7 +160,7 @@ export class GameBot extends PlayerResources implements IUser {
     if (this.canTakeGems) {
       if (this.gemsCount < PLAYER_GEMS_MAX) {
         const colorsToPick: TCardCost = this.chooseGemColorToTake();
-        console.log('colorsToPick', colorsToPick);
+        // console.log('colorsToPick', colorsToPick);
 
         this.dispatch(EPlayerAction.TakeGems, colorsToPick);
         return;
