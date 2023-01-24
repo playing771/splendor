@@ -105,8 +105,8 @@ describe('Game functionality', () => {
     const newGameSetup = new Map<number, IGameSetup>();
     newGameSetup.set(2, {
       gems: 10,
-      nobles: 1
-    })
+      nobles: 1,
+    });
 
     const game = new Game({
       players: GAME_CONFIG.players,
@@ -116,9 +116,9 @@ describe('Game functionality', () => {
         decks: TABLE_CONFIG.decks,
       },
       hasAutostart: true,
-      setup: newGameSetup
+      setup: newGameSetup,
     });
-    
+
     expect(game.table.gems).toEqual({
       [EGemColor.Gold]: 5,
       [EGemColor.Blue]: 10,
@@ -126,7 +126,7 @@ describe('Game functionality', () => {
       [EGemColor.Black]: 10,
       [EGemColor.Green]: 10,
       [EGemColor.White]: 10,
-    })
+    });
     expect(game.table.nobles).toHaveLength(1);
     expect(game.table.First.cards).toHaveLength(4);
     expect(game.table.Second.cards).toHaveLength(4);
@@ -721,12 +721,31 @@ describe('Game functionality', () => {
     expect(game.getState()).toBe(EGameBasicState.GameEnded);
     expect(onGameEndMocked).toBeCalledWith(
       expect.objectContaining({
-        winner: PLAYERS[1].id,
-        players: [
-          { score: 16, id: 'player_2', cardsBoughtCount: 2 },
-          { score: 0, id: 'player_1', cardsBoughtCount: 0 },
-          { score: 0, id: 'PL_3', cardsBoughtCount: 0 },
+        'players': [
+          {
+            'cardsBoughtCount': 2,
+            'id': 'player_2',
+            'name': 'Evgenii',
+            'nobles': 0,
+            'score': 16,
+          },
+          {
+            'cardsBoughtCount': 0,
+            'id': 'player_1',
+            'name': 'Maxim',
+            'nobles': 0,
+            'score': 0,
+          },
+          {
+            'cardsBoughtCount': 0,
+            'id': 'PL_3',
+            'name': 'Player3',
+            'nobles': 0,
+            'score': 0,
+          },
         ],
+        'round': 1,
+        'winner': 'Evgenii',
       })
     );
   });
@@ -811,12 +830,31 @@ describe('Game functionality', () => {
     expect(game.getState()).toBe(EGameBasicState.GameEnded);
     expect(onGameEndMocked).toBeCalledWith(
       expect.objectContaining({
-        winner: PLAYERS[1].id,
-        players: [
-          { score: 15, id: 'player_2', cardsBoughtCount: 1 },
-          { score: 15, id: 'PL_3', cardsBoughtCount: 2 },
-          { score: 15, id: 'player_1', cardsBoughtCount: 3 },
+        'players': [
+          {
+            'cardsBoughtCount': 1,
+            'id': 'player_2',
+            'name': 'Evgenii',
+            'nobles': 0,
+            'score': 15,
+          },
+          {
+            'cardsBoughtCount': 2,
+            'id': 'PL_3',
+            'name': 'Player3',
+            'nobles': 0,
+            'score': 15,
+          },
+          {
+            'cardsBoughtCount': 3,
+            'id': 'player_1',
+            'name': 'Maxim',
+            'nobles': 0,
+            'score': 15,
+          },
         ],
+        'round': 1,
+        'winner': 'Evgenii',
       })
     );
   });
@@ -880,12 +918,31 @@ describe('Game functionality', () => {
     expect(game.getState()).toBe(EGameBasicState.GameEnded);
     expect(onGameEndMocked).toBeCalledWith(
       expect.objectContaining({
+        players: [
+          {
+            cardsBoughtCount: 1,
+            id: 'player_1',
+            name: 'Maxim',
+            nobles: 0,
+            score: 16,
+          },
+          {
+            cardsBoughtCount: 1,
+            id: 'player_2',
+            name: 'Evgenii',
+            nobles: 0,
+            score: 16,
+          },
+          {
+            cardsBoughtCount: 1,
+            id: 'PL_3',
+            name: 'Player3',
+            nobles: 0,
+            score: 16,
+          },
+        ],
+        round: 1,
         winner: null,
-        players: expect.arrayContaining([
-          { score: 16, id: 'player_2', cardsBoughtCount: 1 },
-          { score: 16, id: 'player_1', cardsBoughtCount: 1 },
-          { score: 16, id: 'PL_3', cardsBoughtCount: 1 },
-        ]),
       })
     );
   });
@@ -958,19 +1015,24 @@ describe('Game functionality', () => {
 
     expect(game.getGameResults()).toEqual(
       expect.objectContaining({
+        round: 1,
         players: [
           {
             cardsBoughtCount: 1,
+            name: 'Two',
             id: 'ID_TWO',
             score: 5,
+            nobles: 1,
           },
           {
             cardsBoughtCount: 0,
+            name: 'Maxim',
             id: 'player_1',
             score: 0,
+            nobles: 0,
           },
         ],
-        winner: 'ID_TWO',
+        winner: 'Two',
       })
     );
   });
