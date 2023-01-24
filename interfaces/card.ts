@@ -1,8 +1,8 @@
 import { EDeckLevel } from "./devDeck";
-import { EGemColor } from "./gem";
+import { EGemColor, EGemColorPickable } from "./gem";
 
 export type TCardCost = {
-  [key in EGemColor]?: number
+  [key in EGemColorPickable]?: number
 }
 
 export interface ICardShape {
@@ -12,17 +12,4 @@ export interface ICardShape {
   cost: TCardCost
   lvl: EDeckLevel
 }
-
-// const card_one: ICardShape = {
-//   id: '1',
-//   color: ECardColor.Red,
-//   score: 7,
-//   cost: {
-//     [ECardColor.Blue]: 1,
-//     [ECardColor.Black]: 4,
-//     [ECardColor.White]: 0,
-//     [ECardColor.Red]: 0,
-//     [ECardColor.Green]: 0,
-//   }
-// }
 

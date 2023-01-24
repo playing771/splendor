@@ -37,6 +37,8 @@ export class TableManager<C extends { id: string }>
 
     if (topCardFromDeck !== null) {
       this.table[level].cards[index] = topCardFromDeck;
+    } else {
+      this.table[level].cards.splice(index,1)
     }
     return card;
   }

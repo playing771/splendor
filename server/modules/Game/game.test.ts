@@ -128,9 +128,9 @@ describe('Game functionality', () => {
       [EGemColor.White]: 10,
     });
     expect(game.table.nobles).toHaveLength(1);
-    expect(game.table.First.cards).toHaveLength(4);
-    expect(game.table.Second.cards).toHaveLength(4);
-    expect(game.table.Third.cards).toHaveLength(4);
+    expect(game.table[EDeckLevel.First].cards).toHaveLength(4);
+    expect(game.table[EDeckLevel.Second].cards).toHaveLength(4);
+    expect(game.table[EDeckLevel.Third].cards).toHaveLength(4);
   });
 
   it('can change game state', () => {
@@ -362,7 +362,7 @@ describe('Game functionality', () => {
     expect(
       game.getPlayer(FIRST_PLAYER.id).cardsBought[CARD_TO_TAKE.color][0].id
     ).toBe(CARD_TO_TAKE.id);
-    expect(game.table.First.cards.length === 4);
+    expect(game.table[EDeckLevel.First].cards.length === 4);
     expect(game.getPlayer(FIRST_PLAYER.id).gems).toEqual({
       [EGemColor.Black]:
         PLAYER_INITIAL_GEMS[EGemColor.Black] -

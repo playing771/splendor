@@ -100,6 +100,18 @@ describe('Table functional', () => {
     expect(tableManager.table[EDeckLevel.Second].deck.cards).toHaveLength(0);
   });
 
+  it.only('will remove card from table if no cards on deck', () => {
+    const firstLvlCardsPool = TABLE_CONFIG.decks![EDeckLevel.First].slice(0, 4);
+    const table = new GameTable({ ...TABLE_CONFIG, decks: { ...TABLE_CONFIG.decks!, [EDeckLevel.First]: firstLvlCardsPool } });
+    const tableManager = new TableManager(table);
+
+    const cardToTake = table[EDeckLevel.First].cards[0];
+    tableManager.giveCardFromTable(cardToTake.id);
+
+    expect(table[EDeckLevel.First].cards).toHaveLength(3);
+    expect(table[EDeckLevel.First].cards[0].id).toBe(firstLvlCardsPool[2].id);
+  })
+
   it('give gem from table', () => {
     const table = new GameTable(TABLE_CONFIG);
     const tableManager = new TableManager(table);
