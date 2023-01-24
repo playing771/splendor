@@ -181,7 +181,7 @@ export class Game implements IGameShape<ICardShape> {
   }
 
   public dispatch(userId: string, action: EPlayerAction, data?: any) {
-    console.log('dispatch', userId, action);
+    console.log('dispatch', userId, action, data);
 
     const playerStateMachine = this.smPlayers[userId];
 

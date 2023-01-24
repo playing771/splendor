@@ -5,13 +5,14 @@ import { EDeckLevel } from '../../../interfaces/devDeck';
 import { EGameBasicState, EPlayerAction } from '../../../interfaces/game';
 import { TPlayerGems } from '../../../interfaces/player';
 import { EUserRole, IUser } from '../../../interfaces/user';
-import { Nullable } from '../../../utils/typescript';
+import { getKeys, Nullable } from '../../../utils/typescript';
 import { random } from '../../utils/math';
 import {
   SEVERAL_GEMS_TO_TAKE_IN_STOCK_LIMIT,
   PLAYER_GEMS_MAX,
   TAKE_GEM_LIMIT,
   TAKE_GEM_LIMIT_SAME_COLOR,
+  PLAYER_CARDS_HOLDED_MAX,
 } from '../../../gameRules';
 import { PlayerResources } from '../Player/PlayerResources';
 
@@ -22,7 +23,7 @@ const canAffordToPayCost = (cost: TCardCost, gems: TPlayerGems) => {
   return canAfford;
 };
 
-const MAX_TURNS_TO_SKIP = 5;
+const ROUNDS_LIMIT = 60;
 
 export class GameBot extends PlayerResources implements IUser {
   id: string;
@@ -31,17 +32,16 @@ export class GameBot extends PlayerResources implements IUser {
 
   gameId: string;
   state: Pick<IGameStateDTO, 'availableActions' | 'isPlayerActive'> & {
-    isGameEnded: boolean
+    isGameEnded: boolean;
   };
   tableState: IGameStateDTO['table'];
-
-  // gemsRated: Record<EGemColorPickable, number>
 
   skippedTurns: number;
 
   desiredCard: Nullable<{ lvl: EDeckLevel; index: number; id: string }>;
 
   dispatch: (action: EPlayerAction, data?: unknown) => any;
+  round: number;
 
   constructor(
     name: string,
@@ -70,7 +70,7 @@ export class GameBot extends PlayerResources implements IUser {
 
     this.dispatch = (action: EPlayerAction, data?: unknown) => {
       globalThis.setTimeout(() => {
-        gameServiceDispatch(this.gameId, action, this.id, data);
+      gameServiceDispatch(this.gameId, action, this.id, data);
       });
       // gameServiceDispatch(this.gameId, action, this.id, data)
     };
@@ -78,8 +78,6 @@ export class GameBot extends PlayerResources implements IUser {
   }
 
   public updateGameState(state: IMessage<IGameStateDTO>) {
-    console.log('updateGameState, actions:', state.data?.availableActions);
-
     try {
       // console.log('GameBot updateGameState', state);
       if (!state.data) {
@@ -96,9 +94,14 @@ export class GameBot extends PlayerResources implements IUser {
       this.cardsBought = state.data.playerState!.cardsBought;
       this.cardsHolded = state.data.playerState!.cardsHolded;
       this.nobles = state.data.playerState!.nobles;
+      this.round = state.data.round;
 
       // this.myState = state.data.playerState.;
       this.tableState = state.data.table;
+
+      if (state.data.round >= ROUNDS_LIMIT) {
+        throw Error(`Bot ${this.name} lost...`);
+      }
 
       this.tryToAct();
     } catch (error) {
@@ -125,20 +128,57 @@ export class GameBot extends PlayerResources implements IUser {
     );
   }
 
-  private tryToAct() {
+  get needToReturnGems() {
+    return this.state.availableActions.includes(EPlayerAction.ReturnGems);
+  }
 
+  private tryToAct() {
     if (this.state.isGameEnded || !this.canAct) {
-      console.log('Failed to act: isGameEnded',this.state.isGameEnded);
-      
+      // console.log('Failed to act: isGameEnded',this.state.isGameEnded);
+
       return;
     }
 
+    if (this.needToReturnGems) {
+      let gemsToReturnCount = this.gemsCount - PLAYER_GEMS_MAX;
+      const gemsToReturn = {};
+      getKeys(this.gems).every((color) => {
+        if (this.gems[color] > 0) {
+          gemsToReturn[color] = 1;
+          gemsToReturnCount -= 1;
+        }
+
+        if (gemsToReturnCount === 0) {
+          return false;
+        }
+
+        return true;
+      });
+
+      this.dispatch(EPlayerAction.ReturnGems, gemsToReturn);
+      return;
+    }
+    console.log(this.round);
+
     if (
       !this.desiredCard ||
+      !this.tableState[this.desiredCard.lvl].cards[this.desiredCard.index] ||
       this.tableState[this.desiredCard.lvl].cards[this.desiredCard.index].id !==
-      this.desiredCard.id
+        this.desiredCard.id
     ) {
-      this.desiredCard = this.chooseDesiredCard(EDeckLevel.First);
+      // const isRich = false;
+      // const isSuperRich = false;
+      // const isRich = this.cardsBoughtCount > 12;
+      // const isSuperRich = this.cardsBoughtCount > 16
+      const isRich = this.cardsBoughtCount > 12;
+      const isSuperRich = true;
+      this.desiredCard = this.chooseDesiredCard(
+        isSuperRich
+          ? EDeckLevel.Third
+          : isRich
+          ? EDeckLevel.Second
+          : EDeckLevel.First
+      );
     }
 
     if (this.canOnlyEndTurn) {
@@ -146,7 +186,12 @@ export class GameBot extends PlayerResources implements IUser {
       return;
     }
 
-    const cardsAffordable = this.findAffordableCards();
+    const [affordableHoldedCards, cardsAffordable] = this.findAffordableCards();
+
+    if (affordableHoldedCards.length > 0) {
+      this.dispatch(EPlayerAction.BuyHoldedCard, affordableHoldedCards[0].id);
+      return;
+    }
 
     if (cardsAffordable.length > 0) {
       this.dispatch(EPlayerAction.BuyCard, cardsAffordable[0].id);
@@ -159,20 +204,31 @@ export class GameBot extends PlayerResources implements IUser {
 
     if (this.canTakeGems) {
       if (this.gemsCount < PLAYER_GEMS_MAX) {
-        const colorsToPick: TCardCost = this.chooseGemColorToTake();
-        // console.log('colorsToPick', colorsToPick);
+        if (this.gemsCount === PLAYER_GEMS_MAX - 1) {
+          if (this.cardsHoldedCount < PLAYER_CARDS_HOLDED_MAX) {
+            this.dispatch(EPlayerAction.HoldCardFromDeck, EDeckLevel.Second);
+            return;
+          }
+        }
+
+        let colorsToPick: TCardCost = this.chooseGemColorToTake();
+
+        if (
+          Object.values(colorsToPick).reduce(
+            (acc, value) => (acc += value),
+            0
+          ) === 0
+        ) {
+          this.desiredCard = this.chooseDesiredCard(EDeckLevel.First);
+          colorsToPick = this.chooseGemColorToTake();
+        }
 
         this.dispatch(EPlayerAction.TakeGems, colorsToPick);
         return;
       }
     }
 
-    if (this.skippedTurns >= MAX_TURNS_TO_SKIP) {
-      throw Error(`Bot ${this.name} lost...`);
-    }
-
     console.log('DO NOTHING, SKIPPING MY TURN');
-    this.skippedTurns += 1;
     this.dispatch(EPlayerAction.EndTurn);
   }
 
@@ -239,13 +295,24 @@ export class GameBot extends PlayerResources implements IUser {
         colorsPickedCount += 1;
       }
     }
+    if (this.round > 50) {
+      // debugger
+    }
+    // console.log('colorsToPick',colorsToPick);
 
     return colorsToPick;
   }
 
   private chooseDesiredCard(lvl: EDeckLevel) {
+    if (this.tableState[lvl].cards.length === 0) {
+      lvl = EDeckLevel.Second;
+    }
     const index = random(0, this.tableState[lvl].cards.length - 1);
-    const card = this.tableState.First.cards[index];
+
+    const card = this.tableState[lvl].cards[index];
+    if (!card) {
+      debugger;
+    }
 
     return { id: card.id, index, lvl };
   }
@@ -264,7 +331,15 @@ export class GameBot extends PlayerResources implements IUser {
       }
     }
 
+    const affordableHoldedCards: ICardShape[] = [];
+
+    for (const card of this.cardsHolded) {
+      if (canAffordToPayCost(card.cost, this.getAllGemsAvailable)) {
+        affordableHoldedCards.push(card);
+      }
+    }
+
     // small hack)
-    return affordableCards.reverse();
+    return [affordableHoldedCards, affordableCards.reverse()];
   }
 }
