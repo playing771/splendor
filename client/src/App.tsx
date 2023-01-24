@@ -12,8 +12,8 @@ Modal.setAppElement('#root');
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <Toaster />
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
@@ -22,8 +22,8 @@ function App() {
           <Route path="/rooms/:roomId" element={<RoomPage />} />
           <Route path="/games/:gameId" element={<GamePage />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
