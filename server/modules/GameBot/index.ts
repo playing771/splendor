@@ -15,13 +15,10 @@ import {
   PLAYER_CARDS_HOLDED_MAX,
 } from '../../../gameRules';
 import { PlayerResources } from '../Player/PlayerResources';
+import { EGemColor } from '../../../interfaces/gem';
+import { canAffordToPayCost } from '../../../utils/cost';
 
-const canAffordToPayCost = (cost: TCardCost, gems: TPlayerGems) => {
-  const canAfford = Object.keys(cost).every(
-    (color) => cost[color] <= gems[color]
-  );
-  return canAfford;
-};
+
 
 const ROUNDS_LIMIT = 60;
 
@@ -70,7 +67,7 @@ export class GameBot extends PlayerResources implements IUser {
 
     this.dispatch = (action: EPlayerAction, data?: unknown) => {
       globalThis.setTimeout(() => {
-      gameServiceDispatch(this.gameId, action, this.id, data);
+        gameServiceDispatch(this.gameId, action, this.id, data);
       });
       // gameServiceDispatch(this.gameId, action, this.id, data)
     };
@@ -164,7 +161,7 @@ export class GameBot extends PlayerResources implements IUser {
       !this.desiredCard ||
       !this.tableState[this.desiredCard.lvl].cards[this.desiredCard.index] ||
       this.tableState[this.desiredCard.lvl].cards[this.desiredCard.index].id !==
-        this.desiredCard.id
+      this.desiredCard.id
     ) {
       // const isRich = false;
       // const isSuperRich = false;
@@ -176,8 +173,8 @@ export class GameBot extends PlayerResources implements IUser {
         isSuperRich
           ? EDeckLevel.Third
           : isRich
-          ? EDeckLevel.Second
-          : EDeckLevel.First
+            ? EDeckLevel.Second
+            : EDeckLevel.First
       );
     }
 

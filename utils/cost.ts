@@ -36,3 +36,22 @@ export const getGemsDiff = (cost: TCardCost, gems: TPlayerGems): IGemsDiff => {
   }, {} as TCardCost);
   return { hasDiff, gems: gemsDiff };
 };
+
+export const canAffordToPayCost = (cost: TCardCost, gems: TPlayerGems) => {
+  let gold = gems[EGemColor.Gold];
+  const canAfford = Object.keys(cost).every(
+    (color) => {
+      const diff = gems[color] - cost[color];
+      if (diff >= 0) {
+        return true;
+      } else {
+        if (diff + gold >= 0) {
+          gold = gold + diff;
+          return true
+        }
+      }
+      return false
+    }
+  );
+  return canAfford;
+};

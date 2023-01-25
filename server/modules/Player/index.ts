@@ -93,13 +93,13 @@ export class Player extends PlayerResources implements IPlayerShape {
 
   public buyCard(card: ICardShape) {
     const { cost, color } = card;
-    const gemsToSpent = this.calculateGemsToSpend(cost);
-    Object.entries(gemsToSpent).forEach(([color, count]) => {
+    const gemsToSpend = this.calculateGemsToSpend(cost);
+    Object.entries(gemsToSpend).forEach(([color, count]) => {
       this.spendGems(color as EGemColor, count);
     });
     this.cardsBought[color].push(card);
 
-    return gemsToSpent;
+    return gemsToSpend;
   }
 
   public buyHoldedCard(card: ICardShape) {
