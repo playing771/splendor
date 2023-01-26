@@ -18,7 +18,6 @@ import { useParams } from 'react-router-dom';
 import { useErrorToast } from '../../utils/useErrorToast';
 import { MyInfo } from './MyInfo';
 import { GameResultsModal } from './GameResultsModal';
-import { useModal } from '../../components/Modal/useModal';
 
 import cn from 'classnames';
 
@@ -85,6 +84,16 @@ export const GamePage = () => {
     }
   }, [sendMessage, isOpen, instance]);
 
+  useEffect(() => {
+    if (
+      gameState &&
+      gameState.availableActions.length === 1 &&
+      gameState.availableActions[0] === EPlayerAction.EndTurn
+    ) {
+      handleDispatchAction(EPlayerAction.EndTurn)();
+    }
+  }, [gameState?.availableActions]);
+
   if (!gameState) return <h1>...loading</h1>;
 
   const {
@@ -104,7 +113,7 @@ export const GamePage = () => {
     availableActions[0] === EPlayerAction.EndTurn;
   const canTakeGems = availableActions.includes(EPlayerAction.TakeGems);
 
-  const rivals = players.filter((player) => player.id !== playerState?.id);
+  // const rivals = players.filter((player) => player.id !== playerState?.id);
 
   return (
     <div className={styles.Game}>
@@ -116,7 +125,7 @@ export const GamePage = () => {
       </div>
       <div className={styles.Game_info}>
         <div className={styles.Game_infoPlayers}>
-          <PlayersList players={rivals} activePlayerId={activePlayer} />
+          <PlayersList players={players} activePlayerId={activePlayer} />
         </div>
         <div className={styles.Game_infoTable}>
           <GameTable
@@ -164,10 +173,10 @@ export const GamePage = () => {
           disabled={!isPlayerActive}
           onClick={handleEndTurnClick}
           className={cn(styles.EndTurnButton, {
-            [styles.EndTurnButton__active]: needToEndTurn,
+            // [styles.EndTurnButton__active]: needToEndTurn,
           })}
         >
-          End turn
+          Skip turn
         </button>
       )}
 
