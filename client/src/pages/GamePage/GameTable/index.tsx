@@ -9,6 +9,7 @@ import { Nullable } from '../../../../../utils/typescript';
 
 import { NoblesList } from '../NoblesList';
 import { CardModal } from '../CardModal';
+import { EGemColor } from '../../../../../interfaces/gem';
 
 import './styles.css';
 
@@ -21,12 +22,16 @@ export const GameTable = memo(
     onBuyCard,
     onHoldCard,
     onHoldCardFromDeck,
+    cardsBought,
+    gems
   }: {
     isPlayerActive: boolean;
     table: TGameTableSafeState<ICardShape>;
     onBuyCard: (cardId: string) => void;
     onHoldCard: (cardId: string) => void;
     onHoldCardFromDeck: (deckLvl: EDeckLevel) => void;
+    cardsBought?: {[key in EGemColor]: ICardShape[]}
+    gems?: TPlayerGems
   }) => {
     const [activeCard, setActiveCard] = useState<Nullable<ICardShape>>(null);
 
@@ -68,6 +73,8 @@ export const GameTable = memo(
                 lvl={lvl}
                 onClick={handleCardClick}
                 onHoldCardFromDeck={onHoldCardFromDeck}
+                gems={gems}
+                cardsBought={cardsBought}
               />
             );
           })}

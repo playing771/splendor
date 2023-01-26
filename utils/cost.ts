@@ -1,6 +1,6 @@
-import { TCardCost } from '../interfaces/card';
-import { EGemColor } from '../interfaces/gem';
-import { TPlayerGems } from '../interfaces/player';
+import { ICardShape, TCardCost } from '../interfaces/card';
+import { EGemColor, EGemColorPickable } from '../interfaces/gem';
+import { TPlayerCardsBought, TPlayerGems } from '../interfaces/player';
 import { getKeys } from './typescript';
 
 interface IGemsDiff {
@@ -11,7 +11,9 @@ interface IGemsDiff {
 /**
  *  Gold, Red, Blue, White, Black, Green
  */
-export const createPlayerGems = (...args: number[]): TPlayerGems => {
+export const createPlayerGems = (
+  ...args: [number, number, number, number, number, number]
+): TPlayerGems => {
   return {
     [EGemColor.Gold]: args[0],
     [EGemColor.Red]: args[1],
@@ -27,10 +29,10 @@ export const getGemsDiff = (cost: TCardCost, gems: TPlayerGems): IGemsDiff => {
   const gemsDiff = getKeys(EGemColor).reduce((acc, color) => {
     if (
       typeof gems[color] !== 'undefined' ||
-      typeof cost[color] !== 'undefined'
+      typeof cost[color as EGemColorPickable] !== 'undefined'
     ) {
-      const diff = (gems[color] || 0) - (cost[color] || 0);
-      acc[color] = diff;
+      const diff = (gems[color] || 0) - (cost[color as EGemColorPickable] || 0);
+      acc[color as EGemColorPickable] = diff;
     }
     return acc;
   }, {} as TCardCost);
@@ -39,19 +41,41 @@ export const getGemsDiff = (cost: TCardCost, gems: TPlayerGems): IGemsDiff => {
 
 export const canAffordToPayCost = (cost: TCardCost, gems: TPlayerGems) => {
   let gold = gems[EGemColor.Gold];
-  const canAfford = Object.keys(cost).every(
-    (color) => {
-      const diff = gems[color] - cost[color];
-      if (diff >= 0) {
+  const canAfford = Object.keys(cost).every((color) => {
+    const diff =
+      gems[color as EGemColorPickable] -
+      (cost[color as EGemColorPickable] || 0);
+    if (diff >= 0) {
+      return true;
+    } else {
+      if (diff + gold >= 0) {
+        gold = gold + diff;
         return true;
-      } else {
-        if (diff + gold >= 0) {
-          gold = gold + diff;
-          return true
-        }
       }
-      return false
     }
-  );
+    return false;
+  });
   return canAfford;
+};
+
+export const gemsFromCardsBought = (cardsBought: TPlayerCardsBought) => {
+  return getKeys(cardsBought).reduce((acc, color) => {
+    acc[color] = cardsBought[color].length;
+    return acc;
+  }, {} as TCardCost);
+};
+
+export const getAllGemsAvailable = (
+  cardsBought?: TPlayerCardsBought,
+  gems: TPlayerGems = createPlayerGems(0, 0, 0, 0, 0, 0)
+) => {
+  const gemsFromCards = cardsBought ? gemsFromCardsBought(cardsBought) : {};
+
+  return getKeys(EGemColorPickable).reduce(
+    (acc, color) => {
+      acc[color] += gemsFromCards[color] || 0;
+      return acc;
+    },
+    { ...gems }
+  );
 };

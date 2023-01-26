@@ -125,6 +125,8 @@ export const GamePage = () => {
             onBuyCard={handleBuyCard}
             onHoldCard={handleHoldCard}
             onHoldCardFromDeck={handleHoldCardFromDeck}
+            cardsBought={playerState?.cardsBought}
+            gems={playerState?.gems}
           />
         </div>
         <div className={styles.Game_infoGems}>

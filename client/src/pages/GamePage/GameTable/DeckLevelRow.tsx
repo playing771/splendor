@@ -1,43 +1,67 @@
+import { memo } from 'react';
 import { ICardShape } from '../../../../../interfaces/card';
 import { EDeckLevel } from '../../../../../interfaces/devDeck';
-import { EGemColor } from '../../../../../interfaces/gem';
 import { Card } from '../../../components/Card';
 import { CardStack } from '../../../components/Card/CardStack';
-import { CardWithActions } from '../../../components/Card/CardWithActions';
+import {
+  canAffordToPayCost,
+  getAllGemsAvailable,
+} from '../../../../../utils/cost';
+import styles from './styles.module.scss';
+import {
+  TPlayerGems,
+  TPlayerCardsBought,
+} from '../../../../../interfaces/player';
 
 import cn from 'classnames';
 
-import styles from './styles.module.scss';
-
-export const DeckLevelRow = ({
-  cardsCountInDeck,
-  cards,
-  lvl,
-  onClick,
-  onHoldCardFromDeck,
-}: {
-  cardsCountInDeck: number;
-  cards: ICardShape[];
-  lvl: EDeckLevel;
-  onClick: (cardId: string, cardInfo: ICardShape) => void;
-  onHoldCardFromDeck: (deckLvl: EDeckLevel) => void;
-}) => {
-  return (
-    <div className="DeckLevelRow">
-      <div
-        className={`Deck Deck__${lvl}`}
-        onClick={() => onHoldCardFromDeck(lvl)}
-      >
-        {
-          <CardStack
-            count={cardsCountInDeck}
-            cardClassName={cn(styles.DeckCards, styles[`DeckCards__${lvl}`])}
-          />
-        }
+export const DeckLevelRow = memo(
+  ({
+    cardsCountInDeck,
+    cards,
+    lvl,
+    onClick,
+    onHoldCardFromDeck,
+    cardsBought,
+    gems,
+  }: {
+    cardsCountInDeck: number;
+    cards: ICardShape[];
+    lvl: EDeckLevel;
+    onClick: (cardId: string, cardInfo: ICardShape) => void;
+    onHoldCardFromDeck: (deckLvl: EDeckLevel) => void;
+    cardsBought?: TPlayerCardsBought;
+    gems?: TPlayerGems;
+  }) => {
+    return (
+      <div className="DeckLevelRow">
+        <div
+          className={`Deck Deck__${lvl}`}
+          onClick={() => onHoldCardFromDeck(lvl)}
+        >
+          {
+            <CardStack
+              count={cardsCountInDeck}
+              cardClassName={cn(styles.DeckCards, styles[`DeckCards__${lvl}`])}
+            />
+          }
+        </div>
+        {cards.map((cardData) => {
+          return (
+            <Card
+              key={cardData.id}
+              onClick={onClick}
+              isAffordable={canAffordToPayCost(
+                cardData.cost,
+                getAllGemsAvailable(cardsBought, gems)
+              )}
+              {...cardData}
+            />
+          );
+        })}
       </div>
-      {cards.map((cardData) => {
-        return <Card key={cardData.id} onClick={onClick} {...cardData} />;
-      })}
-    </div>
-  );
-};
+    );
+  }
+);
+
+DeckLevelRow.displayName = 'DeckLevelRow';

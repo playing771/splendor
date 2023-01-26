@@ -1,7 +1,8 @@
 import { ICardShape, TCardCost } from '../../../interfaces/card';
-import { EGemColor } from '../../../interfaces/gem';
+import { EGemColor, EGemColorPickable } from '../../../interfaces/gem';
 import { INobleShape } from '../../../interfaces/noble';
 import { TPlayerCardsBought, TPlayerGems } from '../../../interfaces/player';
+import { gemsFromCardsBought, getAllGemsAvailable } from '../../../utils/cost';
 import { getKeys } from '../../../utils/typescript';
 import { countTokens } from '../Game/countTokens';
 
@@ -37,11 +38,11 @@ export abstract class PlayerResources {
     this.nobles = nobles;
   }
 
-  private calculateGemsFromBoughtCards(color: EGemColor) {
+  private calculateGemsFromBoughtCards(color: EGemColorPickable) {
     return this.cardsBought[color].length;
   }
 
-  private calculateScoreFromBoughtCards(color: EGemColor) {
+  private calculateScoreFromBoughtCards(color: EGemColorPickable) {
     return this.cardsBought[color].reduce(
       (total, card) => (total += card.score),
       0
@@ -62,21 +63,9 @@ export abstract class PlayerResources {
       0
     );
   }
-
-  get gemsFromCardsBought() {
-    return getKeys(this.cardsBought).reduce((acc, color) => {
-      acc[color] = this.calculateGemsFromBoughtCards(color);
-      return acc;
-    }, {} as TCardCost);
-  }
-
+  
   get getAllGemsAvailable(){
-    const gemsFromCards = this.gemsFromCardsBought;
-    
-    return getKeys(EGemColor).reduce((acc, color)=> {
-      acc[color] += gemsFromCards[color] || 0;
-      return acc
-    }, {...this.gems})
+    return getAllGemsAvailable(this.cardsBought, this.gems);
   }
 
   get score() {

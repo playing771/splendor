@@ -47,7 +47,7 @@ export const arena = () => {
   const bot1 = gameService.addBot(room.id, user.id, 'bot_one_id');
   const bot2 = gameService.addBot(room.id, user.id, 'bot_two_id');
   const bot3 = gameService.addBot(room.id, user.id, 'bot_three_id');
-  const bot4 = gameService.addBot(room.id, user.id, "bot_four_id");
+  const bot4 = gameService.addBot(room.id, user.id, 'bot_four_id');
 
   const game = gameService.startGame(room.id, user.id, GAME_CONFIG);
 

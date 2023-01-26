@@ -10,6 +10,7 @@ import { getKeys } from '../../../utils/typescript';
 import { PLAYER_CARDS_HOLDED_MAX } from '../../../gameRules';
 import { INobleShape } from '../../../interfaces/noble';
 import { PlayerResources } from './PlayerResources';
+import { gemsFromCardsBought } from '../../../utils/cost';
 
 export class Player extends PlayerResources implements IPlayerShape {
   // gems: TPlayerGems;
@@ -54,7 +55,7 @@ export class Player extends PlayerResources implements IPlayerShape {
   }
 
   public calculateGemsToSpend(cost: TCardCost) {
-    const extraGems = this.gemsFromCardsBought;
+    const extraGems = gemsFromCardsBought(this.cardsBought);
 
     const gemsToSpend = Object.values(EGemColor).reduce((acc, color) => {
       acc[color] = 0;

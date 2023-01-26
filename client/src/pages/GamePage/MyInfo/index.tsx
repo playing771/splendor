@@ -1,13 +1,20 @@
-import { useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { EPlayerAction } from '../../../../../interfaces/game';
 import { EGemColor } from '../../../../../interfaces/gem';
-import { IPlayerShape, TPlayerGems } from '../../../../../interfaces/player';
+import {
+  IPlayerShape,
+  TPlayerCardsBought,
+  TPlayerGems,
+} from '../../../../../interfaces/player';
 import { Nullable } from '../../../../../utils/typescript';
 import { GemsModal } from '../GemsModal';
 import { Card } from '../../../components/Card';
 import { CardModal } from '../CardModal';
 import { PlayerInfo } from '../PlayerInfo';
-
+import {
+  canAffordToPayCost,
+  getAllGemsAvailable,
+} from '../../../../../utils/cost';
 
 import styles from './styles.module.scss';
 
@@ -96,15 +103,18 @@ export const MyInfo = ({
     availableActions.length === 1 &&
     availableActions[0] === EPlayerAction.ReturnGems;
 
+  const handleCardClick = useCallback((cardId: string) => {
+
+    setActiveCardId(cardId);
+  }, [])
+
   return (
     <div className={styles.MyInfo}>
       <MyHoldedCards
         cardsHolded={cardsHolded}
-        onCardClick={(cardId) => {
-          console.log('setActiveCardId', cardId);
-
-          setActiveCardId(cardId);
-        }}
+        cardsBought={cardsBought}
+        gems={gems}
+        onCardClick={handleCardClick}
       />
       <PlayerInfo
         cardsBought={cardsBought}
@@ -138,18 +148,33 @@ export const MyInfo = ({
   );
 };
 
-function MyHoldedCards({
+const MyHoldedCards = memo(({
   cardsHolded,
   onCardClick,
+  cardsBought,
+  gems,
 }: {
   cardsHolded: IPlayerShape['cardsHolded'];
   onCardClick: (cardId: string) => void;
-}) {
+  cardsBought: TPlayerCardsBought;
+  gems: TPlayerGems;
+}) => {
   return (
     <div className={styles.MyHoldedCards}>
       {cardsHolded.map((card) => {
-        return <Card {...card} onClick={onCardClick} />;
+        return (
+          <Card
+            {...card}
+            onClick={onCardClick}
+            isAffordable={canAffordToPayCost(
+              card.cost,
+              getAllGemsAvailable(cardsBought, gems)
+            )}
+          />
+        );
       })}
     </div>
   );
-}
+})
+
+MyHoldedCards.displayName = 'MyHoldedCards'

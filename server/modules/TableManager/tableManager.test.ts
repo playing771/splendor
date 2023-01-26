@@ -100,7 +100,7 @@ describe('Table functional', () => {
     expect(tableManager.table[EDeckLevel.Second].deck.cards).toHaveLength(0);
   });
 
-  it.only('will remove card from table if no cards on deck', () => {
+  it('will remove card from table if no cards on deck', () => {
     const firstLvlCardsPool = TABLE_CONFIG.decks![EDeckLevel.First].slice(0, 4);
     const table = new GameTable({ ...TABLE_CONFIG, decks: { ...TABLE_CONFIG.decks!, [EDeckLevel.First]: firstLvlCardsPool } });
     const tableManager = new TableManager(table);

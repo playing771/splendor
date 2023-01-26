@@ -12,10 +12,11 @@ export interface ICardProps extends ICardShape {
   className?: string;
   children?: ReactNode;
   onClick?: (cardId: string, cardInfo: ICardShape) => void
+  isAffordable?: boolean;
 }
 
 export const Card = memo(
-  ({ size = 'sm', className, children, onClick, ...cardInfo }: ICardProps) => {
+  ({ size = 'sm', className, children, onClick, isAffordable, ...cardInfo }: ICardProps) => {
     const { color, cost, id, score } = cardInfo;
     const costs = Object.entries(cost).filter(([_, value]) => value > 0) as [
       EGemColor,
@@ -27,11 +28,11 @@ export const Card = memo(
     }
 
     return (
-      <div key={id} className={cn(styles.Card, styles[`Card__${color}`], styles[`Card__${size}`], className)} onClick={handleCardClick}>
+      <div key={id} className={cn(styles.Card, styles[`Card__${color}`], styles[`Card__${size}`], isAffordable && styles.AffordableCard, className)} onClick={handleCardClick}>
         <div className={styles.Card_info}>
           <div className={cn(styles.Card_header)}>
             {/* <span>{score}</span> */}
-            
+
             {/* <Gem color={color} size={size} className={styles.Card_gem}/> */}
 
           </div>
