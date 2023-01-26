@@ -3,13 +3,12 @@ import { DeckLevelRow } from './DeckLevelRow';
 import { ICardShape } from '../../../../../interfaces/card';
 import { TGameTableSafeState } from '../../../../../interfaces/gameTable';
 import { memo, useCallback, useState } from 'react';
-import { TPlayerGems } from '../../../../../interfaces/player';
+import { TPlayerCardsBought, TPlayerGems } from '../../../../../interfaces/player';
 
 import { Nullable } from '../../../../../utils/typescript';
 
 import { NoblesList } from '../NoblesList';
 import { CardModal } from '../CardModal';
-import { EGemColor } from '../../../../../interfaces/gem';
 
 import './styles.css';
 
@@ -30,7 +29,7 @@ export const GameTable = memo(
     onBuyCard: (cardId: string) => void;
     onHoldCard: (cardId: string) => void;
     onHoldCardFromDeck: (deckLvl: EDeckLevel) => void;
-    cardsBought?: {[key in EGemColor]: ICardShape[]}
+    cardsBought?: TPlayerCardsBought
     gems?: TPlayerGems
   }) => {
     const [activeCard, setActiveCard] = useState<Nullable<ICardShape>>(null);
